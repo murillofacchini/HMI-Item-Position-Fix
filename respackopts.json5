@@ -3,16 +3,16 @@
     version: 9,
     capabilities: ["FileFilter", "DirFilter"],
     conf: {
-      AlexSkinModel: false,
-      Weskerson3DItems: false,
-      RVTorches: false,
-      Glowing3DArmors: false,
-      Glowing3DTotem: false,
-      BensBundle: false,
-      FreshFlowersAndPlants: false,
-      FreshFoods: false,
-      FreshPaintings: false,
-      FreshOresAndIngots: false,
-      FreshSeeds: false
+      AlexSkinModel:          false,
+      Weskerson3DItems:       false,
+      RVTorches:              false,
+      Glowing3DArmors:        false,
+      Glowing3DTotem:         false,
+      BensBundle:             false,
+      FreshFlowersAndPlants:  false,
+      FreshFoods:             false,
+      FreshPaintings:         false,
+      FreshOresAndIngots:     false,
+      FreshSeeds:             false
     }
 }

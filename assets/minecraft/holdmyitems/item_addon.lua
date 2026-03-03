@@ -86,16 +86,16 @@ local packCompatibility = {
 }
 
 local activePacks = {}
-    if ${w3di} then table.insert(activePacks, "w3di") end
-    if ${rvTorchs} then table.insert(activePacks, "rvTorchs") end
-    if ${glowing3Darmors} then table.insert(activePacks, "glowing3Darmors") end
-    if ${glowing3Dtotem} then table.insert(activePacks, "glowing3Dtotem") end
-    if ${freshFlowersPlants} then table.insert(activePacks, "freshFlowersPlants") end
-    if ${freshFoods} then table.insert(activePacks, "freshFoods") end
-    if ${freshPaintings} then table.insert(activePacks, "freshPaintings") end
-    if ${freshOresIngots} then table.insert(activePacks, "freshOresIngots") end
-    if ${freshSeeds} then table.insert(activePacks, "freshSeeds") end
-    if ${bensBundle} then table.insert(activePacks, "bensBundle") end
+    if ${w3di}                  then table.insert(activePacks, "w3di") end
+    if ${rvTorchs}              then table.insert(activePacks, "rvTorchs") end
+    if ${glowing3Darmors}       then table.insert(activePacks, "glowing3Darmors") end
+    if ${glowing3Dtotem}        then table.insert(activePacks, "glowing3Dtotem") end
+    if ${freshFlowersPlants}    then table.insert(activePacks, "freshFlowersPlants") end
+    if ${freshFoods}            then table.insert(activePacks, "freshFoods") end
+    if ${freshPaintings}        then table.insert(activePacks, "freshPaintings") end
+    if ${freshOresIngots}       then table.insert(activePacks, "freshOresIngots") end
+    if ${freshSeeds}            then table.insert(activePacks, "freshSeeds") end
+    if ${bensBundle}            then table.insert(activePacks, "bensBundle") end
 
 ------ FUNÇÕES ------
 
@@ -290,10 +290,10 @@ end
 if packActive("rvTorchs") and verifyItems(packCompatibility.rvTorchs) then
     if packActive("w3di") then
         applyAdj({
-            { items = {"^torch", "soul_torch"},   m = {-0.04, 0.085, 0.01}, r = {nil, 5, nil, true}, s = {0.65, 0.65, 0.65} },
-            { items = {"campfire"},               m = {-0.1, -0.1, -0.15}, r = {75, -15, -7}, s = {1/1.35, 1/1.35, 1/1.5} },
-            { items = {"campfire"},               m = {0.15, 0.45, -0.56}, r = {-2.5, 7.5, -36.5} },
-            { items = {"repeater", "comparator"}, m = {-0.15, 0.15, -0.1}, r = {85, -35, 7}, s = {1/1.35, 1/1.35, 1/1.35} },
+            { items = {"^torch", "soul_torch"},   m = {-0.04, 0.085, 0.01}, r = {nil, 5, nil}, s = {0.65, 0.65, 0.65} },
+            { items = {"campfire"},               m = {-0.1, -0.1, -0.15},  r = {75, -15, -7}, s = {1/1.35, 1/1.35, 1/1.5} },
+            { items = {"campfire"},               m = {0.15, 0.45, -0.56},  r = {-2.5, 7.5, -36.5} },
+            { items = {"repeater", "comparator"}, m = {-0.15, 0.15, -0.1},  r = {85, -35, 7}, s = {1/1.35, 1/1.35, 1/1.35} },
             { items = {"repeater", "comparator"}, m = {0.15, 0.095, -0.06}, r = {nil, 2, 9} },
         })
     end
@@ -310,7 +310,7 @@ if packActive("freshFlowersPlants") and verifyItems(packCompatibility.freshFlowe
     if not AlexModel then move(0.03, nil, nil, true) end
     applyAdj({
         { items = {"sapling", "mangrove_propagule", "azalea", "grass", "fern", "bush", "crimson_roots", "warped_roots", "nether_sprouts"},
-          m = {0.01, -0.015, -0.055}, r = {16, -7.5, -3} },
+          m = {0.01, -0.015, -0.075}, r = {16, -7.5, -3} },
         { items = {"_coral"},             m = {0.16, -0.035, -0.035}, r = {nil, -4.5, -1.5} },
         { items = {"mushroom", "fungus"}, m = {0.025, nil, nil}, r = {nil, -5, -2} },
         { items = {"seagrass"},           m = {0.24, -0.105, -0.195}, r = {3, -2.5, -5} },
@@ -543,7 +543,7 @@ if itemName:match("_button") then move(skinModel(0.215, 0.245), 0.035, 0.07) rot
 if itemName:match("_fence_gate") then move(skinModel(-0.02, 0), -0.1, -0.03) end
 -- Barras
 if itemName:match("_bars") then move(skinModel(-0.02, 0.01), nil, 0.04) end
-if itemName == "iron_bars" then move(nil, nil, -0.05) end
+if itemName == "iron_bars" then move(0.07, 0.05, -0.06) rotate(nil, nil, -0.5) end
 -- Correntes
 if itemName:match("_chain") then move(skinModel(0.08, 0.1), 0.026, nil) rotate(0.4, nil, -14.7) end
 if itemName:match("^waxed") and itemName:match("_copper_chain") then move(skinModel(-0.03, -0.02), nil, 0.049) end
@@ -686,7 +686,10 @@ if itemName == "string" then move(l == 1 and 0 or skinModel(0.09, 0.07), nil, -0
 if verifyItems({"_boat", "_raft"}) then move(0.1, 0.08, -0.05) end
 -- Picaretas, Machados, Pas e Enxadas
 if verifyItems({"pickaxe", "shovel", "hoe", "axe"}) then move(skinModel(0.02, 0.04), nil, -0.05) end
-if itemName:match("shovel") then move(-0.05, -0.105, skinModel(0.072, 0.08)) rotate(nil, 5, nil) end
+if itemName:match("pickaxe") then move(skinModel(0, -0.01), nil, 0.005) rotate(nil, nil, -0.5) end
+if itemName:match("shovel") then move(-0.07, -0.2, skinModel(0.07, 0.095)) rotate(5.5, 3.5, -5.5) end
+if itemName:match("hoe") then move(skinModel(0, 0.02), -0.185, 0.005) rotate(nil, -6, nil) end
+if itemName:match("axe") then move(skinModel(0, 0.02), -0.105, nil) rotate(nil, -6, nil) end
 -- Trouxas
 if itemName:match("bundle") then move(l == 1 and skinModel(0.01, -0.01) or (skinModel(0.04, 0.02)), nil, -0.02) end
 -- Baldes
@@ -738,6 +741,8 @@ if itemName == "saddle" or itemName == "goat_horn" or itemName:match("_harness")
 
 -- Espadas e Maca
 if itemName:match("_sword") or itemName == "mace" then move(skinModel(0.03, 0.04), nil, -0.02) end
+if itemName:match("_sword") then rotate(nil, -6.5, nil) scale(1, 0.9, 1) end
+if itemName == "mace" then move(0, -0.04, -0.04) rotate(nil, -5.5, nil) scale(0.9, 0.9, 0.9) end
 -- Lanças
 if itemName:match("_spear") then move(0.01, nil, 0.02) end
 -- Tridente
@@ -770,7 +775,7 @@ if not isItemUsing then
     -- Geral
     if verifyList(itemLists.foods, {""}) then move(skinModel(0.06, 0.09), 0.05, -0.07) rotate(nil, 5, -8) end
     -- Bifes e Costeletas de Porco
-    if itemName:match("beef") or itemName:match("porckchop") then move(0.03, nil, nil) end
+    if itemName:match("beef") or itemName:match("porkchop") then move(0.03, nil, nil) end
     if itemName:match("beef") then move(l == 1 and 0 or -0.08, nil, nil) end
     -- Cenouras
     if itemName:match("carrot") then move(nil, -0.04, nil) end
