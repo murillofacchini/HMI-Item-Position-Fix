@@ -1,26 +1,21 @@
 -- by omnis._.
 
-local l = context.bl and 1 or -1
+-- ===== CONTEXTS =====
 local item = context.item
 local matrices = context.matrices
+local player = context.player
 local itemName = I:getName(item):gsub("minecraft:", "")
 local AlexModel = ${AlexSkinModel}
-local isItemUsing = false
+local l = context.bl and 1 or -1
 
-if P:isUsingItem(context.player) then
-    if (
-        I:getUseAction(item) == "drink" or
-        I:getUseAction(item) == "eat" or
-        I:getUseAction(item) == "trident" 
-    ) then 
-        isItemUsing = true 
-    else 
-        isItemUsing = false 
-    end
+-- ===== ITEM STATE =====
+local isItemUsing = false
+if P:isUsingItem(player) then
+    local useAction = I:getUseAction(item)
+    isItemUsing = useAction == "drink" or useAction == "eat" or useAction == "trident"
 end
 
------- COMPATIBILIDADE ------
-
+-- ===== PACK COMPATIBILITY =====
 local packCompatibility = {
     rvTorchs = {"torch", "^lantern$", "soul_lantern", "copper_lantern", "campfire", "candle", "repeater", "comparator"},
     freshPaintings = {"painting"},
@@ -28,30 +23,31 @@ local packCompatibility = {
     bensBundle = {"bundle"},
     glowing3Dtotem = {"totem_of_undying"},
     w3di = {
-        -- Blocos Funcionais
+        -- Functional Blocks
         "torch", "^lantern$", "soul_lantern", "copper_lantern", "campfire", "end_crystal", "flower_pot", "armor_stand", "_sign", "ender_eye",
-        -- Blocos de Redstone
+        -- Redstone Blocks
         "redstone$", "repeater", "comparator", "lever",
-        -- Ferramentas
+        -- Tools
         "bucket", "fishing_rod", "flint_and_steel", "fire_charge", "bone_meal", "shears", "name_tag",
         "lead", "bundle", "compass", "clock", "map", "book", "wind_charge", "ender_pearl", "elytra",
         "firework_rocket", "carrot_on_a_stick", "warped_fungus_on_a_stick", "goat_horn", "music_disc",
         "_boat", "_raft",
-        -- Combate
+        -- Combat
         "mace", "nautilus_armor", "totem_of_undying", "snowball", "^egg$", "brown_egg", "blue_egg",
-        -- Alimentos e Poções
-        "apple", "chorus_fruit", "melon_slice", "carrot", "potato", "beetroot",
-        "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "chicken", "mutton", "rabbit", 
-        "cod", "salmon", "tropical_fish", "pufferfish", "_stew", "rotten_flesh", "spider_eye", 
-        "dried_kelp", "sweet_berries", "glow_berries", "potion",
-        -- Ingredientes
+        -- Foods & Potions
+        "apple", "chorus_fruit", "melon_slice", "carrot", "potato", "^beetroot$",
+        "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$", 
+        "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken", 
+        "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$", 
+        "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "potion",
+        -- Ingredients
         "coal$", "raw", "^emerald$", "^lapis_lazuli$", "diamond$", "quartz$", "amethyst_shard",
         "nugget", "ingot", "netherite_scrap", "stick$", "flint$", "bone$", "feather", 
         "honeycomb", "scute", "slime_ball", "clay_ball", "prismarine_crystals",
         "nautilus_shell", "heart_of_the_sea", "blaze_rod", "breeze_rod", "shulker_shell",
         "disc_fragment_5", "bowl", "^brick$", "bottle", "glowstone_duster", "gunpowder",
         "dragon_breath", "blaze_powder", "sugar$", "_banner_pattern",
-        -- Ovos Geradores
+        -- Spawn Eggs
         "spawn_egg"
     },
     freshFlowersPlants = {
@@ -61,13 +57,14 @@ local packCompatibility = {
         "cacutus_flower", "eyeblossom", "wither_rose", "pink_petals", "wildflowers", "leaf_litter",
         "spore_blossom", "bamboo", "sugar_cane", "roots", "nether_sprouts",
         "vine", "sunflower", "lilac", "peony", "pitcher_plant", "_dripleaf", "rose_bush",
-        "glow_lichen", "lily_pad", "seagrass", "sea_pickle", "kelp", "_coral$", "_coral_fan", "sculk_vein", "cactus_flower"
+        "glow_lichen", "lily_pad", "seagrass", "sea_pickle", "^kelp$", "_coral$", "_coral_fan", "sculk_vein", "cactus_flower"
     },
     freshFoods = {
-        "apple", "chorus_fruit", "melon_slice", "carrot$", "^potato$", "baked_potato", "poisonous_potato", "^beetroot$",
-        "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "cooked_chicken", "mutton", "^rabbit$", "cooked_rabbit", 
-        "^cod$", "cooked_cod", "^salmon$", "cooked_salmon", "^tropical_fish$", "^pufferfish$", "_stew", "_soup", "rotten_flesh", "^spider_eye$", 
-        "dried_kelp", "sweet_berries", "glow_berries", "cake", "bowl"
+        "apple", "chorus_fruit", "melon_slice", "carrot", "potato", "^beetroot$",
+        "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$", 
+        "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken", 
+        "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$", 
+        "^dried_kelp$", "^honeycomb$", "_berries", "bowl"
     },
     freshOresIngots = {
         "redstone$", "coal$", "raw", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$",
@@ -97,48 +94,39 @@ local activePacks = {}
     if ${freshSeeds}            then table.insert(activePacks, "freshSeeds") end
     if ${bensBundle}            then table.insert(activePacks, "bensBundle") end
 
------- FUNÇÕES ------
-
-local function compat(itemID)
-    for _, pack in ipairs(activePacks) do
-        if packCompatibility[pack] then
-            for _, item in ipairs(packCompatibility[pack]) do
-                if itemID:match(item) then return true end
-            end
-        end
+-- ===== UTILITY FUNCTIONS =====
+local function packActive(pack)
+    for _, p in ipairs(activePacks) do
+        if p == pack then return true end
     end
     return false
 end
 
-local function verifyList(list, sufixes)
-    for _, material in ipairs(list) do
-        for _, sufix in ipairs(sufixes) do
-            if I:isOf(item, Items:get("minecraft:" .. material .. sufix)) then
-                return true
-            end
-        end
-    end
-    return false
-end
-
-local function verifyItems(sufixes)
-    for _, sufix in ipairs(sufixes) do
-        if itemName:match(sufix) then
-            return true
-        end
+local function itemMatches(patterns)
+    for _, pattern in ipairs(patterns) do
+        if itemName:match(pattern) then return true end
     end
     return false
 end
 
 local function isInList(list)
-    for _, itemId in ipairs(list) do
-        if itemName == itemId then return true end
+    for _, id in ipairs(list) do
+        if itemName == id then return true end
+    end
+    return false
+end
+
+local function isItemCompat(itemID)
+    for _, pack in ipairs(activePacks) do
+        for _, i in ipairs(packCompatibility[pack] or {}) do
+            if itemID:match(i) then return true end
+        end
     end
     return false
 end
 
 local function move(x, y, z, force)
-    if not compat(itemName) or force then
+    if not isItemCompat(itemName) or force then
         if x then M:moveX(matrices, x * l) end
         if y then M:moveY(matrices, y) end
         if z then M:moveZ(matrices, z) end
@@ -146,7 +134,7 @@ local function move(x, y, z, force)
 end
 
 local function rotate(rx, ry, rz, force)
-    if not compat(itemName) or force then
+    if not isItemCompat(itemName) or force then
         if rx then M:rotateX(matrices, rx) end
         if ry then M:rotateY(matrices, ry * l) end
         if rz then M:rotateZ(matrices, rz * l) end
@@ -154,331 +142,339 @@ local function rotate(rx, ry, rz, force)
 end
 
 local function scale(sx, sy, sz, force)
-    if not compat(itemName) or force then
-        if sx or sy or sz then M:scale(matrices, sx, sy, sz) end
+    if not isItemCompat(itemName) or force then
+        M:scale(matrices, sx or 1, sy or 1, sz or 1)
+    end
+end
+
+local function pose(transforms, force)
+    for _, tab in ipairs(transforms) do
+        for _, i in ipairs(tab[1]) do
+            if itemName:match(i) then
+                if tab.m then move(tab.m[1], tab.m[2], tab.m[3], force) end
+                if tab.r then rotate(tab.r[1], tab.r[2], tab.r[3], force) end
+                if tab.s then scale(tab.s[1], tab.s[2], tab.s[3], force) end
+            end
+        end
     end
 end
 
 local function skinModel(posAlex, posSteve)
-    if AlexModel then return posAlex else return posSteve end
+    return AlexModel and posAlex or posSteve
 end
 
------- AJUSTES DE PACOTES ------
-
-local function packActive(respack)
-    for _, pack in ipairs(activePacks) do
-        if pack == respack then return true end
-    end
-    return false
+local function hand(posMainHand, posOffHand)
+    return l == 1 and posMainHand or posOffHand
 end
 
-local function applyAdj(adjustments)
-    for _, a in ipairs(adjustments) do
-        if verifyItems(a.items) then
-            if a.m then move(a.m[1], a.m[2], a.m[3], true) end
-            if a.r then rotate(a.r[1], a.r[2], a.r[3], true) end
-            if a.s then scale(a.s[1], a.s[2], a.s[3], true) end
-        end
-    end
-end
+-- ===== PACK ADJUSTMENTS =====
 
 -- Glowing 3D Totem
 if packActive("glowing3Dtotem") and itemName == "totem_of_undying" then
-    if packActive("w3di") then move(-0.05, 0.01, -0.075, true) rotate(-1, -55, 9.5, true) scale(1/1.2, 1/1.2, 1/1.2, true) end
-    move(skinModel(0.01, 0.03), 0.095, -0.13, true) rotate(13, 64, -21.5, true) scale(0.8, 0.8, 0.8, true)
+    if packActive("w3di") then
+        move(-0.05, 0.01, -0.075, true)
+        rotate(-1, -55, 9.5, true)
+        scale(1/1.2, 1/1.2, 1/1.2, true)
+    end
+    move(skinModel(0.01, 0.03), 0.095, -0.13, true)
+    rotate(13, 64, -21.5, true)
+    scale(0.8, 0.8, 0.8, true)
 end
 
 -- Fresh Foods
-if packActive("freshFoods") and verifyItems(packCompatibility.freshFoods) then
+if packActive("freshFoods") and itemMatches(packCompatibility.freshFoods) then
     if packActive("w3di") then
         if not AlexModel then
-            applyAdj({
-                { items = {"beef", "porkchop", "mutton"},          m = {0.005, nil, nil} },
-                { items = {"apple", "chorus_fruit", "pufferfish"}, m = {0.015, nil, nil} },
-                { items = {"potato"},                              m = {nil, -0.015, nil} },
-                { items = {"chicken"},                             m = {0.005, -0.055, -0.02}, r = {nil, -1.5, nil} },
-                { items = {"salmon"},                              m = {nil, nil, 0.02} },
-                { items = {"tropical_fish"},                       m = {-0.015, nil, 0.035}, r = {-10, 3.5, 1.5} },
-            })
-            if not verifyItems({
+            pose({
+                { {"beef", "porkchop", "mutton"}, m = {0.005, nil, nil} },
+                { {"apple", "chorus_fruit", "pufferfish"}, m = {0.015, nil, nil} },
+                { {"potato"}, m = {nil, -0.015, nil} },
+                { {"^chicken$", "cooked_chicken"}, m = {0.005, -0.055, -0.02}, r = {nil, -1.5, nil} },
+                { {"salmon"}, m = {nil, nil, 0.02} },
+                { {"tropical_fish"}, m = {-0.015, nil, 0.035}, r = {-10, 3.5, 1.5} },
+            }, true)
+            if not itemMatches({
                 "carrot", "spider_eye", "melon_slice", "sweet_berries", "glow_berries", "potato", "beetroot", "dried_kelp",
                 "beef", "porkchop", "mutton", "rabbit", "pufferfish", "bread", "cookie", "cake", "soup", "stew", "bowl"
-            }) then move(0.03, nil, nil, true) end
+            }) then 
+                move(0.03, nil, nil, true) 
+            end
         end
 
-        applyAdj({
-            -- Escala geral
-            { items = {"apple", "sweet_berries", "chorus_fruit", "pufferfish", "carrot"}, s = {1/1.05, 1/1.05, 1/1.05} },
-            { items = {"sweet_berries", "spider_eye", "glow_berries"}, s = {1/1.1, 1/1.1, 1/1.1} },
-            -- Rotação geral
-            { items = {"spider_eye", "apple", "sweet_berries", "chorus_fruit", "pufferfish", "pumpkin_pie",
-                       "potato", "beef", "porkchop", "chicken", "mutton", "rotten_flesh", "bread", "cookie",
-                       "cod", "salmon", "tropical_fish", "glow_berries", "melon", "kelp"}, r = {nil, nil, 5} },
-            -- Grupos
-            { items = {"apple", "chorus_fruit", "pufferfish"},        m = {-0.05, -0.01, 0.05}, r = {1.5, -2, -1} },
-            { items = {"beef", "porkchop", "mutton", "rotten_flesh"}, m = {-0.05, nil, 0.01}, s = {1/1.2, 1/1.4, 1/1.2} },
-            { items = {"chicken", "^rabbit$"},                        m = {-0.045, nil, 0.1}, r = {nil, 4, nil}, s = {1/1.15, 1/1.15, 1/1.15} },
-            { items = {"cod", "salmon", "tropical_fish"},             m = {-0.06, 0.01, -0.01}, r = {6, -3.5, nil}, s = {1/1.3, 1/1.4, 1/1.3} },
-            { items = {"cod", "salmon", "tropical_fish"},             r = {4, 0.5, -2.5} },
-            { items = {"_soup", "_stew", "bowl"},                     m = {nil, -0.13, -0.2}, r = {-115, -180, 180}, s = {1/1.2, 1/1.2, 1/1.2} },
-            { items = {"_soup", "_stew", "bowl"},                     r = {3.5, -9, nil} },
-            { items = {"_soup", "_stew", "bowl"},                     m = {-0.06, 0.2, -0.3} },
-            -- Individuais
-            { items = {"_soup"},         m = {0.08, nil, nil}, r = {nil, 3.5, -8.5} },
-            { items = {"chorus_fruit"},  m = {-0.015, nil, nil}, r = {-4, nil, nil} },
-            { items = {"pufferfish"},    r = {nil, -16, nil} },
-            { items = {"melon_slice"},   m = {0.025, nil, nil} },
-            { items = {"^cod$"},         m = {nil, nil, 0.055} },
-            { items = {"spider_eye"},    m = {-0.05, nil, 0.04} },
-            { items = {"potato"},        m = {-0.07, nil, 0.02}, r = {-4, -2, nil} },
-            { items = {"carrot"},        m = {-0.07, nil, -0.03}, r = {-4, -4, 8} },
-            { items = {"melon_slice"},   m = {-0.07, nil, nil}, s = {1/1.2, 1/1.2, 1/1.2} },
-            { items = {"chicken"},       m = {nil, nil, -0.06} },
-            { items = {"^rabbit$"},      m = {0.045, -0.055, -0.045}, r = {nil, -2.5, 6} },
-            { items = {"cooked_rabbit"}, m = {-0.06, nil, 0.07}, r = {nil, nil, 5.5} },
-            { items = {"pumpkin_pie"},   m = {-0.07, nil, nil}, s = {1/1.15, 1/1.15, 1/1.15} },
-            { items = {"bread"},         m = {-0.05, nil, 0.1}, s = {1/1.15, 1/1.25, 1/1.15} },
-            { items = {"cookie"},        m = {-0.04, nil, -0.015}, r = {-1, -2.5, -0.5}, s = {1/1.15, 1/1.25, 1/1.15} },
-            { items = {"golden_carrot"}, m = {nil, nil, -0.01} },
-            { items = {"beetroot"},      m = {-0.07, nil, 0.02}, r = {nil, -4, 8}, s = {1/1.04, 1/1.04, 1/1.04} },
-            { items = {"glow_berries"},  m = {-0.07, -0.025, -0.055} },
-            { items = {"sweet_berries"}, m = {0.015, 0.03, -0.025}, r = {nil, 4, -2} },
-            { items = {"dried_kelp"},    m = {-0.07, nil, 0.02}, s = {1/1.05, 1/1.05, 1/1.05} },
-            { items = {"tropical_fish"}, m = {0.02, nil, 0.05}, r = {-3.5, nil, 1.5} },
-            { items = {"cake"},          m = {-0.1, -0.1, -0.15}, r = {75, -7, -15}, s = {1/1.35, 1/1.35, 1/1.5} },
-            { items = {"cake"},          m = {0.14, 0.28, 0.115}, r = {3, -6, 23} },
-            { items = {"cake"},          m = {-0.2, -0.1, -0.4} },
-        })
+        pose({
+            { {
+                "spider_eye", "apple", "sweet_berries", "chorus_fruit", "pufferfish", "pumpkin_pie",
+                "potato", "beef", "porkchop", "^chicken$", "mutton", "rotten_flesh", "bread", "cookie",
+                "cod", "salmon", "tropical_fish", "glow_berries", "melon", "^kelp$", "cooked_chicken"
+            }, r = {nil, nil, 5} },
+
+            { {"apple", "sweet_berries", "chorus_fruit", "pufferfish", "carrot"}, s = {1/1.05, 1/1.05, 1/1.05} },
+            { {"sweet_berries", "spider_eye", "glow_berries"}, s = {1/1.1, 1/1.1, 1/1.1} },
+            { {"apple", "chorus_fruit", "pufferfish"}, m = {-0.05, -0.01, 0.05}, r = {1.5, -2, -1} },
+            { {"beef", "porkchop", "mutton", "rotten_flesh"}, m = {-0.05, nil, 0.01}, s = {1/1.2, 1/1.4, 1/1.2} },
+            { {"^chicken$", "^rabbit$", "cooked_chicken"}, m = {-0.045, nil, 0.1}, r = {nil, 4, nil}, s = {1/1.15, 1/1.15, 1/1.15} },
+            { {"cod", "salmon", "tropical_fish"}, m = {-0.06, 0.01, -0.01}, r = {6, -3.5, nil}, s = {1/1.3, 1/1.4, 1/1.3} },
+            { {"cod", "salmon", "tropical_fish"}, r = {4, 0.5, -2.5} },
+            { {"_soup", "_stew", "bowl"}, m = {nil, -0.13, -0.2}, r = {-115, -180, 180}, s = {1/1.2, 1/1.2, 1/1.2} },
+            { {"_soup", "_stew", "bowl"}, r = {3.5, -9, nil} },
+            { {"_soup", "_stew", "bowl"}, m = {-0.06, 0.2, -0.3} },
+            { {"_soup"}, m = {0.08, nil, nil}, r = {nil, 3.5, -8.5} },
+            { {"chorus_fruit"}, m = {-0.015, nil, nil}, r = {-4, nil, nil} },
+            { {"pufferfish"}, r = {nil, -16, nil} },
+            { {"melon_slice"}, m = {0.025, nil, nil} },
+            { {"^cod$"}, m = {nil, nil, 0.055} },
+            { {"spider_eye"}, m = {-0.05, nil, 0.04} },
+            { {"potato"}, m = {-0.07, nil, 0.02}, r = {-4, -2, nil} },
+            { {"carrot"}, m = {-0.07, nil, -0.03}, r = {-4, -4, 8} },
+            { {"melon_slice"}, m = {-0.07, nil, nil}, s = {1/1.2, 1/1.2, 1/1.2} },
+            { {"^chicken$", "cooked_chicken"}, m = {nil, nil, -0.06} },
+            { {"^rabbit$"}, m = {0.045, -0.055, -0.045}, r = {nil, -2.5, 6} },
+            { {"cooked_rabbit"}, m = {-0.06, nil, 0.07}, r = {nil, nil, 5.5} },
+            { {"pumpkin_pie"}, m = {-0.07, nil, nil}, s = {1/1.15, 1/1.15, 1/1.15} },
+            { {"bread"}, m = {-0.05, nil, 0.1}, s = {1/1.15, 1/1.25, 1/1.15} },
+            { {"cookie"}, m = {-0.04, nil, -0.015}, r = {-1, -2.5, -0.5}, s = {1/1.15, 1/1.25, 1/1.15} },
+            { {"golden_carrot"}, m = {nil, nil, -0.01} },
+            { {"beetroot"}, m = {-0.07, nil, 0.02}, r = {nil, -4, 8}, s = {1/1.04, 1/1.04, 1/1.04} },
+            { {"glow_berries"}, m = {-0.07, -0.025, -0.055} },
+            { {"sweet_berries"}, m = {0.015, 0.03, -0.025}, r = {nil, 4, -2} },
+            { {"dried_kelp"}, m = {-0.07, nil, 0.02}, s = {1/1.05, 1/1.05, 1/1.05} },
+            { {"tropical_fish"}, m = {0.02, nil, 0.05}, r = {-3.5, nil, 1.5} },
+            { {"cake"}, m = {-0.1, -0.1, -0.15}, r = {75, -7, -15}, s = {1/1.35, 1/1.35, 1/1.5} },
+            { {"cake"}, m = {0.14, 0.28, 0.115}, r = {3, -6, 23} },
+            { {"cake"}, m = {-0.2, -0.1, -0.4} },
+        }, true)
     end
 
     if not isItemUsing then
-        if not AlexModel and not verifyItems({"carrot", "spider_eye"}) then move(0.03, nil, nil, true) end
-        applyAdj({
-            { items = {"apple"},                                 m = {skinModel(0.11, 0.095), 0.02, -0.035}, r = {10.5, 9.5, -7} },
-            { items = {"melon_slice"},                           m = {0.105, -0.06, -0.095}, r = {nil, 10.5, -8.5} },
-            { items = {"sweet_berries"},                         m = {0.02, nil, -0.025}, r = {nil, nil, -10} },
-            { items = {"glow_berries"},                          m = {0.03, -0.03, -0.075}, r = {10, nil, -18} },
-            { items = {"chorus_fruit"},                          m = {skinModel(0.125, 0.11), -0.04, -0.08}, r = {11, 4, -8} },
-            { items = {"carrot"},                                m = {nil, nil, -0.01}, r = {10.5, 4, -4.5} },
-            { items = {"golden_carrot"},                         m = {nil, -0.02, -0.03}, r = {-4, nil, 1} },
-            { items = {"potato"},                                m = {0.05, 0.03, -0.105}, r = {9, 6, -8.5}, s = {1.2, 1.2, 1.2} },
-            { items = {"poisonous_potato", "baked_potato"},      m = {-0.005, -0.016, nil}, r = {-3, nil, nil} },
-            { items = {"beetroot"},                              m = {0.025, -0.085, -0.195}, r = {9, 3.5, -8.5} },
-            { items = {"dried_kelp"},                            m = {0.08, -0.025, -0.105}, r = {11, 17, -10.5} },
-            { items = {"beef", "porkchop", "chicken", "mutton"}, m = {0.09, 0.012, -0.075}, r = {6, 2.5, -9}, s = {1.1, 1.1, 1.1} },
-            { items = {"mutton"},                                m = {-0.025, nil, nil} },
-            { items = {"chicken"},                               m = {0.005, -0.02, nil}, r = {nil, -0.5, nil}, s = {1/1.1, 1/1.1, 1/1.1} },
-            { items = {"chicken"},                               m = {-0.01, nil, nil}, r = {nil, 3, nil} },
-            { items = {"cooked_rabbit"},                         m = {0.005, nil, -0.06}, r = {nil, 3, -10} },
-            { items = {"cod", "salmon", "tropical_fish"},        m = {0.115, -0.06, -0.125}, r = {1, 5, -7} },
-            { items = {"salmon"},                                m = {-0.09, nil, skinModel(0, -0.03)} },
-            { items = {"pufferfish"},                            m = {0.145, -0.03, -0.075}, r = {11, nil, nil} },
-            { items = {"bread"},                                 m = {skinModel(0.105, 0.11), -0.05, -0.09}, r = {8.5, 7.5, -8} },
-            { items = {"cookie"},                                m = {0.105, 0.005, -0.08}, r = {10.5, 9.5, -9} },
-            { items = {"cake"},                                  m = {0.115, -0.02, -0.015}, r = {-1, -6, nil} },
-            { items = {"pumpkin_pie"},                           m = {0.095, 0.04, -0.15}, r = {14.5, 11.5, -3.5} },
-            { items = {"rotten_flesh"},                          m = {0.05, -0.11, -0.22} },
-            { items = {"spider_eye"},                            m = {-0.01, -0.14, -0.18}, r = {2, 10.5, 26.5} },
-            { items = {"_stew", "_soup", "bowl"},                m = {0.105, -0.035, -0.045}, r = {7.5, 3.5, -7} },
-        })
-        if itemName == "rabbit" then move(0.09, 0.012, -0.075, true) rotate(6, 2.5, -9, true) scale(1.1, 1.1, 1.1, true) end
-        if itemName == "rabbit" then move(0.005, -0.02, nil, true) rotate(nil, -0.5, nil, true) scale(1/1.1, 1/1.1, 1/1.1, true) end
+        if not AlexModel and not itemMatches({"carrot", "spider_eye"}) then move(0.03, nil, nil, true) end
+        pose({
+            { {"apple"}, m = {skinModel(0.11, 0.095), 0.02, -0.035}, r = {10.5, 9.5, -7} },
+            { {"melon_slice"}, m = {0.105, -0.06, -0.095}, r = {nil, 10.5, -8.5} },
+            { {"sweet_berries"}, m = {0.02, nil, -0.025}, r = {nil, nil, -10} },
+            { {"glow_berries"}, m = {0.03, -0.03, -0.075}, r = {10, nil, -18} },
+            { {"chorus_fruit"}, m = {skinModel(0.125, 0.11), -0.04, -0.08}, r = {11, 4, -8} },
+            { {"carrot"}, m = {nil, nil, -0.01}, r = {10.5, 4, -4.5} },
+            { {"golden_carrot"}, m = {nil, -0.02, -0.03}, r = {-4, nil, 1} },
+            { {"potato"}, m = {0.05, 0.03, -0.105}, r = {9, 6, -8.5}, s = {1.2, 1.2, 1.2} },
+            { {"poisonous_potato", "baked_potato"}, m = {-0.005, -0.016, nil}, r = {-3, nil, nil} },
+            { {"beetroot"}, m = {0.025, -0.085, -0.195}, r = {9, 3.5, -8.5} },
+            { {"dried_kelp"}, m = {0.08, -0.025, -0.105}, r = {11, 17, -10.5} },
+            { {"beef", "porkchop", "^chicken$", "cooked_chicken", "mutton"}, m = {0.09, 0.012, -0.075}, r = {6, 2.5, -9}, s = {1.1, 1.1, 1.1} },
+            { {"mutton"}, m = {-0.025, nil, nil} },
+            { {"^chicken$", "cooked_chicken"}, m = {0.005, -0.02, nil}, r = {nil, -0.5, nil}, s = {1/1.1, 1/1.1, 1/1.1} },
+            { {"^chicken$", "cooked_chicken"}, m = {-0.01, nil, nil}, r = {nil, 3, nil} },
+            { {"cooked_rabbit"}, m = {0.005, nil, -0.06}, r = {nil, 3, -10} },
+            { {"cod", "salmon", "tropical_fish"}, m = {0.115, -0.06, -0.125}, r = {1, 5, -7} },
+            { {"salmon"}, m = {-0.09, nil, skinModel(0, -0.03)} },
+            { {"pufferfish"}, m = {0.145, -0.03, -0.075}, r = {11, nil, nil} },
+            { {"bread"}, m = {skinModel(0.105, 0.11), -0.05, -0.09}, r = {8.5, 7.5, -8} },
+            { {"cookie"}, m = {0.105, 0.005, -0.08}, r = {10.5, 9.5, -9} },
+            { {"cake"}, m = {0.115, -0.02, -0.015}, r = {-1, -6, nil} },
+            { {"pumpkin_pie"}, m = {0.095, 0.04, -0.15}, r = {14.5, 11.5, -3.5} },
+            { {"rotten_flesh"}, m = {0.05, -0.11, -0.22} },
+            { {"spider_eye"}, m = {-0.01, -0.14, -0.18}, r = {2, 10.5, 26.5} },
+            { {"_stew", "_soup", "bowl"}, m = {0.105, -0.035, -0.045}, r = {7.5, 3.5, -7} },
+            { {"^rabbit$"}, m = {0.09, 0.012, -0.075}, r = {6, 2.5, -9}, s = {1.1, 1.1, 1.1} },
+            { {"^rabbit$"}, m = {0.005, -0.02, nil}, r = {nil, -0.5, nil}, s = {1/1.1, 1/1.1, 1/1.1} },
+        }, true)
     end
 end
 
 -- R&V Torchs
-if packActive("rvTorchs") and verifyItems(packCompatibility.rvTorchs) then
+if packActive("rvTorchs") and itemMatches(packCompatibility.rvTorchs) then
     if packActive("w3di") then
-        applyAdj({
-            { items = {"^torch", "soul_torch"},   m = {-0.04, 0.085, 0.01}, r = {nil, 5, nil}, s = {0.65, 0.65, 0.65} },
-            { items = {"campfire"},               m = {-0.1, -0.1, -0.15},  r = {75, -15, -7}, s = {1/1.35, 1/1.35, 1/1.5} },
-            { items = {"campfire"},               m = {0.15, 0.45, -0.56},  r = {-2.5, 7.5, -36.5} },
-            { items = {"repeater", "comparator"}, m = {-0.15, 0.15, -0.1},  r = {85, -35, 7}, s = {1/1.35, 1/1.35, 1/1.35} },
-            { items = {"repeater", "comparator"}, m = {0.15, 0.095, -0.06}, r = {nil, 2, 9} },
-        })
+        pose({
+            { {"^torch", "soul_torch"}, m = {-0.04, 0.085, 0.01}, r = {nil, 5, nil}, s = {0.65, 0.65, 0.65} },
+            { {"campfire"}, m = {-0.1, -0.1, -0.15}, r = {75, -15, -7}, s = {1/1.35, 1/1.35, 1/1.5} },
+            { {"campfire"}, m = {0.15, 0.45, -0.56}, r = {-2.5, 7.5, -36.5} },
+            { {"repeater", "comparator"}, m = {-0.15, 0.15, -0.1}, r = {85, -35, 7}, s = {1/1.35, 1/1.35, 1/1.35} },
+            { {"repeater", "comparator"}, m = {0.15, 0.095, -0.06}, r = {nil, 2, 9} },
+        }, true)
     end
     move(skinModel(0.01, 0.04), nil, nil, true) rotate(nil, -5.5, nil, true)
 end
 
 -- Fresh Seeds
-if packActive("freshSeeds") and verifyItems(packCompatibility.freshSeeds) then
+if packActive("freshSeeds") and itemMatches(packCompatibility.freshSeeds) then
     move(skinModel(0.035, 0.065), 0.045, 0.025, true) rotate(8, 1.5, 1, true)
 end
 
 -- Fresh Flowers and Plants
-if packActive("freshFlowersPlants") and verifyItems(packCompatibility.freshFlowersPlants) then
+if packActive("freshFlowersPlants") and itemMatches(packCompatibility.freshFlowersPlants) then
     if not AlexModel then move(0.03, nil, nil, true) end
-    applyAdj({
-        { items = {"sapling", "mangrove_propagule", "azalea", "grass", "fern", "bush", "crimson_roots", "warped_roots", "nether_sprouts"},
-          m = {0.01, -0.015, -0.075}, r = {16, -7.5, -3} },
-        { items = {"_coral"},             m = {0.16, -0.035, -0.035}, r = {nil, -4.5, -1.5} },
-        { items = {"mushroom", "fungus"}, m = {0.025, nil, nil}, r = {nil, -5, -2} },
-        { items = {"seagrass"},           m = {0.24, -0.105, -0.195}, r = {3, -2.5, -5} },
-        { items = {"bamboo"},             m = {0.015, nil, nil}, r = {nil, -5, nil} },
-        { items = {"sugar_cane"},         m = {-0.02, nil, nil}, r = {nil, -3, nil} },
-        { items = {"sea_pickle"},         m = {0.015, nil, nil}, r = {nil, -4, nil} },
-        { items = {"twisting_vines"},     m = {0.09, 0.01, 0.06}, r = {13.5, nil, nil} },
-    })
-    if isInList({"rose_bush", "seagrass"}) then move(-0.01, 0.015, 0.055, true) rotate(-16, 7.5, 3, true) end
+    pose({
+        { {
+            "sapling", "mangrove_propagule", "azalea", "grass", "fern", "bush", "crimson_roots", 
+            "warped_roots", "nether_sprouts"
+        }, m = {0.01, -0.015, -0.075}, r = {16, -7.5, -3} },
+
+        { {"_coral"}, m = {0.16, -0.035, -0.035}, r = {nil, -4.5, -1.5} },
+        { {"mushroom", "fungus"}, m = {0.025, nil, nil}, r = {nil, -5, -2} },
+        { {"seagrass"}, m = {0.24, -0.105, -0.195}, r = {3, -2.5, -5} },
+        { {"seagrass", "rose_bush"}, m = {-0.01, 0.015, 0.055}, r = {-16, 7.5, 3} },
+        { {"bamboo"}, m = {0.015, nil, nil}, r = {nil, -5, nil} },
+        { {"sugar_cane"}, m = {-0.02, nil, nil}, r = {nil, -3, nil} },
+        { {"sea_pickle"}, m = {0.015, nil, nil}, r = {nil, -4, nil} },
+        { {"twisting_vines"}, m = {0.09, 0.01, 0.06}, r = {13.5, nil, nil} },
+    }, true)
 end
 
 -- Fresh Ores and Ingots
-if packActive("freshOresIngots") and verifyItems(packCompatibility.freshOresIngots) then
-    if not AlexModel and not verifyItems({"_shard"}) then move(0.04, -0.005, nil, true) end
+if packActive("freshOresIngots") and itemMatches(packCompatibility.freshOresIngots) then
+    if not AlexModel and not itemMatches({"_shard"}) then move(0.04, -0.005, nil, true) end
     if packActive("w3di") then
-        applyAdj({
-            { items = {"quartz", "nugget", "amethyst_shard", "redstone", "netherite_scrap", "resin_clump"},
+        pose({
+            { {"quartz", "nugget", "amethyst_shard", "redstone", "netherite_scrap", "resin_clump"},
             m = {-0.07, nil, 0.05}, r = {0.3, -4, 7}, s = {1/1.1, 1/1.1, 1/1.1} },
-            { items = {"diamond", "emerald", "lapis_lazuli"}, m = {-0.07, 0.05, 0.1}, r = {0.3, 0, 7}, s = {1/1.1, 1/1.25, 1/1.1} },
-            { items = {"ingot", "brick"},                     m = {0, nil, 0.1}, r = {0.3, -15, 5}, s = {1/1.15, 1/1.15, 1/1.15} },
-            { items = {"raw"},                                m = {-0.05, nil, 0.05}, r = {nil, nil, 5}, s = {1/1.3, 1, 1/1.3} },
-            { items = {"coal"},                               m = {0.05, nil, 0.05}, r = {nil, -95, 5}, s = {1, 1/1.2, 1} },
-            { items = {"flint"},                              r = {10, nil, 5}, s = {1/1.3, 1/1.3, 1/1.3} },
-            
-            { items = {"diamond"},                            m = {0.045, -0.065, -0.015}, r = {nil, -6, -3.5}, s = {0.96, 0.96, 0.96} },
-            { items = {"emerald"},                            m = {0.04, -0.085, nil}, r = {nil, -3, -3} },
-            { items = {"coal"},                               m = {-0.275, 0.02, nil} },
-            { items = {"amethyst_shard"},                     m = {nil, -0.025, nil} },
-            { items = {"nugget", "ingot", "brick"},           m = {-0.01, nil, nil} },
-            { items = {"netherite_scrap"},                    m = {0.02, nil, -0.035}, r = {nil, nil, -4.5} },
-            { items = {"flint"},                              m = {0.03, -0.01, -0.055} },
-            { items = {"redstone"},                           m = {-0.025, nil, nil} },
-            { items = {"resin_clump"},                        m = {0.075, nil, -0.055} },
-        })
+            { {"diamond", "emerald", "lapis_lazuli"}, m = {-0.07, 0.05, 0.1}, r = {0.3, 0, 7}, s = {1/1.1, 1/1.25, 1/1.1} },
+            { {"ingot", "brick"}, m = {0, nil, 0.1}, r = {0.3, -15, 5}, s = {1/1.15, 1/1.15, 1/1.15} },
+            { {"raw"}, m = {-0.05, nil, 0.05}, r = {nil, nil, 5}, s = {1/1.3, 1, 1/1.3} },
+            { {"coal"}, m = {0.05, nil, 0.05}, r = {nil, -95, 5}, s = {1, 1/1.2, 1} },
+            { {"flint"}, r = {10, nil, 5}, s = {1/1.3, 1/1.3, 1/1.3} },
+            { {"diamond"}, m = {0.045, -0.065, -0.015}, r = {nil, -6, -3.5}, s = {0.96, 0.96, 0.96} },
+            { {"emerald"}, m = {0.04, -0.085, nil}, r = {nil, -3, -3} },
+            { {"coal"}, m = {-0.275, 0.02, nil} },
+            { {"amethyst_shard"}, m = {nil, -0.025, nil} },
+            { {"nugget", "ingot", "brick"}, m = {-0.01, nil, nil} },
+            { {"netherite_scrap"}, m = {0.02, nil, -0.035}, r = {nil, nil, -4.5} },
+            { {"flint"}, m = {0.03, -0.01, -0.055} },
+            { {"redstone"}, m = {-0.025, nil, nil} },
+            { {"resin_clump"}, m = {0.075, nil, -0.055} },
+        }, true)
     end
-    applyAdj({
-        { items = {"amethyst_cluster", "amethyst_bud"}, m = {0.005, -0.005, -0.01}, r = {nil, nil, -3.5} },
-        { items = {"ingot", "brick", },                 m = {0.025, -0.025, -0.055}, r = {3, 17, -7.5} },
-        { items = {"diamond"},                          m = {0.055, 0.02, -0.195}, r = {20, 21, -12} },
-        { items = {"emerald"},                          m = {0.045, -0.005, -0.235}, r = {20, 21, -12} },
-        { items = {"_shard"},                           m = {nil, -0.06, -0.06}, r = {15, 3, -7.5} },
-        { items = {"resin_clump"},                      m = {0.05, 0.005, -0.055}, r = {nil, nil, -8.5} },
-        { items = {"lapis_lazuli"},                     m = {-0.03, -0.11, -0.205}, r = {nil, 5, -7.5} },
-        { items = {"quartz"},                           m = {0.045, -0.035, -0.1}, r = {4.5, 2.5, -6} },
-        { items = {"pointed_dripstone"},                m = {0.135, -0.02, -0.105}, r = {nil, -5, -1.5} },
-        { items = {"redstone"},                         m = {0.135, -0.095, -0.165}, r = {-4, nil, -7} },
-        { items = {"raw"},                              m = {0.08, -0.03, -0.155}, r = {11.5, nil, nil} },
-        { items = {"nugget"},                           m = {0.095, -0.085, -0.105}, r = {nil, 3.5, -6.5} },
-        { items = {"netherite_scrap"},                  m = {0.11, -0.075, -0.17}, r = {nil, nil, -18} },
-        { items = {"flint"},                            m = {0.105, 0.06, -0.075}, r = {17, nil, -6.5} },
-        { items = {"coal"},                             m = {0.075, nil, -0.17}, r = {nil, nil, -6} },
-    })
+    pose({
+        { {"amethyst_cluster", "amethyst_bud"}, m = {0.005, -0.005, -0.01}, r = {nil, nil, -3.5} },
+        { {"ingot", "brick"}, m = {0.025, -0.025, -0.055}, r = {3, 17, -7.5} },
+        { {"diamond"}, m = {0.055, 0.02, -0.195}, r = {20, 21, -12} },
+        { {"emerald"}, m = {0.045, -0.005, -0.235}, r = {20, 21, -12} },
+        { {"_shard"}, m = {nil, -0.06, -0.06}, r = {15, 3, -7.5} },
+        { {"resin_clump"}, m = {0.05, 0.005, -0.055}, r = {nil, nil, -8.5} },
+        { {"lapis_lazuli"}, m = {-0.03, -0.11, -0.205}, r = {nil, 5, -7.5} },
+        { {"quartz"}, m = {0.045, -0.035, -0.1}, r = {4.5, 2.5, -6} },
+        { {"pointed_dripstone"}, m = {0.135, -0.02, -0.105}, r = {nil, -5, -1.5} },
+        { {"redstone"}, m = {0.135, -0.095, -0.165}, r = {-4, nil, -7} },
+        { {"raw"}, m = {0.08, -0.03, -0.155}, r = {11.5, nil, nil} },
+        { {"nugget"}, m = {0.095, -0.085, -0.105}, r = {nil, 3.5, -6.5} },
+        { {"netherite_scrap"}, m = {0.11, -0.075, -0.17}, r = {nil, nil, -18} },
+        { {"flint"}, m = {0.105, 0.06, -0.075}, r = {17, nil, -6.5} },
+        { {"coal"}, m = {0.075, nil, -0.17}, r = {nil, nil, -6} },
+    }, true)
 end
 
 -- Ben's Bundle
-if packActive("bensBundle") and verifyItems(packCompatibility.bensBundle) then
+if packActive("bensBundle") and itemMatches(packCompatibility.bensBundle) then
     if packActive("w3di") then
-        applyAdj({
-            { items = {"bundle"}, m = {0.05, nil, 0.05}, r = {nil, -95, 5}, s = {0.7, 0.7, 0.7} },
-            { items = {"bundle"}, m = {-0.045, 0.03, 0.045}, r = {5.5, 66, -5} },
-        })
+        move(0.05, nil, 0.05, true) rotate(nil, -95, 5, true) scale(0.7, 0.7, 0.7, true)
+        move(-0.045, 0.03, 0.045, true) rotate(5.5, 66, -5, true)
     end
     move(skinModel(0.04, 0.06), 0.085, -0.06, true) 
     rotate(nil, nil, -10, true)
 end
 
------- LISTAS DE ITENS ------
+-- ===== ITEM LISTS =====
 
 local itemLists = {
     hangingPlants = {"spore_blossom", "hanging_roots", "pale_hanging_moss", "weeping_vines"},
-    woods = {
-        "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", 
-        "mangrove", "cherry", "pale_oak", "bamboo", "crimson", "warped"
-    },
     flowers = {
         "dandelion", "poppy", "blue_orchid", "allium", "azure_bluet",
-        "oxeye_daisy", "cornflower", "lily_of_the_valley", "torchflower", "cactus_flower",
+        "oxeye_daisy", "cornflower", "lily_of_the_valley", "^torchflower$", "cactus_flower",
         "closed_eyeblossom", "open_eyeblossom", "wither_rose", 
-        "sunflower", "lilac", "rose_bush", "peony", "pitcher_plant", "azalea",
-        "flowering_azalea", "nether_wart"
+        "sunflower", "lilac", "rose_bush", "peony", "pitcher_plant", "^azalea$",
+        "^flowering_azalea$", "^nether_wart$"
     },
     foods = {
-        "apple", "golden_apple", "enchanted_golden_apple", "chorus_fruit", "melon_slice",
-        "carrot", "golden_carrot", "potato", "baked_potato", "poisonous_potato", "beetroot",
-        "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "chicken", "mutton", "rabbit", 
-        "cod", "salmon", "tropical_fish", "pufferfish", "cooked_beef", "cooked_porkchop", "cooked_chicken", 
-        "cooked_mutton", "cooked_rabbit", "cooked_cod", "cooked_salmon", "mushroom_stew", "rabbit_stew", 
-        "beetroot_soup", "suspicious_stew", "rotten_flesh", "spider_eye", "dried_kelp", "honeycomb", "sweet_berries", "glow_berries", "bowl"
+        "apple", "chorus_fruit", "melon_slice", "carrot", "potato", "^beetroot$",
+        "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$", 
+        "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken", 
+        "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$", 
+        "^dried_kelp$", "^honeycomb$", "_berries", "bowl"
+    },
+    spawnEggAdjust = {
+        "blaze", "bogged", "breeze", "camel", "cave_spider", "cod", "cow",
+        "creaking", "creeper", "dolphin", "donkey", "drowned", "elder_guardian",
+        "enderman", "evoker", "frog", "ghast", "glow_squid", "goat", "guardian",
+        "happy_ghast", "hoglin", "horse", "husk", "iron_golem", "llama", "magma_cube",
+        "mooshroom", "mule", "panda", "phantom", "pig", "piglin", "piglin_brute",
+        "pillager", "polar_bear", "pufferfish", "ravager", "salmon", "sheep", 
+        "shulker", "skeleton", "skeleton_horse", "slime", "sniffer", "snow_golem",
+        "cave", "squid", "stray", "strider", "tadpole", "trader_llama", "tropical_fish",
+        "turtle", "spider", "villager", "vindicator", "wandering_trader", "warden",
+        "witch", "wither_skeleton", "wolf", "zoglin", "zombie", "zombie_horse",
+        "zombie_villager", "zombified_piglin", "nautilus", "zombie_nautilus",
+        "camel_husk", "parched"
     },
     sprites2D = {
-        -- Blocos Coloridos
+        -- Colored Blocks
         "candle",
-        -- Blocos Naturais
-        "small_amethyst_bud", "glow_lichen", "vine", "pitcher_pod", "lily_pad",
-        "frogspawn", "sniffer_egg", "kelp", "seagrass", "twisting_vines",
-        -- Blocos Funcionais
+        -- Natural Blocks
+        "small_amethyst_bud", "glow_lichen", "^vine$", "twisting_vines", "pitcher_pod", "lily_pad",
+        "frogspawn", "sniffer_egg", "^kelp$", "seagrass",
+        -- Functional Blocks
         "armor_stand", "glow_item_frame", "ender_eye", "fire_charge", "bone_meal", "name_tag", "lead",
         "cauldron", "ladder",
-        -- Blocos de Redstone
-        "redstone", "string", "comparator", "repeater", "tripwire_hook", "hopper", 
-        -- Ferramentas
-        "bundle", "compass", "recovery_compass", "map", "wind_charge", "ender_pearl",
-        "elytra", "saddle", "goat_horn", "firework_rocket", "flint_and_steel", "brush", "clock",
-        -- Combate
-        "turtle_helmet", "wolf_armor", "totem_of_undying", "arrow", "spectral_arrow", "tipped_arrow",
-        "snowball", "egg", "brown_egg", "blue_egg", "writable_book",
-        -- Ingreditentes
-        "coal", "charcoal", "raw_iron", "raw_copper", "raw_gold", "emerald", "lapis_lazuli", "diamond",
-        "quartz", "amethyst_shard", "netherite_scrap", "flint", "wheat", "feather", "leather", "rabbit_hide", "resin_clump", "ink_sac",
-        "glow_ink_sac", "turtle_scute", "armadillo_scute", "slime_ball", "clay_ball", "prismarine_shard", "prismarine_crystals",
-        "nautilus_shell", "heart_of_the_sea", "nether_star", "shulker_shell", "popped_chorus_fruit", "echo_shard",
-        "disc_fragment_5", "nether_brick", "resin_brick", "paper", "firework_star", "glowstone_dust", "book",
-        "gunpowder", "fermented_spider_eye", "blaze_powder", "sugar", "glistering_melon_slice", "magma_cream", "ghast_tear",
-        "phantom_membrane", "trial_key", "ominous_trial_key", "enchanted_book"   
+        -- Redstone Blocks
+        "^redstone$", "string", "comparator", "repeater", "tripwire_hook", "hopper", 
+        -- Tools
+        "bundle", "compass", "^map$", "wind_charge", "ender_pearl",
+        "elytra", "saddle", "goat_horn", "firework_rocket", "brush", "clock",
+        -- Combat
+        "turtle_helmet", "wolf_armor", "totem_of_undying", "arrow",
+        "snowball", "^egg$", "brown_egg", "blue_egg",
+        -- Ingredients
+        "coal$", "raw_", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$", "_shard", "netherite_scrap", "flint", 
+        "wheat", "feather", "leather", "rabbit_hide", "resin_clump", "ink_sac", "_scute", "slime_ball", "clay_ball", 
+        "prismarine_crystals", "nautilus_shell", "heart_of_the_sea", "phantom_membrane", "_key", "ghast_tear",
+        "nether_star", "shulker_shell", "popped_chorus_fruit", "disc_fragment_5", "^nether_brick$", "^resin_brick$", 
+        "paper", "firework_star", "glowstone_dust", "book$", "gunpowder", "fermented_spider_eye", "blaze_powder", 
+        "^sugar$", "glistering_melon_slice", "magma_cream"
     }
 }
 
------- VERIFICAÇÃO DE TIPOS ------
-
+-- ===== ITEM TYPE CHECKING =====
 local is2D = (
-    verifyItems({
+    itemMatches({
         "music_disc_", "_dye", "_banner_pattern", "_pottery_sherd", "_smithing_template", "_spawn_egg",
-        "_bundle", "_harness", "_candle", "_nugget", "_ingot", "_helmet", "_chestplate", "_leggings", "_boots",
+        "_bundle", "_harness", "candle", "_nugget", "_ingot", "_helmet", "_chestplate", "_leggings", "_boots",
         "_horse_armor", "_seeds", "rail", "minecart", "nautilus_armor"
     }) or
-    verifyList(itemLists.woods, {"_sign"}) or
-    isInList(itemLists.sprites2D) or 
+    (itemName:match("_sign") and not itemName:match("hanging_sign")) or
+    itemMatches(itemLists.sprites2D) or 
     isInList({"brick", "rabbit_foot", "iron_bars"})
 )
+
 local isException = (
-    (
-    verifyList(itemLists.foods, {""}) or
-    verifyItems({
+    itemMatches({
         "_door", "_hanging_sign", "_boat", "_raft", "^lantern$", "soul_lantern", "copper_lantern", "_golem_statue",
-        "_pickaxe", "_shovel", "_hoe", "_axe", "_sword", "rail", "bucket", "_head", "_skull", "_dye",
-        "_spear", "torch", "button", "chain"
+        "_pickaxe", "_shovel", "_hoe", "_axe", "_sword", "rail", "bucket", "_head", "_skull", "_dye", "_spear", 
+        "torch", "button", "chain", "^bamboo$", "painting", "^item_frame$", "^bell$", "fishing_rod", "spyglass",
+        "on_a_stick", "mace", "trident", "_bottle", "potion", "dragon_breath", "^stick$", "^bone$", "blaze_rod", 
+        "breeze_rod", "pink_petals", "wildflowers", "leaf_litter", "shears", "shield", "bow$", "lever", "cocoa_beans", 
+        "sculk_vein", "filled_map"
     }) or
-    isInList({
-        "bamboo", "painting", "item_frame", "bell", "fishing_rod", "spyglass", 
-        "carrot_on_a_stick", "warped_fungus_on_a_stick", "mace", "trident", "honey_bottle", "ominous_bottle",
-        "potion", "splash_potion", "lingering_potion", "experience_bottle", "dragon_breath", "glass_bottle",
-        "stick", "bone", "blaze_rod", "breeze_rod", "pink_petals", "wildflowers", "leaf_litter", "shears", "shield",
-        "bow", "crossbow", "lever", "cocoa_beans", "sculk_vein"
-    })
-    )
+    itemMatches(itemLists.foods)
 )
 
------- AJUSTE GERAL PARA BLOCOS ------
-
+-- ===== GENERAL BLOCK ADJUSTMENTS =====
 if not isException then
     move(skinModel(0.17, 0.175), nil, 0.07)
     if not (
         is2D or
-        verifyList(itemLists.flowers, {""}) or
-        verifyItems({
-            "_coral$", "_coral_fan", "_sapling", "_fungus", "_roots", "_tulip", "_bush", "_grass", "fern", "_mushroom", "glass_pane",
-            "_dripleaf"
+        itemMatches(itemLists.flowers) or
+        itemMatches({
+            "_coral$", "_coral_fan", "_sapling", "_fungus", "_roots", "_tulip", "_bush", "_grass", "fern", "_mushroom", 
+            "glass_pane", "_dripleaf"
         }) or
         isInList({
-            "mangrove_propagule", "medium_amethyst_bud", "large_amethyst_bud", "amethyst_cluster", "pointed_dripstone", "nether_sprouts",
-            "cobweb"
+            "mangrove_propagule", "medium_amethyst_bud", "large_amethyst_bud", "amethyst_cluster", "pointed_dripstone", 
+            "nether_sprouts", "cobweb"
         })
     ) then
-        if I:isBlock(item) and 
-            not verifyItems({
-                "_fence", "_wall", "_bed", "_banner$", "end_rod", "grindstone", "anvil", "brewing_stand", "conduit", "scaffolding", 
-                "lightning_rod", "flower_pot", "decorated_pot", "_shelf", "dragon_egg", "heavy_core", "pressure_plate",
-                "chorus_plant", "turtle_egg", "cocoa_beans", "sea_pickle", "copper_bars", "cake"
+        if 
+            I:isBlock(item) and
+            not itemMatches({
+                "_fence", "_wall", "_bed", "_banner$", "end_rod", "grindstone", "anvil", "brewing_stand", "conduit", 
+                "scaffolding", "lightning_rod", "flower_pot", "decorated_pot", "_shelf", "dragon_egg", "heavy_core", 
+                "pressure_plate", "chorus_plant", "turtle_egg", "cocoa_beans", "sea_pickle", "copper_bars", "cake"
             }) 
         then
             move(skinModel(-0.103, -0.063), 0.085, 0.15)
@@ -491,436 +487,277 @@ if not isException then
     end
 end
 
------- AJUSTES PARA SPRITES 2D ------
-
+-- ===== 2D SPRITES ADJUSTMENTS =====
 if is2D then
     move(skinModel(-0.14, -0.1), 0.04, -0.105)
     rotate(nil, 5, -8)
-    -- Rotação
-    if (
-        isInList({
-            "small_amethyst_bud", "pitcher_pod", "lily_pad", "glow_lichen"
-        }) or
-        itemName:match("_seeds")
-    ) then
-        rotate(nil, -33, -1.9)
-    end
+
+    pose({{{"small_amethyst_bud", "pitcher_pod", "lily_pad", "glow_lichen",  "_seeds"}, r = {nil, -33, -1.9} }})
 end
 
------- AJUSTES DE BLOCOS EM 90 OU 180 GRAUS ------
+-- ===== ROTATED BLOCKS (90/180 DEGREES) =====
 
 -- 90
-if isInList({
-    "piston", "sticky_piston", "barrel"
-}) then
-    move(-0.03, 0.38, -0.05)
-    M:rotateX(matrices, 90)
-end
+pose({{{"piston", "barrel"}, m = {-0.03, 0.38, -0.05}, r = {90, nil, nil}}})
 
 -- 180
-if (
-    isInList({
-        "lectern", "chiseled_bookshelf", "crafter", "furnace", "dispenser", "dropper", "loom", "smoker", "blast_furnace"
-    }) or 
-    itemName:match("_shelf")
-) then
-    move(-0.3, nil, 0.3)
-    M:rotateY(matrices, 180 * l)
-    if itemName:match("_shelf") then move(skinModel(0.02, 0), nil, skinModel(-0.07, -0.13)) end
+pose({
+    { {
+        "lectern", "chiseled_bookshelf", "crafter", "furnace", "dispenser", "dropper", "loom", "smoker", 
+        "blast_furnace", "_shelf"
+    }, m = {-0.3, nil, 0.3}, r = {nil, 180, nil} },
+
+    { {"_shelf"}, m = {skinModel(0.02, 0), nil, skinModel(-0.07, -0.13)} }
+})
+
+-- ===== CATEGORY-BASED ADJUSTMENTS =====
+
+-- === CONSTRUCTION BLOCKS ===
+pose({
+    { {"_fence", "_wall"}, m = {skinModel(-0.02, 0), nil, 0.05} },
+    { {"_fence_gate"},     m = {skinModel(-0.02, 0), -0.1, -0.03} },
+    { {"_button"},         m = {skinModel(0.215, 0.245), 0.035, 0.07}, r = {8.2, -31, -5}, s = {1.3, 1.3, 1.3} },
+    { {"_bars"},           m = {skinModel(-0.02, 0.01), nil, 0.04} },
+    { {"iron_bars"},       m = {0.07, 0.05, -0.06}, r = {nil, nil, -0.5} },
+    { {"chain"},           m = {skinModel(0.08, 0.1), 0.026, nil}, r = {0.4, nil, -14.7} }
+})
+if itemMatches({"^waxed"}) and itemMatches({"_copper_chain"}) then 
+    move(skinModel(-0.03, -0.02), nil, 0.049) 
 end
 
------- AJUSTES POR CATEGORIA ------
+-- === COLORED BLOCKS ===
+pose({
+    { {"glass_pane"}, m = {skinModel(-0.1, -0.07), 0.1, -0.12}, r = {nil, nil, -6} },
+    { {"_banner$"},   m = {skinModel(-0.14, -0.13), 0.13, 0.17}, r = {nil, -90, nil} },
+    { {"candle"},    m = {hand(0.02, 0.05), 0.03, -0.03} },
+    { {"_bed"},       m = {-0.2, nil, 0.3} }
+})
+-- === NATURAL BLOCKS ===
+pose({
+    { {
+        "_coral$", "_coral_fan", "_sapling", "_fungus", "_roots", "_tulip", "_bush", "_grass", "fern", "_mushroom",
+        "mangrove_propagule", "medium_amethyst_bud", "large_amethyst_bud", "amethyst_cluster", "pointed_dripstone",
+        "nether_sprouts", "cobweb"
+    }, m = {skinModel(-0.05, -0.047), 0.06, skinModel(-0.1, -0.08)}, r = {4, nil, -5} },
 
--- Blocos de Construção
+    { {"^sunflower$"}, 
+        m = {hand(-0.1, -0.07), nil, hand(skinModel(0.32, 0.35), skinModel(-0.07, -0.06))}, 
+        r = {nil, hand(-120, 30), nil} 
+    },
 
--- Cercas
-if itemName:match("_fence") then move(skinModel(-0.02, 0), nil, 0.05) end
--- Muros
-if itemName:match("_wall") then move(skinModel(-0.02, 0), nil, 0.05) end
--- Botoes
-if itemName:match("_button") then move(skinModel(0.215, 0.245), 0.035, 0.07) rotate(8.2, -31, -5) scale(1.3, 1.3, 1.3) end
--- Portoes
-if itemName:match("_fence_gate") then move(skinModel(-0.02, 0), -0.1, -0.03) end
--- Barras
-if itemName:match("_bars") then move(skinModel(-0.02, 0.01), nil, 0.04) end
-if itemName == "iron_bars" then move(0.07, 0.05, -0.06) rotate(nil, nil, -0.5) end
--- Correntes
-if itemName:match("_chain") then move(skinModel(0.08, 0.1), 0.026, nil) rotate(0.4, nil, -14.7) end
-if itemName:match("^waxed") and itemName:match("_copper_chain") then move(skinModel(-0.03, -0.02), nil, 0.049) end
+    { itemLists.flowers, m = {skinModel(-0.05, -0.047), 0.06, skinModel(-0.1, -0.08)}, r = {4, nil, -5} },
+    { itemLists.hangingPlants, m = {nil, -0.53, nil}, r = {4, nil, -5} },
+    { {"^bush$"}, m = {0.045, nil, skinModel(0.02, 0.05)} },
+    { {"^fern$"}, m = {skinModel(0.01, 0), nil, nil} },
+    { {"^small_dripleaf$"}, m = {skinModel(-0.052, -0.03), nil, -0.083} },
+    { {"^big_dripleaf$"}, m = {skinModel(-0.058, -0.027), nil, -0.163} },
+    { {"^spore_blossom$"}, m = {-0.07, nil, nil} },
+    { {"^sugar_cane$"}, m = {hand(0.022, 0.036), nil, skinModel(0, 0.016)}, r = {nil, nil, -7} },
+    { {"^frogspawn$"}, m = {skinModel(0, 0.04), 0.03, -0.03} },
+    { {"^torchflower$"}, m = {skinModel(0.056, 0.048), 0.061, skinModel(0.07, 0.12)} },
+    { {"^azalea$", "^flowering_azalea$"}, m = {skinModel(0.01, 0), nil, skinModel(-0.01, 0.02)} },
+    { {"^chorus_plant$"}, m = {hand(skinModel(0.02, 0.043), skinModel(-0.01, 0.03)), -0.1, nil} },
+    { {"^sea_pickle$"}, m = {skinModel(0.07, 0.09), -0.07, -0.03}, r = {nil, 0.5, nil}, s = {1.5, 1.5, 1.5} },
+    { {"^weeping_vines$"}, m = {skinModel(-0.02, 0), skinModel(-0.3, -0.2), skinModel(-0.1, 0)} },
+    { {"^twisting_vines$"}, m = {hand(skinModel(0.095, 0.128), skinModel(-0.01, 0.02)), skinModel(0.06, 0.02), -0.03} },
+    { {"^dried_ghast$"}, m = {-0.3, nil, 0.3}, r = {nil, 180, nil} },
+    { {"^pitcher_pod$"}, m = {hand(-0.05, skinModel(0.08, 0.15)), 0.104, 0.07} },
+    { {"^nether_wart$"}, m = {hand(0.04, skinModel(0.03, 0.02)), skinModel(0.03, 0.04), 0.12}, r  = {4, -31, nil} },
+    { {"^lily_pad$"}, m = {nil, 0.2, nil}, r = {101.5, nil, -6} },
+    { {"^bamboo$"}, m = {skinModel(0.02, 0.04), nil, skinModel(0.02, 0)} },
+    { {"^vine$"}, m = {skinModel(-0.12, -0.15), -0.3, nil}, r = {10, 90, nil} },
+    { {"^glow_lichen$"}, m = {skinModel(-0.15, -0.17), -0.2, nil}, r = {10, 90, nil} },
+    { {"^sculk_vein$"}, m = {-0.16, -0.119, nil}, r = {11.6, 58.8, -8.5} },
+    { {"^kelp$"}, m = {hand(0.17, -0.1), -0.03, -0.04} },
+    { {"^seagrass$"}, m = {skinModel(0.04, 0.06), skinModel(0.06, 0.04), -0.035} },
+    { {"^small_amethyst_bud$"}, m = {nil, 0.105, 0.09} },
+    { {"^turtle_egg$"}, m = {skinModel(0.02, 0.046), -0.08, -0.06}, s = {1.3, 1.3, 1.3} },
+    { {"^sniffer_egg$"}, m = {hand(-0.02, skinModel(0.11, 0.1)), 0.03, -0.03} },
+    { {"_seeds"}, m = {hand(-0.03, 0.02), 0.08, skinModel(0.07, 0.1)} },
+    { {"^beetroot_seeds$"}, m = {skinModel(0.04, 0.02), 0.03, -0.02}, r = {nil, -5, nil} },
+    { {"^torchflower_seeds$"}, m = {0.22, -0.065, -0.055}, r = {nil, -1.5, hand(7, 3)} },
+    { {"^cocoa_beans$"}, m = {skinModel(0.18, 0.2), -0.186, 0.145}, r = {8.8, -30, -3.4}, s = {1.5, 1.5, 1.5} },
+})
 
--- Blocos Coloridos
+-- === FUNCTIONAL BLOCKS ===
+pose({
+    { {"ender_eye", "ender_pearl"}, m = {hand(0.02, 0.05), -0.02, -0.05} },
+    { {"torch"}, m = {skinModel(-0.01, 0.02), 0.04, 0.02}, r = {7.5, nil, -5}, s = {1.2, 1.2, 1.2} },
+    { {"anvil"}, m = {skinModel(-0.31, -0.28), nil, nil}, r = {nil, 90, nil} },
+    { {"lightning_rod"}, m = {skinModel(-0.02, -0.01), nil, skinModel(0.02, 0.05)} },
+    { {"golem_statue"}, m = {-0.04, nil, -0.05} },
+    { {"^end_rod$"}, m = {skinModel(0.01, 0.02), nil, skinModel(0.02, 0.05)}, s = {1.3, 1.3, 1.3} },
+    { {"^grindstone$"}, m = {skinModel(0, 0.035), 0.33, -0.08}, r = {90, nil, nil} },
+    { {"^end_crystal$"}, m = {-0.15, -0.1, 0.15} },
+    { {"^conduit$"}, m = {skinModel(-0.05, -0.06), skinModel(-0.07, -0.04), skinModel(0.08, 0.16)} },
+    { {"^scaffolding$"}, m = {skinModel(0, 0.01), -0.27, nil}, r = {nil, nil, skinModel(0, -3.5)} },
+    { {"^flower_pot$"}, m = {skinModel(-0.02, 0), nil, 0.05} },
+    { {"^dragon_egg$"}, m = {skinModel(0, 0.03), -0.04, nil} },
+    { {"^ladder$"}, m = {skinModel(0.05, 0.03), 0.03, -0.03} },
+    { {"^glow_item_frame$"}, m = {hand(0.02, 0.04), nil, -0.03} },
+    { {"^armor_stand$"}, m = {hand(0.05, skinModel(0.02, 0.055)), 0.03, -0.07} },
+    { {"^cauldron$"}, m = {hand(skinModel(0.06, 0.05), 0.02), nil, -0.03} },
+})
 
--- Paineis de Vidro
-if itemName:match("glass_pane") then move(skinModel(-0.1, -0.07), 0.1, -0.12) rotate(nil, nil, -6) end
--- Banners
-if itemName:match("_banner$") then move(skinModel(-0.14, -0.13), 0.13, 0.17) rotate(nil, -90, nil) end
--- Velas
-if itemName:match("candle") then move(l == 1 and 0.02 or skinModel(0.05, 0.05), 0.03, -0.03) end
--- Camas
-if itemName:match("_bed") then move(-0.2, nil, 0.3) end
-
--- Blocos Naturais
-
--- Mudas, Corais, Fungos, Raizes, Cogumelos, Flores, Matos, Espeleotema e Teia de Aranha
-if (
-    verifyItems({"_coral$", "_coral_fan", "_sapling", "_fungus", "_roots", "_tulip", "_bush", "_grass", "fern", "_mushroom"}) or
-    verifyList(itemLists.flowers, {""}) or
-    isInList({"mangrove_propagule", "medium_amethyst_bud", "large_amethyst_bud", "amethyst_cluster", "pointed_dripstone", "nether_sprouts", "cobweb"})
-) then 
-    move(skinModel(-0.05, -0.047), 0.06, skinModel(-0.1, -0.08))
-    rotate(4, nil, -5)
+if itemMatches({"_sign"}) and not itemMatches({"hanging_sign"}) then 
+    move(hand(0.02, 0.05), nil, nil)
 end
--- Arbusto e Samambaia
-if itemName == "bush" then move(0.045, nil, skinModel(0.02, 0.05)) end
-if itemName == "fern" then move(skinModel(0.01, 0), nil, nil) end
--- Plantaformas
-if itemName == "small_dripleaf" then move(skinModel(-0.052, -0.03), nil, -0.083) end
-if itemName == "big_dripleaf" then move(skinModel(-0.058, -0.027), nil, -0.163) end
--- Plantas de pendurar
-if verifyList(itemLists.hangingPlants, {""}) then move(nil, -0.53, nil) rotate(4, nil, -5) end
-if itemName == "spore_blossom" then move(-0.07, nil, nil) end
--- Cana de Açúcar
-if itemName == "sugar_cane" then move(l == 1 and 0.022 or 0.036, nil, skinModel(0, 0.016)) rotate(nil, nil, -7) end
--- Ovos de Sapo
-if itemName == "frogspawn" then move(skinModel(0, 0.04), 0.03, -0.03) end
--- Plantocha
-if itemName == "torchflower" then move(skinModel(0.056, 0.048), 0.061, skinModel(0.07, 0.12)) end
--- Girassol
-if itemName == "sunflower" then move(l == 1 and -0.1 or -0.07, nil, l == 1 and skinModel(0.32, 0.35) or skinModel(-0.07, -0.06)) 
-    rotate(nil, l == 1 and -120 or 30, nil) end
--- Azalea e Azalea Florescente
-if itemName == "azalea" or itemName == "flowering_azalea" then move(skinModel(0.01, 0), nil, skinModel(-0.01, 0.02)) end
--- Planta do Coro
-if itemName == "chorus_plant" then move(l == 1 and skinModel(0.02, 0.043) or skinModel(-0.01, 0.03), -0.1, nil) end
--- Pepino-do-Mar
-if itemName == "sea_pickle" then move(skinModel(0.07, 0.09), -0.07, -0.03) rotate(nil, 0.5, nil) scale(1.5, 1.5, 1.5) end
--- Trepadeiras Choronas
-if itemName == "weeping_vines" then move(skinModel(-0.02, 0), skinModel(-0.3, -0.2), skinModel(-0.1, 0)) end
--- Ghast Seco
-if itemName == "dried_ghast" then move(-0.3, nil, 0.3) rotate(nil, 180, nil) end
--- Vagem de Planta Ancestral
-if itemName == "pitcher_pod" then move(l == 1 and -0.05 or skinModel(0.08, 0.15), 0.104, skinModel(0.07, 0.07)) end
--- Fungo do Nether
-if itemName == "nether_wart" then move(l == 1 and 0.04 or skinModel(0.03, 0.02), skinModel(0.03, 0.04), 0.12) rotate(4, -31, nil) end
--- Vitoria-Regia
-if itemName == "lily_pad" then move(nil, 0.2, nil) rotate(101.5, nil, -6) end
--- Bambu
-if itemName == "bamboo" then move(skinModel(0.02, 0.04), nil, skinModel(0.02, 0)) end
--- Trepadeira, Líquen Brilhante e Veio de Sculk
-if itemName == "vine" then move(skinModel(-0.12, -0.15), -0.3, nil) rotate(10, 90, nil) end
-if itemName == "glow_lichen" then move(skinModel(-0.15, -0.17), -0.2, nil) rotate(10, 90, nil) end
-if itemName == "sculk_vein" then move(-0.16, -0.119, nil) rotate(11.6, 58.8, -8.5) end
--- Alga
-if itemName == "kelp" then move(l == 1 and 0.17 or -0.1, -0.03, -0.04) end
--- Erva Marinha
-if itemName == "seagrass" then move(skinModel(0.04, 0.06), skinModel(0.06, 0.04), -0.035) end
--- Trepadeiras Retorcidas
-if itemName == "twisting_vines" then move(l == 1 and skinModel(0.095, 0.128) or skinModel(-0.01, 0.02), skinModel(0.06, 0.02), -0.03) end
--- Cristal de Ametista Pequeno
-if itemName == "small_amethyst_bud" then move(nil, 0.105, 0.09) end
--- Ovo de Tartaruga
-if itemName == "turtle_egg" then move(skinModel(0.02, 0.046), -0.08, -0.06) scale(1.3, 1.3, 1.3) end
--- Ovo de Farejador
-if itemName == "sniffer_egg" then move(l == 1 and -0.02 or skinModel(0.11, 0.1), 0.03, -0.03) end
--- Sementes
-if itemName:match("_seeds") then move(l == 1 and -0.03 or 0.02, 0.08, skinModel(0.07, 0.1)) end
-if itemName == "beetroot_seeds" then move(skinModel(0.04, 0.02), 0.03, -0.02) rotate(nil, -5, nil) end
-if itemName == "torchflower_seeds" then move(l == 1 and skinModel(0.2, 0.18) or skinModel(0.22, 0.2), 0.03, -0.049) rotate(5, nil, 0.9) end
-if itemName == "cocoa_beans" then move(skinModel(0.18, 0.2), -0.186, 0.145) rotate(8.8, -30, -3.4) scale(1.5, 1.5, 1.5) end
 
--- Blocos Funcionais
+-- === REDSTONE BLOCKS ===
+pose({
+    { {"hopper", "tripwire_hook"}, m = {0.04, nil, -0.03} },
+    { {"minecart"}, m = {hand(skinModel(0.06, 0), skinModel(0.025, 0)), nil, skinModel(-0.06, -0.05)} },
+    { {"rail"}, m = {skinModel(0.2, 0.2), nil, 0.06} },
+    { {"^redstone$"}, m = {skinModel(0.03, 0.02), nil, nil} },
+    { {"^lever$"}, m = {-0.42, 0.045, -0.125}, r = {9.5, 101, nil}, s = {2.2, 2.2, 2.2} },
+    { {"^string$"}, m = {hand(0, skinModel(0.09, 0.07)), nil, -0.03} }
+})
 
--- Tochas
-if isInList({"torch", "soul_torch", "redstone_torch", "copper_torch"}) then move(skinModel(-0.01, 0.02), 0.04, 0.02) rotate(7.5, nil, -5) scale(1.2, 1.2, 1.2) end
--- Bigornas
-if itemName:match("anvil") then move(skinModel(-0.31, -0.28), nil, nil) rotate(nil, 90, nil) end
--- Para-raios
-if itemName:match("lightning_rod") then move(skinModel(-0.02, -0.01), nil, skinModel(0.02, 0.05)) end
--- Golens de Cobre
-if itemName:match("golem_statue") then move(-0.04, nil, -0.05) end
--- Placas
-if itemName:match("_sign") and not itemName:match("hanging_sign") then move(l == 1 and 0.02 or 0.05, nil, nil) end
--- Vara do End
-if itemName == "end_rod" then move(skinModel(0.01, 0.02), nil, skinModel(0.02, 0.05)) scale(1.3, 1.3, 1.3) end
--- Rebolo
-if itemName == "grindstone" then move(skinModel(0, 0.035), 0.33, -0.08) rotate(90, nil, nil) end
--- Cristal do End
-if itemName == "end_crystal" then move(-0.15, -0.1, 0.15) end
--- Conduto
-if itemName == "conduit" then move(skinModel(-0.05, -0.06), skinModel(-0.07, -0.04), skinModel(0.08, 0.16)) end
--- Andaime
-if itemName == "scaffolding" then move(skinModel(0, 0.01), -0.27, nil) rotate(nil, nil, skinModel(0, -3.5)) end
--- Vaso
-if itemName == "flower_pot" then move(skinModel(-0.02, 0), nil, 0.05) end
--- Ovo do Dragao
-if itemName == "dragon_egg" then move(skinModel(0, 0.03), -0.04, nil) end
--- Olho de Ender e Perola de Ender
-if itemName == "ender_eye" or itemName == "ender_pearl" then move(l == 1 and 0.02 or 0.05, -0.02, -0.05) end
--- Escada de Mao
-if itemName == "ladder" then move(skinModel(0.05, 0.03), 0.03, -0.03) end
--- Moldura Brilhante
-if itemName == "glow_item_frame" then move(l == 1 and 0.02 or 0.04, nil, -0.03) end
--- Suporte de Armaduras
-if itemName == "armor_stand" then move(l == 1 and 0.05 or skinModel(0.02, 0.055), 0.03, -0.07) end
--- Caldeirao
-if itemName == "cauldron" then move(l == 1 and skinModel(0.06, 0.05) or 0.02, nil, -0.03) end
+-- === TOOLS ===
+pose({
+    { {"bone_meal", "name_tag"}, m = {hand(0, 0.05), nil, -0.06} },
+    { {"_boat", "_raft"}, m = {0.1, 0.08, -0.05} },
+    { {"pickaxe", "shovel", "hoe", "axe"}, m = {skinModel(0.02, 0.04), nil, -0.05} },
+    { {"pickaxe"}, m = {skinModel(0, -0.01), nil, 0.005}, r = {nil, nil, -0.5} },
+    { {"shovel"}, m = {-0.07, -0.2, skinModel(0.07, 0.095)}, r = {5.5, 3.5, -5.5} },
+    { {"hoe"}, m = {skinModel(0, 0.02), -0.185, 0.005}, r = {nil, -6, nil} },
+    { {"axe"}, m = {skinModel(0, 0.02), -0.105, nil}, r = {nil, -6, nil} },
+    { {"bundle"}, m = {hand(skinModel(0.01, -0.01), skinModel(0.04, 0.02)), nil, -0.02} },
+    { {"music_disc"}, m = {hand(0.05, skinModel(0.02, 0)), -0.08, -0.05} },
+    { {"^music_disc_11$"}, m = {nil, 0.04, nil} },
+    { {"^fishing_rod$"}, m = {skinModel(0.01, 0.03), 0.03, nil}, r = {nil, nil, -5.5} },
+    { {"^carrot_on_a_stick$"}, m = {skinModel(0.06, 0.1), skinModel(0.06, 0.02), nil}, r = {nil, 4, -10.8} },
+    { {"^warped_fungus_on_a_stick$"}, m = {skinModel(0.122, 0.16), 0.02, 0.04}, r = {nil, 2.2, -5.5} },
+    { {"^flint_and_steel$"}, m = {hand(-0.1, 0.07), hand(0, 0.03), hand(-0.07, -0.03)}, r = {nil, -10, 8} },
+    { {"^shears$"}, m = {hand(skinModel(0.16, 0.2), skinModel(-0.16, -0.2)), -0.05, hand(-0.07, 0.05)} },
+    { {"^brush$"}, m = {skinModel(-0.01, -0.02), nil, skinModel(-0.02, 0.03)}, r = {nil, -10, 8} },
+    { {"^clock$"}, m = {skinModel(0.04, 0.03), 0.03, -0.05} },
+    { {"^fire_charge$"}, m = {skinModel(-0.02, -0.03), nil, 0.03} },
+    { {"^recovery_compass$"}, m = {skinModel(0.04, 0.03), nil, -0.05} },
+    { {"^compass$"}, m = {skinModel(0.01, -0.01), nil, nil} },
+    { {"^writable_book$"}, m = {-0.03, nil, -0.05} },
+    { {"^firework_rocket$"}, m = {hand(-0.05, 0.05), nil, -0.03} },
+    { {"^lead$"}, m = {hand(0, skinModel(0.05, 0)), nil, -0.06} },
+    { {"^spyglass$"}, r = {nil, nil, -10} },
+    { {"^wind_charge$"}, m = {hand(skinModel(0.055, 0.04), skinModel(0.02, 0)), -0.08, -0.04} },
+    { {"saddle", "goat_horn", "_harness"}, m = {nil, nil, -0.06} }
+})
 
--- Blocos de Redstone
+if not isItemUsing and itemMatches({"bucket"}) then 
+    move(nil, -0.2, nil) 
+end
 
--- Carrinhos
-if itemName:match("minecart") then move(l == 1 and skinModel(0.06, 0) or skinModel(0.025, 0), nil, skinModel(-0.06, -0.05)) end
--- Trilhos
-if itemName:match("rail") then move(skinModel(0.2, 0.2), nil, 0.06) end
--- Redstone
-if itemName == "redstone" then move(skinModel(0.03, 0.02), nil, nil) end
--- Funil e Gancho de Armadilha
-if itemName == "hopper" or itemName == "tripwire_hook" then move(0.04, nil, -0.03) end
--- Alavanca
-if itemName == "lever" then move(-0.42, 0.045, -0.125) rotate(9.5, 101, nil) scale(2.2, 2.2, 2.2) end
--- Linha
-if itemName == "string" then move(l == 1 and 0 or skinModel(0.09, 0.07), nil, -0.03) end
+-- === COMBAT ===
+pose({
+    { {"^egg$", "^snowball$", "^blue_egg$", "^brown_egg$"}, m = {skinModel(0.03, 0.01), -0.04, skinModel(-0.03, -0.02)} },
+    { {"helmet", "chestplate", "leggings", "boots"}, m = {skinModel(0, -0.01), 0.04, nil} },
+    { {"helmet"}, m = {0.04, -0.14, -0.05} },
+    { {"leggings"}, m = {0.05, -0.078, -0.06} },
+    { {"boots"}, m = {0.04, -0.11, -0.06} },
+    { {"_sword"}, r = {nil, -6.5, nil} },
+    { {"_sword", "mace"}, m = {skinModel(0.03, 0.04), nil, -0.02} },
+    { {"_spear"}, m = {0.01, nil, 0.02} },
+    { {"_horse_armor"}, m = {hand(0.03, -0.05), nil, nil} },
+    { {"_nautilus_armor"}, m = {hand(0, 0.06), nil, -0.05} },
+    { {"^totem_of_undying$"}, m = {skinModel(0.04, 0.03), nil, -0.05} },
+    { {"^mace$"}, m = {0, -0.04, -0.04}, r = {nil, -5.5, nil}, s = {0.9, 0.9, 0.9} },
+    { {"^shield$"}, r = {nil, nil, -8} },
+    { {"^wolf_armor$"}, m = {hand(0, skinModel(0.06, 0.05)), -0.12, -0.06} },
+    { {"^arrow$", "^spectral_arrow$", "^tipped_arrow$"}, m = {nil, nil, -0.02} }
+})
 
--- Ferramentas
+if not isItemUsing and itemName == "trident" then 
+    move(skinModel(-0.09, -0.04), nil, 0.07) 
+end
 
--- Barcos
-if verifyItems({"_boat", "_raft"}) then move(0.1, 0.08, -0.05) end
--- Picaretas, Machados, Pas e Enxadas
-if verifyItems({"pickaxe", "shovel", "hoe", "axe"}) then move(skinModel(0.02, 0.04), nil, -0.05) end
-if itemName:match("pickaxe") then move(skinModel(0, -0.01), nil, 0.005) rotate(nil, nil, -0.5) end
-if itemName:match("shovel") then move(-0.07, -0.2, skinModel(0.07, 0.095)) rotate(5.5, 3.5, -5.5) end
-if itemName:match("hoe") then move(skinModel(0, 0.02), -0.185, 0.005) rotate(nil, -6, nil) end
-if itemName:match("axe") then move(skinModel(0, 0.02), -0.105, nil) rotate(nil, -6, nil) end
--- Trouxas
-if itemName:match("bundle") then move(l == 1 and skinModel(0.01, -0.01) or (skinModel(0.04, 0.02)), nil, -0.02) end
--- Baldes
+-- === FOODS & POTIONS ===
 if not isItemUsing then
-    if itemName:match("bucket") then move(nil, -0.2, nil) end
-end
--- Discos
-if itemName:match("music_disc") then move(l == 1 and 0.05 or skinModel(0.02, 0), -0.08, -0.05) end
--- Disco 11
-if itemName == "music_disc_11" then move(nil, 0.04, nil) end
--- Vara de Pesca
-if itemName == "fishing_rod" then move(skinModel(0.01, 0.03), 0.03, nil) rotate(nil, nil, -5.5) end
--- Varas com Cenoura
-if itemName == "carrot_on_a_stick" then move(skinModel(0.06, 0.1), skinModel(0.06, 0.02), nil) rotate(nil, 4, -10.8) end
--- Varas com Fungo Distorcido
-if itemName == "warped_fungus_on_a_stick" then move(skinModel(0.122, 0.16), 0.02, 0.04) rotate(nil, 2.2, -5.5) end
--- Pederneira
-if itemName == "flint_and_steel" then move(l == 1 and -0.1 or 0.07, l == 1 and 0 or 0.03, l == 1 and -0.07 or -0.03) rotate(nil, -10, 8) end
--- Tesoura
-if itemName == "shears" then move(skinModel(0.16 * l, 0.2 * l), -0.05, l == 1 and -0.07 or 0.05) end
--- Pincel
-if itemName == "brush" then move (skinModel(-0.01, -0.02), nil, skinModel(-0.02, 0.03)) rotate(nil, -10, 8) end
--- Relogio
-if itemName == "clock" then move(skinModel(0.03, 0.02), nil, -0.02) end
--- Bola de Fogo
-if itemName == "fire_charge" then move(skinModel(-0.02, -0.03), nil, 0.03) end
--- Bussola da Retomada
-if itemName == "recovery_compass" then move(skinModel(0.04, 0.03), nil, -0.05) end
--- Bussola
-if itemName == "compass" then move(skinModel(0.01, -0.01), nil, nil) end
--- Livro e Pena
-if itemName == "writable_book" then move(-0.03, nil, -0.05) end
--- Fogo de Artificio
-if itemName == "firework_rocket" then move(-0.05 * l, nil, -0.03) end
--- Farinha de Osso e Etiqueta
-if itemName == "bone_meal" or itemName == "name_tag" then move(l == 1 and 0 or 0.05, nil, -0.06) end
--- Laço
-if itemName == "lead" then move(l == 1 and 0 or skinModel(0.05, 0), nil, -0.06) end
--- Relógio
-if itemName == "clock" then move(0.01, 0.03, -0.03) end
--- Luneta
-if itemName == "spyglass" then rotate(nil, nil, -10) end
--- Projétil de Vento
-if itemName == "wind_charge" then move(l == 1 and skinModel(0.055, 0.04) or skinModel(0.02, 0), -0.08, -0.04) end
--- Sela, Arreios
-if itemName == "saddle" or itemName == "goat_horn" or itemName:match("_harness") then move(nil, nil, -0.06) end
-
--- Combate
-
--- Espadas e Maca
-if itemName:match("_sword") or itemName == "mace" then move(skinModel(0.03, 0.04), nil, -0.02) end
-if itemName:match("_sword") then rotate(nil, -6.5, nil) scale(1, 0.9, 1) end
-if itemName == "mace" then move(0, -0.04, -0.04) rotate(nil, -5.5, nil) scale(0.9, 0.9, 0.9) end
--- Lanças
-if itemName:match("_spear") then move(0.01, nil, 0.02) end
--- Tridente
-if not isItemUsing then
-    if itemName == "trident" then move(skinModel(-0.09, -0.04), nil, 0.07) end
-end
--- Escudo
-if itemName == "shield" then rotate(nil, nil, -8) end
--- Armaduras
-if verifyItems({"helmet", "chestplate", "leggings", "boots"}) then move(skinModel(0, -0.01), 0.04, nil) end
-if itemName:match("helmet") then move(0.04, -0.14, -0.05) end
-if itemName:match("leggings") then move(0.05, -0.078, -0.06) end
-if itemName:match("boots") then move(0.04, -0.11, -0.06) end
--- Armaduras de Cavalo
-if itemName:match("_horse_armor") then move(l == 1 and 0.03 or -0.05, nil, nil) end
--- Armaduras de Lobo
-if itemName == "wolf_armor" then move(l == 1 and 0 or skinModel(0.06, 0.05), -0.12, -0.06) end
--- Armaduras de Náutilus
-if itemName:match("_nautilus_armor") then move(l == 1 and 0 or 0.06, nil, -0.05) end
--- Bola de Neve, Ovos e Projetil de Vento
-if itemName == "egg" or itemName == "snowball" or isInList({"blue_egg", "brown_egg"}) then move(skinModel(0.03, 0.01), -0.04, skinModel(-0.03, -0.02)) end
--- Totem da Imortalidade
-if itemName == "totem_of_undying" then move(skinModel(0.04, 0.03), nil, -0.05) end
--- Flechas
-if itemName == "arrow" or itemName == "spectral_arrow" or itemName == "tipped_arrow" then move(nil, nil, -0.02) end
-
--- Alimentos e Poções
-
-if not isItemUsing then
-    -- Geral
-    if verifyList(itemLists.foods, {""}) then move(skinModel(0.06, 0.09), 0.05, -0.07) rotate(nil, 5, -8) end
-    -- Bifes e Costeletas de Porco
-    if itemName:match("beef") or itemName:match("porkchop") then move(0.03, nil, nil) end
-    if itemName:match("beef") then move(l == 1 and 0 or -0.08, nil, nil) end
-    -- Cenouras
-    if itemName:match("carrot") then move(nil, -0.04, nil) end
-    -- Carneiro
-    if itemName:match("mutton") then move(l == 1 and 0.08 or -0.05, 0.02, -0.02) end
-    -- Coelho
-    if itemName:match("rabbit$") then move(l == 1 and -0.03 or 0.05, -0.08, -0.03) end
-    -- Sopas
-    if itemName:match("stew") or itemName:match("soup") or itemName == "bowl" then move(skinModel(0.01, 0.02), -0.08, -0.02) end
-    if itemName == "rabbit_stew" then move(nil, 0.03, nil) end
-    -- Fatia de Melancia
-    if itemName == "melon_slice" then move(l == 1 and 0.07 or -0.07, nil, nil) end
-    -- Bagas Doces
-    if itemName == "sweet_berries" then move(nil, nil, 0.07) end
-    -- Fruta do Coro
-    if itemName == "chorus_fruit" then move(l == 1 and -0.03 or 0.04, nil, nil) end
-    -- Batata e Batata Envenenada
-    if itemName == "potato" or itemName == "poisonous_potato" then move(l == 1 and 0.06 or -0.05, -0.03, 0.01) end
-    -- Beterraba
-    if itemName == "beetroot" then move(l == 1 and 0 or -0.08, nil, 0.05) end
-    -- Algas Secas
-    if itemName == "dried_kelp" then move(nil, nil, -0.02) end
-    -- Biscoito
-    if itemName == "cookie" then move(skinModel(0.015, 0.02), -0.05, -0.03) end
-    -- Olho de Aranha
-    if itemName == "spider_eye" then move(l == 1 and -0.04 or 0.05, nil, nil) end
-    -- Baiacu
-    if itemName == "pufferfish" then move(skinModel(-0.02, -0.03), nil, nil) end
-    -- Pão
-    if itemName == "bread" and AlexModel then move(nil, nil, -0.01) end
-    -- Poções, Bebidas e Frascos
-    if verifyItems({
-        "honey_bottle", "ominous_bottle","potion", "experience_bottle", "dragon_breath", "glass_bottle",
-        "splash_potion", "lingering_potion"
-    }) then move(l == 1 and skinModel(0.05, 0.08) or skinModel(0.08, 0.1), skinModel(0.03, 0.05), skinModel(-0.09, -0.07)) rotate(nil, 5, -8) end
-    if itemName == "ominous_bottle" then move(l == 1 and skinModel(0.02, 0.01) or skinModel(-0.02, -0.01), nil, nil) end
-    if itemName == "splash_potion" or itemName == "lingering_potion" then move(nil, -0.02, nil) end
-end
-
--- Ingredientes
-
-if isInList({
-    "emerald", "lapis_lazuli", "nether_brick"
-}) or verifyItems({
-    "_ingot", "^brick$", "resin_brick"
-}) then
-    move(nil, -0.03, -0.05)
-end
-
--- Mover para trás
-if (
-    itemName:match("raw") or 
-    itemName:match("coal") or 
-    itemName:match("_banner_pattern") or
-    itemName:match("_pottery_sherd") or
-    itemName:match("_smithing_template") or
-    itemName:match("_key") or
-    isInList({
-        "quartz", "amethyst_shard", "netherite_scrap", "diamond", "flint", "wheat", "feather",
-        "leather", "rabbit_hide", "prismarine_shard", "heart_of_the_sea", "nether_star",
-        "shulker_shell", "echo_shard", "book", "fermented_spider_eye", "blaze_powder",
-        "glistering_melon_slice", "phantom_membrane", "enchanted_book", "copper_nugget",
-        "stick"
-})) then move(skinModel(0.01, 0), nil, -0.06) end
-
--- Mover para a direita
-if (
-    itemName:match("_banner_pattern") or
-    itemName:match("_pottery_sherd") or
-    itemName:match("_smithing_template") or
-    isInList({
-        "diamond", "quartz", "amethyst_shard", "flint", "wheat", "feather", "stick", "bone",
-        "leather", "rabbit_hide", "heart_of_the_sea", "blaze_rod", "breeze_rod", "book",
-        "phantom_membrane", "enchanted_book", "emerald", "copper_nugget"
-})) then move(0.03, nil, nil) end
-
--- Mover para baixo
-if isInList({
-    "turtle_scute", "armadillo_scute", "disc_fragment_5", "ghast_tear", "copper_nugget",
-    "iron_nugget", "gold_nugget"
-}) then move(nil, -0.07, nil) end
-
--- Mover para a esquerda na mão secundária
-if (
-    itemName:match("coal") or
-    itemName:match("raw") or
-    isInList({
-        "netherite_scrap", "resin_clump", "prismarine_shard", "nether_star", "shulker_shell", "echo_shard",
-        "fermented_spider_eye", "blaze_powder", "glistering_melon_slice", "trial_key", "ominous_trial_key"
+    pose({
+        { itemLists.foods, m = {skinModel(0.06, 0.09), 0.05, -0.07}, r = {nil, 5, -8} },
+        { {"stew", "soup", "^bowl$"}, m = {skinModel(0.01, 0.02), -0.08, -0.02} },
+        { {"beef", "porkchop", "^rabbit_stew$"}, m = {0.03, nil, nil} },
+        { {"beef"}, m = {hand(0, -0.08), nil, nil} },
+        { {"carrot"}, m = {nil, -0.04, nil} },
+        { {"mutton"}, m = {hand(0.08, -0.05), 0.02, -0.02} },
+        { {"rabbit$"}, m = {hand(-0.03, 0.05), -0.08, -0.03} },
+        { {"^rabbit_stew$"}, m = {nil, 0.03, nil} },
+        { {"^melon_slice$"}, m = {hand(0.07, -0.07), nil, nil} },
+        { {"^sweet_berries$"}, m = {nil, nil, 0.07} },
+        { {"^chorus_fruit$"}, m = {hand(-0.03, 0.04), nil, nil} },
+        { {"^beetroot$"}, m = {hand(0, -0.08), nil, 0.05} },
+        { {"^dried_kelp$"}, m = {nil, nil, -0.02} },
+        { {"^cookie$"}, m = {skinModel(0.015, 0.02), -0.05, -0.03} },
+        { {"^spider_eye$"}, m = {hand(-0.04, 0.05), nil, nil} },
+        { {"^pufferfish$"}, m = {skinModel(-0.02, -0.03), nil, nil} },
+        { {"^bread$"}, m = {nil, nil, skinModel(-0.01, 0)} },
+        { {"^ominous_bottle$"}, m = {hand(skinModel(0.02, 0.01), skinModel(-0.02, -0.01)), nil, nil} },
+        { {"splash_potion", "lingering_potion"}, m = {nil, -0.02, nil} },
+        { {"^potato$", "^poisonous_potato$"}, m = {hand(0.06, -0.05), -0.03, 0.01} },
+        { {"bottle", "potion", "dragon_breath"}, 
+            m = {hand(skinModel(0.05, 0.08), skinModel(0.08, 0.1)), skinModel(0.03, 0.05), skinModel(-0.09, -0.07)},
+            r = {nil, 5, -8}
+         }
     })
-) then move(l == 1 and 0 or 0.05, nil, nil) end
-
--- Corantes
-if itemName:match("_dye") then move(skinModel(0.2, 0.2), 0.06, 0.03) end
--- Esmeralda
-if itemName == "emerald" and AlexModel then move(0.01, nil, nil) end
--- Escama de Tartaruga
-if itemName == "turtle_scute" then move(-0.02, nil, nil) end
--- Resina
-if itemName == "resin_clump" then move(nil, nil, -0.03) end
--- Bolsas de Tinta
-if itemName == "ink_sac" or itemName == "glow_ink_sac" then move(0.03, -0.06, -0.05) end
--- Slime
-if itemName == "slime_ball" then move(0.03, -0.03, -0.05) end
--- Pedaço de Prismarinho e Estrela do Nether
-if itemName == "prismarine_shard" or itemName == "nether_star" then move(0.01, nil, nil) end
--- Cristais de Prismarinho
-if itemName == "prismarine_crystals" then move(nil, -0.04, -0.05) end
--- Concha de Náutilo
-if itemName == "nautilus_shell" then move(l == 1 and 0.085 or -0.02, nil, -0.06) end
--- Núcleo Pesado
-if itemName == "heavy_core" then move(skinModel(-0.02, 0), nil, 0.06) end
--- Pepitas
-if itemName == "copper_nugget" and AlexModel then move(l == 1 and 0.06 or 0.02, nil, -0.04) end
-if itemName == "iron_nugget" then move(nil, nil, -0.02) end
-if itemName == "gold_nugget" then move(0.03, 0.01, -0.05) end
--- Frasco de Experiência
-if itemName == "experience_bottle" then move(nil, nil, -0.02) end
--- Osso
-if itemName == "bone" then move(nil, -0.35, nil) end
--- Bola de Slime
-if itemName == "slime_ball" and AlexModel then move(0.01, nil, nil) end
--- Varas de Blaze e Breeze
-if (itemName == "blaze_rod" or itemName == "breeze_rod") and AlexModel then move(-0.03, nil, nil) end
--- Fatia de Melancia Reluzente
-if itemName == "glistering_melon_slice" then move(skinModel(-0.03, -0.05), nil, nil) end
-
--- Ovos Geradores
-
-local adjust = {
-    "blaze", "bogged", "breeze", "camel", "cave_spider", "cod", "cow",
-    "creaking", "creeper", "dolphin", "donkey", "drowned", "elder_guardian",
-    "enderman", "evoker", "frog", "ghast", "glow_squid", "goat", "guardian",
-    "happy_ghast", "hoglin", "horse", "husk", "iron_golem", "llama", "magma_cube",
-    "mooshroom", "mule", "panda", "phantom", "pig", "piglin", "piglin_brute",
-    "pillager", "polar_bear", "pufferfish", "ravager", "salmon", "sheep", 
-    "shulker", "skeleton", "skeleton_horse", "slime", "sniffer", "snow_golem",
-    "cave", "squid", "stray", "strider", "tadpole", "trader_llama", "tropical_fish",
-    "turtle", "spider", "villager", "vindicator", "wandering_trader", "warden",
-    "witch", "wither_skeleton", "wolf", "zoglin", "zombie", "zombie_horse",
-    "zombie_villager", "zombified_piglin", "nautilus", "zombie_nautilus",
-    "camel_husk", "parched"
-}
-for _, egg in ipairs(adjust) do
-    if itemName == egg .. "_spawn_egg" then move(skinModel(0.065, 0.04), nil, -0.06) end
 end
 
-if itemName:match("_spawn_egg") and not isInList(adjust) then move(-0.02, nil, nil) end
+-- === INGREDIENTS ===
+pose({
+    { { -- Move Back
+        "raw", "coal", "_banner_pattern", "_pottery_sherd", "_smithing_template", "_key", "quartz$", "^amethyst_shard$",
+        "netherite_scrap", "^diamond$", "^flint$", "wheat", "feather", "heart_of_the_sea", "nether_star", "leather",
+        "rabbit_hide", "prismarine_shard", "shulker_shell", "echo_shard", "^book$", "fermented_spider_eye", 
+        "blaze_powder", "glistering_melon_slice", "phantom_membrane", "enchanted_book", "copper_nugget", "^stick$"
+    }, m = {skinModel(0.01, 0), nil, -0.06} },
+
+    { { -- Move right
+        "_banner_pattern", "_pottery_sherd", "_smithing_template", "wheat", "feather", "^stick$", "^bone$", "^flint$",
+        "^diamond$", "quartz$", "amethyst_shard", "leather", "rabbit_hide", "heart_of_the_sea", "blaze_rod", 
+        "breeze_rod", "^book$", "phantom_membrane", "enchanted_book", "^emerald$", "copper_nugget"
+    }, m = {0.03, nil, nil} },
+
+    { { -- Move down
+        "turtle_scute", "armadillo_scute", "disc_fragment_5", "ghast_tear", "_nugget"
+    }, m = {nil, -0.07, nil} },
+
+    { { -- Move left in off-hand
+        "coal$", "raw_", "netherite_scrap", "resin_clump", "prismarine_shard", "nether_star", "shulker_shell", 
+        "echo_shard", "fermented_spider_eye", "blaze_powder", "glistering_melon_slice", "_key"
+    }, m = {hand(0, 0.05), nil, nil} },
+
+    -- Individual items
+    { {"_ingot", "^brick$", "resin_brick", "^emerald$", "^lapis_lazuli$", "^nether_brick$"}, m = {nil, -0.03, -0.05} },
+    { {"^prismarine_shard$", "^nether_star$"}, m = {0.01, nil, nil} },
+    { {"blaze_rod", "breeze_rod"}, m = {skinModel(-0.03, 0), nil, nil} },
+    { {"_dye"}, m = {skinModel(0.2, 0.2), 0.06, 0.03} },
+    { {"ink_sac"}, m = {0.03, -0.06, -0.05} },
+    { {"^emerald$"}, m = {skinModel(0.01, 0), nil, nil} },
+    { {"^turtle_scute$"}, m = {-0.02, nil, nil} },
+    { {"^resin_clump$"}, m = {nil, nil, -0.03} },
+    { {"^slime_ball$"}, m = {0.03, -0.03, -0.05} },
+    { {"^prismarine_crystals$"}, m = {nil, -0.04, -0.05} },
+    { {"^nautilus_shell$"}, m = {hand(0.085, -0.02), nil, -0.06} },
+    { {"^heavy_core$"}, m = {skinModel(-0.02, 0), nil, 0.06} },
+    { {"^copper_nugget$"}, m = {skinModel(hand(0.06, 0.02), 0), nil, skinModel(-0.04, 0)} },
+    { {"^iron_nugget$"}, m = {nil, nil, -0.02} },
+    { {"^gold_nugget$"}, m = {0.03, 0.01, -0.05} },
+    { {"^experience_bottle$"}, m = {nil, nil, -0.02} },
+    { {"^bone$"}, m = {nil, -0.35, nil} },
+    { {"^slime_ball$"}, m = {skinModel(0.01, 0), nil, nil} },
+    { {"^glistering_melon_slice$"}, m = {skinModel(-0.03, -0.05), nil, nil} },
+    { {"^iron_nugget$"}, m = {nil, nil, -0.02} },
+})
+
+-- === SPAWN EGGS ===
+
+local function isEggAdjust(eggID)
+    for _, egg in ipairs(itemLists.spawnEggAdjust) do
+        if eggID == egg .. "_spawn_egg" then return true end
+    end
+    return false
+end
+
+if isEggAdjust(itemName) then
+    move(skinModel(0.065, 0.04), nil, -0.06)
+elseif itemName:match("_spawn_egg") then
+    move(0.005, nil, nil)
+end
