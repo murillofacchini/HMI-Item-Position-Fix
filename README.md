@@ -56,4 +56,4 @@ To ensure correct positioning and avoid physics glitches, please follow this loa
 * **Incompatibility:** Do not use `Actually 3D Stuff` and `Fresh Flowers and Plants` together.
 * **Loading Priority:** When using `A3DS + W3DI`, the `A3DS` pack must be placed above W3DI.
 
-Found a bug or have a suggestion? Join our [Discord](https://discord.com/channels/1453136992534663319/1453138060538675272) or report it in the [HMI Addon Channel](https://discord.com/channels/1346575587787014326/1469563796648366234)!
+Found a bug or have a suggestion? Join our [Discord](https://discord.com/channels/1453136992534663319/1453138060538675272) or report it in the [HMI Addon Channel](https://discord.com/channels/1346575587787014326/1469563796648366234) or on the [github project](https://github.com/murillofacchini/HMI-Item-Position-Fix/issues)!
