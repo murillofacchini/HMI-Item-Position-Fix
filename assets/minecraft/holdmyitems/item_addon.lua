@@ -629,23 +629,7 @@ if a3ds and itemMatches(packCompatibility.a3ds) then
 end
 
 -- Weskerson's 3D Items
-if w3di and not a3ds then
-    if not bensBundle and itemName:match("bundle") then
-        move(nil, nil, 0.005, true)
-        rotate(2.5, -0.5, -2.5, true)
-        scale(0.8, 0.8, 0.8, true)
-    end
-    if not freshOres and itemMatches(packCompatibility.freshOresIngots) then
-        pose({
-            { {"emerald"}, m = {0.015, 0.035, -0.02}, r = {2.5, 4.5, nil}, s = {0.75} },
-            { {"lapis_lazuli"}, m = {-0.02, 0.045, nil}, r = {nil, 4.5, nil} },
-            { {"diamond"}, m = {0.015, 0.035, -0.045}, r = {2, 4, nil}, s = {0.75} },
-            { {"amethyst_shard"}, m = {nil, nil, -0.05} },
-            { {"nugget"}, m = {nil, 0.08, -0.02} },
-            { {"ingot", "brick$"}, m = {0.03, 0.01, -0.02}, r = {nil, -10.5, -2.5}, s = {0.85} },
-            { {"flint"}, m = {-0.065, -0.075, -0.12}, r = {11.5, 3.5, -4} },
-        }, true)
-    end
+if w3di then
     if not freshFoods and itemMatches(packCompatibility.freshFoods) then
         pose({
             { {"melon_slice"}, m = {nil, nil, -0.115}, r = {nil, 4.5, nil} },
@@ -668,43 +652,77 @@ if w3di and not a3ds then
             { {"lantern"}, m = {nil, 0.125, 0.025}, s = {0.7} },
         }, true)
     end
+    if not a3ds then
+        if not bensBundle and itemName:match("bundle") then
+            move(nil, nil, 0.005, true)
+            rotate(2.5, -0.5, -2.5, true)
+            scale(0.8, 0.8, 0.8, true)
+        end
+        if not freshOres and itemMatches(packCompatibility.freshOresIngots) then
+            pose({
+                { {"emerald"}, m = {0.015, 0.035, -0.02}, r = {2.5, 4.5, nil}, s = {0.75} },
+                { {"lapis_lazuli"}, m = {-0.02, 0.045, nil}, r = {nil, 4.5, nil} },
+                { {"diamond"}, m = {0.015, 0.035, -0.045}, r = {2, 4, nil}, s = {0.75} },
+                { {"amethyst_shard"}, m = {nil, nil, -0.05} },
+                { {"nugget"}, m = {nil, 0.08, -0.02} },
+                { {"ingot", "brick$"}, m = {0.03, 0.01, -0.02}, r = {nil, -10.5, -2.5}, s = {0.85} },
+                { {"flint"}, m = {-0.065, -0.075, -0.12}, r = {11.5, 3.5, -4} },
+            }, true)
+        end
+        pose({
+            -- Functional Blocks
+            { {"armor_stand"}, m = {-0.02, nil, -0.085} },
+            { {"ender_"}, m = {0.015, nil, -0.04}, r = {1.5, -0.5, -2.5}, s = {0.9} },
+
+            -- Tools
+            { {"fishing_rod"}, m = {0.03, nil, 0.135} },
+            { {"flint_and_steel"}, m = {nil, nil, -0.12}, r = {3, -6.5, 1.5} },
+            { {"fire_charge"}, m = {0.05, nil, -0.045}, r = {nil, 1.5, nil}, s = {0.85} },
+            { {"^compass$"}, m = {0.025, -0.005, -0.16}, r = {11.5, -1.5, nil} },
+            { {"writable_book"}, m = {0.09, nil, -0.155} },
+            { {"carrot_on_a_stick"}, m = {0.05, nil, -0.06}, r = {nil, nil, -14.5} },
+            { {"warped_fungus_on_a_stick"}, m = {-0.05, nil, 0.055}, r = {-52.5, 7.5, -2.5} },
+            { {"shears"}, m = {nil, nil, -0.035} },
+
+            -- Combat
+            { {"snowball", "^egg$", "blue_egg", "brown_egg"}, m = {0.1, nil, -0.045}, r = {nil, 1.5, nil}, s = {0.85} },
+
+            --Ingredients
+            { {"^bone$"}, m = {-0.02, -0.06, nil} },
+            { {"bone_meal"}, m = {-0.02, nil, nil} },
+            { {"honeycomb"}, m = {-0.03, nil, nil} },
+            { {"prismarine_crystals"}, m = {nil, nil, 0.01}, r = {nil, 24.5, nil} },
+            { {"heart_of_the_sea"}, m = {0.01, 0.015, -0.025}, r = {3.5, 2.5, -1}, s = {0.75} },
+            { {"breeze_rod", "blaze_rod"}, m = {-0.015, nil, nil} },
+            { {"banner_pattern"}, m = {0.065, -0.07, nil}, r = {nil, 8.5, nil} },
+        }, true)
+    end
     pose({
         -- Functional Blocks
-        { {"armor_stand"}, m = {-0.02, nil, -0.085} },
-        { {"ender_"}, m = {0.015, nil, -0.04}, r = {1.5, -0.5, -2.5}, s = {0.9} },
         { {"flower_pot"}, m = {0.02, 0.015, -0.015}, r = {9.5, -4.5, 3.5} },
         { {"sign"}, m = {0.03, 0.08, -0.03}, r = {7, 4, nil} },
 
         -- Tools
-        { {"fishing_rod"}, m = {0.03, nil, 0.135} },
-        { {"flint_and_steel"}, m = {nil, nil, -0.12}, r = {3, -6.5, 1.5} },
-        { {"fire_charge"}, m = {0.05, nil, -0.045}, r = {nil, 1.5, nil}, s = {0.85} },
-        { {"compass", "clock"}, m = {0.025, -0.005, -0.16}, r = {11.5, -1.5, nil} },
-        { {"writable_book"}, m = {0.09, nil, -0.155} },
-        { {"carrot_on_a_stick"}, m = {0.05, nil, -0.06}, r = {nil, nil, -14.5} },
-        { {"warped_fungus_on_a_stick"}, m = {-0.05, nil, 0.055}, r = {-52.5, 7.5, -2.5} },
+        { {"recovery_compass", "clock"}, m = {0.025, -0.005, -0.16}, r = {11.5, -1.5, nil} },
         { {"bucket"}, m = {-0.07, -0.065, -0.045}, r = {85, -159.5, -5.5}, s = {0.8} },
-        { {"shears"}, m = {nil, nil, -0.035} },
-
-        -- Combat
-        { {"snowball", "^egg$", "blue_egg", "brown_egg"}, m = {0.1, nil, -0.045}, r = {nil, 1.5, nil}, s = {0.85} },
 
         -- Foods & Drinks
         { {"apple"}, m = {nil, -0.005, -0.02}, r = {0.5, 4.5, -2} },
 
-        --Ingredients
-        { {"^bone$"}, m = {-0.02, -0.06, nil} },
-        { {"bone_meal"}, m = {-0.02, nil, nil} },
-        { {"honeycomb"}, m = {-0.03, nil, nil} },
-        { {"prismarine_crystals"}, m = {nil, nil, 0.01}, r = {nil, 24.5, nil} },
-        { {"heart_of_the_sea"}, m = {0.01, 0.015, -0.025}, r = {3.5, 2.5, -1}, s = {0.75} },
-        { {"breeze_rod", "blaze_rod"}, m = {-0.015, nil, nil} },
-        { {"banner_pattern"}, m = {0.065, -0.07, nil}, r = {nil, 8.5, nil} },
-
         -- Spawn Eggs
         { {"_spawn_egg"}, m = {0.05, -0.01, nil}, r = {nil, -1, nil} }
     }, true)
-    if not AlexModel then move(0.025, nil, nil, true) end
+    if not AlexModel then
+        if 
+            not a3ds or 
+            (a3ds and 
+            (itemMatches({"flower_pot", "sign", "recovery_compass", "clock", "bucket", "apple", "spawn_egg"}) or 
+            itemMatches(packCompatibility.freshFoods) or 
+            itemMatches(packCompatibility.rvTorchs))) 
+        then
+            move(0.025, nil, nil, true)
+        end
+    end
 end
 
 -- === ITEMS LISTS ===
