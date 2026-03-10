@@ -317,6 +317,7 @@ if glowing3Dtotem and itemName == "totem_of_undying" then
         move(skinModel(0.02, 0.03), 0.15, -0.16, true)
         rotate(16.5, 64, -21.5, true)
     end
+    if not AlexModel then move(0.01, nil, nil, true) end
 end
 
 -- R&V Torchs
@@ -380,6 +381,7 @@ if bensBundle and itemName:match("bundle") then
         move(0.01, 0.1, -0.025, true) 
         rotate(11.5, 32.5, -11.5, true)
     end
+    if not AlexModel then move(0.01, nil, nil, true) end
 end
 
 -- Fresh Flowers and Plants
@@ -476,7 +478,7 @@ if freshFoods and itemMatches(packCompatibility.freshFoods) then
         { {"chorus_fruit"}, m = {skinModel(0.125, 0.11), -0.04, -0.08}, r = {11, 4, -8} },
         { {"carrot"}, m = {nil, nil, -0.01}, r = {10.5, 4, -4.5} },
         { {"golden_carrot"}, m = {nil, -0.02, -0.03}, r = {-4, nil, 1} },
-        { {"potato"}, m = {0.05, 0.03, -0.105}, r = {9, 6, -8.5}, s = {1.2, 1.2, 1.2} },
+        { {"potato"}, m = {0.05, 0.03, -0.105}, r = {9, 6, -8.5}, s = {1.2} },
         { {"poisonous_potato", "baked_potato"}, m = {-0.005, -0.016, nil}, r = {-3, nil, nil} },
         { {"beetroot"}, m = {0.025, -0.085, -0.195}, r = {9, 3.5, -8.5} },
         { {"dried_kelp"}, m = {0.08, -0.025, -0.105}, r = {11, 17, -10.5} },
@@ -582,6 +584,7 @@ if a3ds and itemMatches(packCompatibility.a3ds) then
         { {"writable_book"}, m = {0.015, -0.02, -0.06}, r = {nil, 14.5, -9.5}, s = {0.75} },
         { {"ender_"}, m = {0.06, 0.01, -0.065}, r = {2, 3, -6.5} },
         { {"ender_pearl"}, m = {-0.02, nil, nil} },
+        { {"ender_eye"}, m = {nil, -0.015, nil} },
         { {"firework_rocket"}, m = {-0.005, nil, -0.15}, r = {2, 3, -8} },
         { {"goat_horn"}, m = {0.07, 0.08, -0.065}, r = {nil, 3.5, -7.5} },
         { {"carrot_on_a_stick"}, r = {nil, 10.5, nil} },
@@ -612,6 +615,13 @@ if a3ds and itemMatches(packCompatibility.a3ds) then
         { {"banner_pattern"}, m = {nil, -0.055, -0.125}, r = {6, nil, nil} },
         { {"clay_ball"}, m = {hand(0, 0.1), nil, nil} },
     }, true)
+    if not AlexModel and not isInList({"name_tag"}) then
+        move(0.03, nil, nil, true)
+        pose({
+            { {"jungle_sapling"}, m = {-0.005, nil, 0.025} },
+            { {"frogspawn"}, m = {0.015} }
+        }, true)
+    end
 end
 
 -- Weskerson's 3D Items
@@ -675,6 +685,9 @@ if w3di and not a3ds then
         -- Combat
         { {"snowball", "^egg$", "blue_egg", "brown_egg"}, m = {0.1, nil, -0.045}, r = {nil, 1.5, nil}, s = {0.85} },
 
+        -- Foods & Drinks
+        { {"apple"}, m = {nil, -0.005, -0.02}, r = {0.5, 4.5, -2} },
+
         --Ingredients
         { {"^bone$"}, m = {-0.02, -0.06, nil} },
         { {"bone_meal"}, m = {-0.02, nil, nil} },
@@ -683,7 +696,11 @@ if w3di and not a3ds then
         { {"heart_of_the_sea"}, m = {0.01, 0.015, -0.025}, r = {3.5, 2.5, -1}, s = {0.75} },
         { {"breeze_rod", "blaze_rod"}, m = {-0.015, nil, nil} },
         { {"banner_pattern"}, m = {0.065, -0.07, nil}, r = {nil, 8.5, nil} },
+
+        -- Spawn Eggs
+        { {"_spawn_egg"}, m = {0.05, -0.01, nil}, r = {nil, -1, nil} }
     }, true)
+    if not AlexModel then move(0.025, nil, nil, true) end
 end
 
 -- === ITEMS LISTS ===
@@ -827,7 +844,7 @@ pose({
 pose({
     { {"_fence", "_wall"}, m = {skinModel(-0.02, 0), nil, 0.05} },
     { {"_fence_gate"},     m = {skinModel(-0.02, 0), -0.1, -0.03} },
-    { {"_button"},         m = {skinModel(0.215, 0.245), 0.035, 0.07}, r = {8.2, -31, -5}, s = {1.3, 1.3, 1.3} },
+    { {"_button"},         m = {skinModel(0.215, 0.245), 0.035, 0.07}, r = {8.2, -31, -5}, s = {1.3} },
     { {"_bars"},           m = {skinModel(-0.02, 0.01), nil, 0.04} },
     { {"iron_bars"},       m = {0.07, 0.05, -0.06}, r = {nil, nil, -0.5} },
     { {"chain"},           m = {skinModel(0.08, 0.1), 0.026, nil}, r = {0.4, nil, -14.7} }
@@ -869,7 +886,7 @@ pose({
     { {"^torchflower$"}, m = {skinModel(0.056, 0.048), 0.061, skinModel(0.07, 0.12)} },
     { {"^azalea$", "^flowering_azalea$"}, m = {skinModel(0.01, 0), nil, skinModel(-0.01, 0.02)} },
     { {"^chorus_plant$"}, m = {hand(skinModel(0.02, 0.043), skinModel(-0.01, 0.03)), -0.1, nil} },
-    { {"^sea_pickle$"}, m = {skinModel(0.07, 0.09), -0.07, -0.03}, r = {nil, 0.5, nil}, s = {1.5, 1.5, 1.5} },
+    { {"^sea_pickle$"}, m = {skinModel(0.07, 0.09), -0.07, -0.03}, r = {nil, 0.5, nil}, s = {1.5} },
     { {"^weeping_vines$"}, m = {skinModel(-0.02, 0), skinModel(-0.3, -0.2), skinModel(-0.1, 0)} },
     { {"^twisting_vines$"}, m = {hand(skinModel(0.095, 0.128), skinModel(-0.01, 0.02)), skinModel(0.06, 0.02), -0.03} },
     { {"^dried_ghast$"}, m = {-0.3, nil, 0.3}, r = {nil, 180, nil} },
@@ -883,22 +900,22 @@ pose({
     { {"^kelp$"}, m = {hand(0.17, -0.1), -0.03, -0.04} },
     { {"^seagrass$"}, m = {skinModel(0.04, 0.06), skinModel(0.06, 0.04), -0.035} },
     { {"^small_amethyst_bud$"}, m = {nil, 0.105, 0.09} },
-    { {"^turtle_egg$"}, m = {skinModel(0.02, 0.046), -0.08, -0.06}, s = {1.3, 1.3, 1.3} },
+    { {"^turtle_egg$"}, m = {skinModel(0.02, 0.046), -0.08, -0.06}, s = {1.3} },
     { {"^sniffer_egg$"}, m = {hand(-0.02, skinModel(0.11, 0.1)), 0.03, -0.03} },
     { {"_seeds"}, m = {hand(-0.03, 0.02), 0.08, skinModel(0.07, 0.1)} },
     { {"^beetroot_seeds$"}, m = {skinModel(0.04, 0.02), 0.03, -0.02}, r = {nil, -5, nil} },
     { {"^torchflower_seeds$"}, m = {0.22, -0.065, -0.055}, r = {nil, -1.5, hand(7, 3)} },
-    { {"^cocoa_beans$"}, m = {skinModel(0.18, 0.2), -0.186, 0.145}, r = {8.8, -30, -3.4}, s = {1.5, 1.5, 1.5} },
+    { {"^cocoa_beans$"}, m = {skinModel(0.18, 0.2), -0.186, 0.145}, r = {8.8, -30, -3.4}, s = {1.5} },
 })
 
 -- == Functional Blocks ==
 pose({
     { {"ender_eye", "ender_pearl"}, m = {hand(0.02, 0.05), -0.02, -0.05} },
-    { {"torch"}, m = {skinModel(-0.01, 0.02), 0.04, 0.02}, r = {7.5, nil, -5}, s = {1.2, 1.2, 1.2} },
+    { {"torch"}, m = {skinModel(-0.01, 0.02), 0.04, 0.02}, r = {7.5, nil, -5}, s = {1.2} },
     { {"anvil"}, m = {skinModel(-0.31, -0.28), nil, nil}, r = {nil, 90, nil} },
     { {"lightning_rod"}, m = {skinModel(-0.02, -0.01), nil, skinModel(0.02, 0.05)} },
     { {"golem_statue"}, m = {-0.04, nil, -0.05} },
-    { {"^end_rod$"}, m = {skinModel(0.03, 0.04), nil, skinModel(0.02, 0.05)}, s = {1.3, 1.3, 1.3} },
+    { {"^end_rod$"}, m = {skinModel(0.015, 0.005), -0.065, skinModel(0.035, -0.005)}, s = {1.3} },
     { {"^grindstone$"}, m = {skinModel(0, 0.035), 0.33, -0.08}, r = {90, nil, nil} },
     { {"^end_crystal$"}, m = {-0.15, -0.1, 0.15} },
     { {"^conduit$"}, m = {skinModel(-0.05, -0.06), skinModel(-0.07, -0.04), skinModel(0.08, 0.16)} },
@@ -982,7 +999,7 @@ if itemName == "trident" then
     move(skinModel(-0.09, -0.04), nil, 0.07) 
 end
 
--- == Foods & Potions ==
+-- == Foods & Drinks ==
 pose({
     { itemLists.foods, m = {skinModel(0.06, 0.09), 0.05, -0.07}, r = {nil, 5, -8} },
     { {"stew", "soup", "^bowl$"}, m = {skinModel(0.01, 0.02), -0.08, -0.02} },
