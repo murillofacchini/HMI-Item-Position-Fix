@@ -13,6 +13,7 @@
     freshSeeds:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshSeeds",
 
     faPlayer:           "HMIItemPositionFix.OtherResourcePacksCompatibility.FreshAnimationsPlayerExtension",
-    NEA:                "HMIItemPositionFix.OtherResourcePacksCompatibility.NotEnoughAnimations"
+    NEA:                "HMIItemPositionFix.OtherResourcePacksCompatibility.NotEnoughAnimations",
+    gHandPoses:         "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses"
   }
 }

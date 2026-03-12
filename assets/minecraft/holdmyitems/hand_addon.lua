@@ -9,7 +9,8 @@ local w3di        = ${w3di}
 local a3ds        = ${a3ds} 
 local rvTorchs    = ${rvTorchs} 
 local bensBundle  = ${bensBundle}
-local freshOres   = ${freshOresIngots} 
+local freshOres   = ${freshOresIngots}
+local gPoses      = ${gHandPoses}
 
 -- === FUNCTIONS ===
 local function itemMatches(tableMatch)

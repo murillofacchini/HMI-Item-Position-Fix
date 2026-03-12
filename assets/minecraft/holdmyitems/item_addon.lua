@@ -19,6 +19,7 @@ local packCompatibility = {
     freshSeeds = {"_seeds"},
     bensBundle = {"bundle"},
     glowing3Dtotem = {"totem_of_undying"},
+    gHandPoses = {"shears"},
     w3di = {
         -- Functional Blocks
         "torch", "^lantern$", "soul_lantern", "copper_lantern", "campfire", "end_crystal", "flower_pot", "armor_stand", "_sign", "ender_eye",
@@ -114,6 +115,7 @@ local activePacks = {}
     local freshOres       = ${freshOresIngots}      and (table.insert(activePacks, "freshOresIngots") or true)
     local freshSeeds      = ${freshSeeds}           and (table.insert(activePacks, "freshSeeds") or true)
     local bensBundle      = ${bensBundle}           and (table.insert(activePacks, "bensBundle") or true)
+    local gPoses          = ${gHandPoses}           and (table.insert(activePacks, "gHandPoses") or true)
 
 -- === FUNCTIONS ===
 local function itemMatches(tableMatch)
@@ -349,7 +351,7 @@ if freshSeeds and itemMatches(packCompatibility.freshSeeds) then
 end
 
 -- Fresh Ores and Ingots
-if freshOres then
+if freshOres and itemMatches(packCompatibility.freshOresIngots) then
     if not AlexModel and not itemMatches({"_shard"}) then move(0.04, -0.005, nil, true) end
     pose({
         { {"amethyst_cluster", "amethyst_bud"}, m = {0.005, -0.005, -0.01}, r = {nil, nil, -3.5} },
@@ -391,7 +393,7 @@ if bensBundle and itemName:match("bundle") then
 end
 
 -- Fresh Flowers and Plants
-if freshFlowers then
+if freshFlowers and itemMatches(packCompatibility.freshFlowersPlants) then
     if not AlexModel then move(0.03, nil, nil, true) end
     pose({
         { {
@@ -631,7 +633,7 @@ if a3ds and itemMatches(packCompatibility.a3ds) then
 end
 
 -- Weskerson's 3D Items
-if w3di then
+if w3di and itemMatches(packCompatibility.w3di) then
     if not freshFoods then
         pose({
             { {"melon_slice"}, m = {nil, nil, -0.115}, r = {nil, 4.5, nil} },

@@ -5,6 +5,8 @@
     a3ds:             "HMIItemPositionFix.ItemsResourcePacksCompatibility.Actually3DStuff",
     rvTorchs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.RVTorches",
     freshOresIngots:  "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshOresAndIngots",
-    bensBundle:       "HMIItemPositionFix.ItemsResourcePacksCompatibility.BensBundle"
+    bensBundle:       "HMIItemPositionFix.ItemsResourcePacksCompatibility.BensBundle",
+
+    gHandPoses:       "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses"
   }
 }
