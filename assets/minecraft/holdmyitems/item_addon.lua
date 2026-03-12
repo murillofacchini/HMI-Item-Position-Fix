@@ -315,8 +315,8 @@ if rvTorchs and itemMatches(packCompatibility.rvTorchs) then
         pose({
             { {"^torch", "soul_torch", "redstone_torch"}, m = {skinModel(-0.04, -0.05), 0.085, 0.01}, r = {nil, 5, nil}, s = {0.65} },
             { {"copper_torch"}, m = {skinModel(0, -0.02), nil, nil}, s = {0.9} },
-            { {"campfire"}, m = {skinModel(0.09, 0.005), skinModel(0.315, 0.33), -0.04}, r = {77.5, -12, 21}, s = {0.65} },
-            { {"repeater", "comparator"}, m = {skinModel(-0.025, -0.045), 0.175, 0.06}, r = {98, -34.5, 14}, s = {0.65} },
+            { {"campfire"}, m = {skinModel(0.09, 0.08), skinModel(0.315, 0.33), -0.04}, r = {77.5, -12, 21}, s = {0.65} },
+            { {"repeater", "comparator"}, m = {skinModel(-0.025, -0.025), 0.175, 0.06}, r = {98, -34.5, 14}, s = {0.65} },
             { {"lantern"}, s = {0.6} }
         }, true)
         if not faPlayer and not nea then
