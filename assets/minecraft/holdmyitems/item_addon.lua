@@ -671,7 +671,7 @@ if w3di then
             { {"shears"}, m = {nil, nil, -0.035} },
 
             -- Combat
-            { {"snowball", "^egg$", "blue_egg", "brown_egg"}, m = {0.06, -0.03, -0.05}, r = {3.5, 2.5, -3} },
+            { {"snowball", "^egg$", "blue_egg", "brown_egg"}, m = {skinModel(0.06, 0.07), skinModel(-0.03, -0.035), skinModel(-0.05, -0.04)}, r = {3.5, 3.5, -3} },
 
             --Ingredients
             { {"^bone$"}, m = {-0.02, -0.06, nil} },
