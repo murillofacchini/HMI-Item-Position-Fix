@@ -110,4 +110,5 @@ end
 -- === HANGING PLANTS ADJUSTS ===
 pose({
     { {"weeping_vines", "hanging_roots", "pale_hanging_moss", "spore_blossom"}, m = {nil, 0.35, -0.05} },
+    { {"glow_item_frame"}, m = {0.14, nil, nil}, r = {25, nil, nil} }
 })
