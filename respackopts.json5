@@ -18,7 +18,8 @@
     },
     OtherResourcePacksCompatibility: {
       FreshAnimationsPlayerExtension: false,
-      NotEnoughAnimations:            false
+      NotEnoughAnimations:            false,
+      GoussHandPoses:                 false
     }
   }
 }

@@ -121,7 +121,7 @@ local itemLists = {
         "copper_torch", "redstone_torch", "hanging_sign", "skeleton_skull", "head", "golem_statue", "comparator",
         "repeater", "button", "hopper", "pickaxe", "axe", "shovel", "hoe", "sword", "carrot_on_a_stick", 
         "warped_fungus_on_a_stick", "boat", "raft", "_spear", "trident", "mace", "cake", "blaze_rod", "breeze_rod", 
-        "heavy_core", "item_frame", "painting", "^lantern$", "soul_lantern", "copper_lantern"
+        "heavy_core", "item_frame", "painting", "^lantern$", "soul_lantern", "copper_lantern", "_head", "_skull"
     }
 }
 
@@ -148,7 +148,7 @@ elseif not isException and is2D then
     rotate(-6.5, -5.5, -1)
 end
 
--- === CATEGORY-BASED ADJUST ===
+-- === INDIVIDUAL ADJUST ===
 pose({
     -- Building Blocks
     { {"_door"}, m = {-0.065, -0.32, 0.334}, r = {nil, -110.5, nil} },
@@ -202,7 +202,6 @@ pose({
     { {"item_frame$", "painting"}, m = {0.035, -0.565, 0.225}, r = {-25, nil, nil} },
     { {"hanging_sign"}, m = {0.1, -0.685, 0.055}, r = {-12.5, -5.5, -1} },
     { {"bell"}, m = {-0.13, -0.61, 0.19}, r = {-18.5, -27.5, -7.5}, s = {1.2} },
-    { {"head", "skull"}, m = {-0.12, 0.115, nil}, r = {-97, -42.5, -89}, s = {1.1} },
 
     -- Redstone Blocks
     { {"repeater", "comparator"}, m = {0.2, -0.075, -0.065}, r = {-5.5, -6, -0.5}, s = {1.25} },

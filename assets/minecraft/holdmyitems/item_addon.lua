@@ -408,13 +408,14 @@ local switchAnimationVariable = Easings:easeInBack(
 )
 if
 	(
-		tag("bundles")
+		itemName:match("bundle")
+		or itemName:match("_head")
+		or itemName:match("_skull")
 		or itemName == "ender_pearl"
 		or itemName == "ender_eye"
 		or I:isThrowable(context.item)
 		or I:isIn(context.item, Tags:getFabricTag("music_discs"))
 		or I:isIn(context.item, Tags:getFabricTag("nuggets"))
-		or tag("skulls")
 	) and useAction ~= "trident"
 then
 	M:rotateX(mat, -10 * switchAnimationVariable)
@@ -1085,7 +1086,6 @@ itemSwingSpeed:put('minecraft:golden_spear', 15)
 itemSwingSpeed:put('minecraft:netherite_spear', 15)
 itemSwingSpeed:put('minecraft:mace', 12)
 
-
 if tag('shovels') then
     itemSwingSpeed:put(I:getName(context.item), 14)
 end
@@ -1164,3 +1164,17 @@ local easedCrossBowM = Easings:easeOutBack(crossBowM)
 local easedCrossBowSecM = Easings:easeOutBack(crossBowSecM)
 local easedCrossBowO = Easings:easeOutBack(crossBowO)
 local easedCrossBowSecO = Easings:easeOutBack(crossBowSecO)
+
+-- === SOME POSITIONS ===
+
+if itemName == "dragon_head" then
+	M:moveY(mat, 0.25)
+    M:rotateZ(mat, 6 * l)
+    M:rotateY(mat, 160 * l)
+elseif itemName:match("_skull") or itemName:match("_head") then
+	M:moveX(mat, -0.1 * l)
+    M:moveY(mat, 0.11)
+    M:rotateZ(mat, 15 * l)
+    M:rotateY(mat, -85 * l)
+    M:rotateX(mat, -55)
+end
