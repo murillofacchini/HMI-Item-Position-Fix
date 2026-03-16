@@ -6,6 +6,7 @@ local itemName    = I:getName(context.item):gsub("minecraft:", "")
 local isUsingItem = P:isUsingItem(context.player)
 local useAction   = I:getUseAction(context.item)
 local AlexModel   = ${AlexSkinModel}
+local axisIndex   = {x = 1, y = 2, z = 3}
 
 -- === FUNCTIONS ===
 local function itemMatches(tableMatch)
@@ -33,6 +34,19 @@ local function scale(x, y, z)
     M:scale(context.matrices, x, y, z)
 end
 
+local function reorder(v)
+    local axStr = v[4]
+    if not axStr then
+        return v[1] or 0, v[2] or 0, v[3] or 0
+    end
+    local out = {0, 0, 0}
+    for i = 1, 3 do
+        local axis = axStr:sub(i, i)
+        out[axisIndex[axis]] = v[i] or 0
+    end
+    return out[1], out[2], out[3]
+end
+
 local function pose(tables)
     for _, t in ipairs(tables) do
         if (t.condition ~= nil and t.condition[1]) or t.condition == nil then
@@ -41,17 +55,17 @@ local function pose(tables)
                     (t.matches == true and itemName:match(i))
                     or (t.matches == nil and (itemName == i or I:isIn(context.item, Tags:getFabricTag(i)) or I:isIn(context.item, Tags:getVanillaTag(i))))
                 then
-                    if t.m then 
-                        move(t.m[1], t.m[2], t.m[3]) 
+                    if t.m then
+                        move(reorder(t.m))
                     end
-                    if t.r then 
-                        rotate(t.r[1], t.r[2], t.r[3]) 
+                    if t.r then
+                        rotate(reorder(t.r))
                     end
-                    if t.s then 
+                    if t.s then
                         if t.s[1] and not t.s[2] and not t.s[3] then
                             scale(t.s[1], t.s[1], t.s[1])
                         elseif t.s[1] or t.s[2] or t.s[3] then
-                            scale(t.s[1], t.s[2], t.s[3])
+                            scale(reorder(t.s))
                         end
                     end
                     break
@@ -146,6 +160,9 @@ if general3D then
 elseif general2D then
     move(0.035, 0.04, -0.075)
     rotate(-6.5, -5.5, -1)
+end
+if not AlexModel then
+    move(0.035, nil, nil)
 end
 
 -- === INDIVIDUAL ADJUST ===
