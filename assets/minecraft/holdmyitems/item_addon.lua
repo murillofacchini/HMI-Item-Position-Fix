@@ -209,8 +209,6 @@ else
 end
 
 if useAction == "spear" then
-    M:rotateZ(mat, 180 * l)
-
     M:rotateZ(mat, -180 * Easings:easeInOutBack(M:clamp(sw * 2, 0, 1)) * l)
     M:moveZ(mat, -0.2 * Easings:easeInOutSine(Easings:easeInOutBack(sc * 0.8)))
 
@@ -395,11 +393,6 @@ if itemName == "slime_ball" or itemName == "slime_block" or itemName == "honey_b
 			M:shear(mat, 0, 0 + ywAngle * 0.006, 0)
 		end
 	end
-end
-
-if tags({"shovels"}) then
-	M:moveX(mat, -0.09 * l)
-	M:rotateY(mat, 80 * l)
 end
 
 prevPitch   = P:getPitch(context.player)
@@ -1166,4 +1159,9 @@ elseif tags({"skulls"}) then
     M:rotateZ(mat, 15 * l)
     M:rotateY(mat, -85 * l)
     M:rotateX(mat, -55)
+end
+
+if tags({"shovels"}) then
+	M:moveX(mat, -0.09 * l)
+	M:rotateY(mat, 80 * l)
 end
