@@ -14,7 +14,9 @@
       FreshFlowersAndPlants:  false,
       FreshFoods:             false,
       FreshOresAndIngots:     false,
-      FreshSeeds:             false
+      FreshSeeds:             false,
+      PatoRefinedBuckets:     false,
+      PatoRefinedTorches:     false
     },
     OtherResourcePacksCompatibility: {
       FreshAnimationsPlayerExtension: false,

@@ -473,11 +473,13 @@ end
 
 if
 	itemName == "brewing_stand"
-	or itemName == "redstone_torch"
 	or itemName == "torch"
-	or itemName == "lantern"
 	or itemName == "soul_torch"
+	or itemName == "redstone_torch"
+	or itemName == "copper_torch"
+	or itemName == "lantern"
 	or itemName == "soul_lantern"
+	or itemName:match("copper_lantern")
 then
 	if itemName == "brewing_stand" or itemName == "torch" then
 		particleManager:addParticle(
@@ -497,6 +499,31 @@ then
 			0,
 			1.3,
 			Texture:of("minecraft", "textures/particle/orange_glow.png"),
+			"ITEM",
+			context.hand,
+			"SPAWN",
+			"ADDITIVE",
+			0,
+			200 + (20 * M:sin(P:getAge(context.player) * 0.2))
+		)
+	elseif itemName == "copper_torch" then
+		particleManager:addParticle(
+			context.particles,
+			false,
+			0.5 * l,
+			0.6,
+			0.5,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			1.3,
+			Texture:of("minecraft", "textures/particle/copper_glow.png"),
 			"ITEM",
 			context.hand,
 			"SPAWN",
@@ -546,7 +573,7 @@ then
 			0,
 			0,
 			1.3,
-			Texture:of("minecraft", "textures/particle/orange_glow.png"),
+			Texture:of("minecraft", "textures/particle/copper_glow.png"),
 			"ITEM",
 			context.hand,
 			"SPAWN",

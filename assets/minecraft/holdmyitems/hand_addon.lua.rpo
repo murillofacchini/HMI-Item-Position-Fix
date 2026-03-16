@@ -6,6 +6,7 @@
     rvTorchs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.RVTorches",
     freshOresIngots:  "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshOresAndIngots",
     bensBundle:       "HMIItemPositionFix.ItemsResourcePacksCompatibility.BensBundle",
+    refinedBuckets:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedBuckets",
 
     gHandPoses:       "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses"
   }
