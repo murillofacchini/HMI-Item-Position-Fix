@@ -1,16 +1,11 @@
 -- by omnis._.
 
 -- === CONTEXTS ===
-local l         = context.mainHand and 1 or -1
-local itemName  = I:getName(context.item):gsub("minecraft:", "")
-local AlexModel = ${AlexSkinModel}
-
--- === ITEM STATE ===
-local isItemUsing = false
-if P:isUsingItem(context.player) then
-    local useAction = I:getUseAction(context.item)
-    isItemUsing = useAction == "drink" or useAction == "eat" or useAction == "trident"
-end
+local l           = context.mainHand and 1 or -1
+local itemName    = I:getName(context.item):gsub("minecraft:", "")
+local isUsingItem = P:isUsingItem(context.player)
+local useAction   = I:getUseAction(context.item)
+local AlexModel   = ${AlexSkinModel}
 
 -- === FUNCTIONS ===
 local function itemMatches(tableMatch)
@@ -23,19 +18,15 @@ local function itemMatches(tableMatch)
 end
 
 local function move(x, y, z)
-    if not isItemUsing then
-        if x then M:moveX(context.matrices, x * l) end
-        if y then M:moveY(context.matrices, y) end
-        if z then M:moveZ(context.matrices, z) end
-    end
+    if x then M:moveX(context.matrices, x * l) end
+    if y then M:moveY(context.matrices, y) end
+    if z then M:moveZ(context.matrices, z) end
 end
 
 local function rotate(x, y, z)
-    if not isItemUsing then
-        if x then M:rotateX(context.matrices, x) end
-        if y then M:rotateY(context.matrices, y * l) end
-        if z then M:rotateZ(context.matrices, z * l) end
-    end
+    if x then M:rotateX(context.matrices, x) end
+    if y then M:rotateY(context.matrices, y * l) end
+    if z then M:rotateZ(context.matrices, z * l) end
 end
 
 local function scale(x, y, z)
@@ -243,7 +234,7 @@ pose({
     { {"rails"}, m = {0.165, -0.085, -0.09}, r = {-5.5, -5, -1.5} },
 
     -- Tools & Utilities
-    { {"bucket"}, m = {0.03, -0.02, -0.26}, r = {-95.5, nil, 149}, matches = true },
+    { {"bucket"}, m = {0.03, -0.02, -0.26}, r = {-95.5, nil, 149}, matches = true, condition = {not isUsingItem} },
     { {"fishing_rod", "_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil}, matches = true },
     { {"pickaxes", "axes", "hoes"}, m = {0.025, -0.115, -0.04}, r = {nil, -8.5, nil} },
     { {"shovels"}, m = {0.005, -0.185, 0.035}, r = {-4, 5.5, -7} },
@@ -331,3 +322,13 @@ pose({
     { itemLists.spawnEggAdjust, m = {nil, 0.04, nil}, matches = true, condition = {itemName:match("spawn_egg")} },
     { {"_spawn_egg"}, m = {-0.005, -0.04, nil}, matches = true }
 })
+
+-- === USING ITEM ===
+if isUsingItem then
+    if
+        useAction == "trident" then move(nil, nil, -0.1)
+        elseif useAction == "eat" then move(nil, -0.1, 0.1)
+        elseif useAction == "drink" and not itemName == "milk_bucket" then move(nil, -0.05, nil)
+        elseif useAction == "drink" and itemName == "milk_bucket" then rotate(-110, 30, 10) move(-0.1, -0.1, 0.1)
+    end
+end

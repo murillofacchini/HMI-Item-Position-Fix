@@ -523,11 +523,6 @@ if useAction == "spear" then
     M:rotateY(mat, 10 * l)
 end
 
--- == BLOCK ROTATION ANIMATION ==
-if tags({"hanging_signs", "doors", "skulls", "signs"}) then
-	applyBlockRotation:put(I:getName(context.item), false)
-end
-
 -- == BOW STATE ==
 usingItem:put("minecraft:bow",    bc >= 0.1)
 useDuration:put("minecraft:bow",  Easings:cubicEase(bc) * 20)

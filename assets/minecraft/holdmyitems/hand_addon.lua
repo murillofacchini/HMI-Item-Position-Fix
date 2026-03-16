@@ -1,8 +1,8 @@
 -- by omnis._.
 
 -- === CONTEXTS ===
-local l         = context.mainHand and 1 or -1
-local itemName  = I:getName(context.item):gsub("minecraft:", "")
+local l           = context.mainHand and 1 or -1
+local itemName    = I:getName(context.item):gsub("minecraft:", "")
 
 -- === PACKS COMPATIBILITY ===
 local w3di              = ${w3di}
@@ -110,7 +110,7 @@ if w3di then
     end
 end
 
--- === HANGING PLANTS ADJUSTS ===
+-- === INDIVIDUAL ADJUSTS ===
 pose({
     { {"weeping_vines", "hanging_roots", "pale_hanging_moss", "spore_blossom"}, m = {nil, 0.35, -0.05} },
     { {"glow_item_frame"}, m = {0.14, nil, nil}, r = {25, nil, nil} }
