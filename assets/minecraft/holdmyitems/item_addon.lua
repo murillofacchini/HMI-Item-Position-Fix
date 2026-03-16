@@ -122,6 +122,8 @@ local easedMapZoomer        = Easings:easeInOutBack(mapZoomer)
 local useAction             = I:getUseAction(context.item)
 local itemName              = I:getName(context.item):gsub("minecraft:", "")
 
+-- == FUNCTIONS ==
+
 function easeCustom(t)
     local t2 = t * t
     local t3 = t2 * t
@@ -142,6 +144,34 @@ local function tags(itemsTags)
 	end
 	return false
 end
+
+local function glow(x, y, z, texture)
+	particleManager:addParticle(
+		context.particles,
+		false,
+		x, y, z,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 1.3,
+		Texture:of("minecraft", texture),
+		"ITEM", context.hand,
+		"SPAWN", "ADDITIVE",
+		0, 200 + (20 * M:sin(P:getAge(context.player) * 0.2))
+	)
+end
+
+local function particle(x, y, z, texture, size, tick)
+	particleManager:addParticle(
+		context.particles, true,
+		x, y, z,
+		(math.random() * 0.12 - 0.06) * l, math.random() * 0.12,
+		0, 0, 0, 0, 0, 0, 0, size or 0.4,
+		Texture:of("minecraft", texture),
+		"SCREEN", context.hand,
+		"OPACITY", "TRANSLUCENT_L",
+		1, 255, tick
+	)
+end
+
+-- == CALC ==
 
 brushSpeedM = brushSpeedM + (M:sin(foodCountSec * 4.14) * brushCounter) * context.deltaTime * 30
 brushSpeedM = brushSpeedM - GRAVITY * brushAngleM * context.deltaTime * 30
@@ -466,196 +496,24 @@ if (context.mainHand and mainHandSwitchEvent) or offHandSwitchEvent then
     S:playSound("context.item.armor.equip_leather", 0.2)
 end
 
-local ticker = function(particle)
-    particle.dy = particle.dy + 0.005 * context.deltaTime * 30
-    particle.dx = particle.dx + 0.005 * M:sin(context.player.age * 0.5) * context.deltaTime * 30
-end
+-- == GLOW AND PARTICLES ==
 
 if
 	itemName == "brewing_stand"
+	or itemName == "lava_bucket"
 	or itemName == "torch"
-	or itemName == "soul_torch"
-	or itemName == "redstone_torch"
-	or itemName == "copper_torch"
-	or itemName == "lantern"
-	or itemName == "soul_lantern"
-	or itemName:match("copper_lantern")
+	or itemName:match("_torch")
+	or tags({"lanterns"})
 then
-	if itemName == "brewing_stand" or itemName == "torch" then
-		particleManager:addParticle(
-			context.particles,
-			false,
-			0.5 * l,
-			0.6,
-			0.5,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1.3,
-			Texture:of("minecraft", "textures/particle/orange_glow.png"),
-			"ITEM",
-			context.hand,
-			"SPAWN",
-			"ADDITIVE",
-			0,
-			200 + (20 * M:sin(P:getAge(context.player) * 0.2))
-		)
-	elseif itemName == "copper_torch" then
-		particleManager:addParticle(
-			context.particles,
-			false,
-			0.5 * l,
-			0.6,
-			0.5,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1.3,
-			Texture:of("minecraft", "textures/particle/copper_glow.png"),
-			"ITEM",
-			context.hand,
-			"SPAWN",
-			"ADDITIVE",
-			0,
-			200 + (20 * M:sin(P:getAge(context.player) * 0.2))
-		)
-	elseif itemName == "lantern" then
-		particleManager:addParticle(
-			context.particles,
-			false,
-			0.45 * l,
-			0.15,
-			0.5,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1.3,
-			Texture:of("minecraft", "textures/particle/orange_glow.png"),
-			"ITEM",
-			context.hand,
-			"SPAWN",
-			"ADDITIVE",
-			0,
-			200 + (20 * M:sin(P:getAge(context.player) * 0.2))
-		)
-	elseif I:isLantern(context.item) and itemName:match("copper") then
-		particleManager:addParticle(
-			context.particles,
-			false,
-			0.45 * l,
-			0.15,
-			0.5,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1.3,
-			Texture:of("minecraft", "textures/particle/copper_glow.png"),
-			"ITEM",
-			context.hand,
-			"SPAWN",
-			"ADDITIVE",
-			0,
-			200 + (20 * M:sin(P:getAge(context.player) * 0.2))
-		)
-	elseif itemName == "soul_torch" then
-		particleManager:addParticle(
-			context.particles,
-			false,
-			0.5 * l,
-			0.6,
-			0.5,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1.3,
-			Texture:of("minecraft", "textures/particle/blue_glow.png"),
-			"ITEM",
-			context.hand,
-			"SPAWN",
-			"ADDITIVE",
-			0,
-			110 + (10 * M:sin(P:getAge(context.player) * 0.2))
-		)
-	elseif itemName == "soul_lantern" then
-		particleManager:addParticle(
-			context.particles,
-			false,
-			0.45 * l,
-			0.15,
-			0.5,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1.3,
-			Texture:of("minecraft", "textures/particle/blue_glow.png"),
-			"ITEM",
-			context.hand,
-			"SPAWN",
-			"ADDITIVE",
-			0,
-			110 + (10 * M:sin(P:getAge(context.player) * 0.2))
-		)
-	elseif itemName == "redstone_torch" then
-		particleManager:addParticle(
-			context.particles,
-			false,
-			0.5 * l,
-			0.6,
-			0.5,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			1.3,
-			Texture:of("minecraft", "textures/particle/red_glow.png"),
-			"ITEM",
-			context.hand,
-			"SPAWN",
-			"ADDITIVE",
-			0,
-			110 + (10 * M:sin(P:getAge(context.player) * 0.2))
-		)
+	if
+		itemName == "brewing_stand" or itemName == "torch" 	then glow(0.5 * l, 0.6, 0.5, "textures/particle/orange_glow.png")
+		elseif itemName == "copper_torch" 					then glow(0.5 * l, 0.6, 0.5, "textures/particle/copper_glow.png")
+		elseif itemName == "soul_torch" 					then glow(0.5 * l, 0.6, 0.5, "textures/particle/blue_glow.png")
+		elseif itemName == "redstone_torch" 				then glow(0.5 * l, 0.6, 0.5, "textures/particle/red_glow.png")
+		elseif itemName == "lantern" 						then glow(0.45 * l, 0.15, 0.5, "textures/particle/orange_glow.png")
+		elseif itemName == "soul_lantern" 					then glow(0.45 * l, 0.15, 0.5, "textures/particle/blue_glow.png")
+		elseif itemName:match("copper_lantern") 			then glow(0.45 * l, 0.15, 0.5, "textures/particle/copper_glow.png")
+		elseif itemName == "lava_bucket" 					then glow(-0.05 * l, 0, 0, "textures/particle/orange_glow.png")
 	end
 end
 
@@ -664,435 +522,28 @@ if swingCountPrev ~= P:getSwingCount(context.player) and context.mainHand and it
 end
 swingCountPrev = P:getSwingCount(context.player)
 
-if itemName == "pink_petals" or itemName == "wildflowers" or itemName == "leaf_litter" then
+if
+	itemName == "pink_petals"
+	or itemName == "wildflowers"
+	or itemName == "leaf_litter"
+then
+	local particle_ticker = function(p)
+		p.dx = p.dx + 0.005 * M:sin(P:getAge(context.player) * 0.3) * context.deltaTime * 30
+	end
 	local flower = ""
-	if itemName == "pink_petals" then
-		flower = "pink_petals"
-	elseif itemName == "wildflowers" then
-		flower = "wild_flowers"
-	elseif itemName == "leaf_litter" then
-		flower = "leaf_litter"
-	end
-
-	local particle_ticker = function(particle)
-		particle.dx = particle.dx + 0.005 * M:sin(P:getAge(context.player) * 0.3) * context.deltaTime * 30
-	end
+	if itemName == "wildflowers" then flower = "wild_flowers" else flower = itemName end
 
 	if swingMHandPrev ~= context.swingMHand and context.mainHand then
 		S:playSound("block.leaf_litter.place", 0.7)
-		local value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.75 * l,
-			-0.2,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.4,
-			Texture:of("minecraft", "textures/particle/firefly.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.75 * l,
-			-0.2,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.4,
-			Texture:of("minecraft", "textures/particle/firefly.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_1.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_1.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_2.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_2.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.2,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_4.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.2,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_4.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-	elseif swingOHandPrev ~= context.swingOHand and not context.mainHand then
-		S:playSound("block.leaf_litter.place", 0.7)
-		local value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.75 * l,
-			-0.2,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.4,
-			Texture:of("minecraft", "textures/particle/firefly.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.75 * l,
-			-0.2,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.4,
-			Texture:of("minecraft", "textures/particle/firefly.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_1.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_1.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_2.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.3,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_2.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.2,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_4.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-		value = math.random() * 0.3
-		particleManager:addParticle(
-			context.particles,
-			true,
-			0.65 * l,
-			-0.25,
-			-0.9,
-			(math.random() * 0.12 - 0.06) * l,
-			math.random() * 0.12,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0.2,
-			Texture:of("minecraft", "textures/particle/" .. flower .. "_4.png"),
-			"SCREEN",
-			context.hand,
-			"OPACITY",
-			"TRANSLUCENT_L",
-			1,
-			255,
-			particle_ticker
-		)
-	end
+        particle(0.75 * l, -0.2,  -0.9, "textures/particle/firefly.png", 0.4, particle_ticker)
+        particle(0.75 * l, -0.2,  -0.9, "textures/particle/firefly.png", 0.4, particle_ticker)
+        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_1.png", 0.3, particle_ticker)
+        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_1.png", 0.3, particle_ticker)
+        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_2.png", 0.3, particle_ticker)
+        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_2.png", 0.3, particle_ticker)
+        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_4.png", 0.2, particle_ticker)
+        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_4.png", 0.2, particle_ticker)
+    end
 end
 
 if context.mainHand then
@@ -1100,6 +551,8 @@ if context.mainHand then
 else
 	swingOHandPrev = context.swingOHand
 end
+
+--------
 
 itemSwingSpeed:put('minecraft:trident', 12)
 itemSwingSpeed:put('minecraft:iron_spear', 15)
@@ -1118,33 +571,6 @@ end
 global.foodCount = 0.0
 global.foodCountO = 0.0
 local easedFoodCounter = Easings:easeInQuart(context.mainHand and foodCount or foodCountO)
-
-if itemName == "lava_bucket" then
-	particleManager:addParticle(
-		context.particles,
-		false,
-		-0.05 * l,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		2,
-		Texture:of("minecraft", "textures/particle/orange_glow.png"),
-		"ITEM",
-		context.hand,
-		"SPAWN",
-		"ADDITIVE",
-		0,
-		150 + (20 * M:sin(P:getAge(context.player) * 0.2))
-	)
-end
 
 if useAction == "trident" then
 	M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
@@ -1174,7 +600,7 @@ end
 
 useDuration:put("minecraft:bow", Easings:cubicEase(bc) * 20)
 
--- === HEADS POSITIONS ===
+-- === SOME POSITIONS ===
 
 if itemName == "dragon_head" then
 	M:moveY(mat, 0.25)
