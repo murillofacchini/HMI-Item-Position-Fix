@@ -1,0 +1,6 @@
+{
+  expansions: {
+    rvTorches:          "HMIItemPositionFix.ItemsResourcePacksCompatibility.RVTorches",
+    refinedTorches:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedTorches"
+  }
+}

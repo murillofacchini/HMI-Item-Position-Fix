@@ -99,6 +99,7 @@ local easedMapSmoother      = Easings:easeInOutBack(mapSmoother)
 local easedMapZoomer        = Easings:easeInOutBack(mapZoomer)
 local useAction             = I:getUseAction(context.item)
 local itemName              = I:getName(context.item):gsub("minecraft:", "")
+local torchesPack           = ${rvTorches} or ${refinedTorches}
 
 -- == FUNCTIONS ==
 function easeCustom(t)
@@ -468,14 +469,14 @@ if
 	or tags({"lanterns"})
 then
 	if
-		itemName == "brewing_stand" or itemName == "torch" 	then glow(0.5 * l, 0.6, 0.5, "textures/particle/orange_glow.png")
-		elseif itemName == "copper_torch" 					then glow(0.5 * l, 0.6, 0.5, "textures/particle/copper_glow.png")
-		elseif itemName == "soul_torch" 					then glow(0.5 * l, 0.6, 0.5, "textures/particle/blue_glow.png")
-		elseif itemName == "redstone_torch" 				then glow(0.5 * l, 0.6, 0.5, "textures/particle/red_glow.png")
-		elseif itemName == "lantern" 						then glow(0.45 * l, 0.15, 0.5, "textures/particle/orange_glow.png")
-		elseif itemName == "soul_lantern" 					then glow(0.45 * l, 0.15, 0.5, "textures/particle/blue_glow.png")
-		elseif itemName:match("copper_lantern") 			then glow(0.45 * l, 0.15, 0.5, "textures/particle/copper_glow.png")
-		elseif itemName == "lava_bucket" 					then glow(-0.05 * l, 0, 0, "textures/particle/orange_glow.png")
+		itemName == "brewing_stand" or itemName == "torch" 		then glow(0.5 * l, 0.6, 0.5, "textures/particle/orange_glow.png")
+		elseif itemName == "copper_torch" and not torchesPack 	then glow(0.5 * l, 0.6, 0.5, "textures/particle/copper_glow.png")
+		elseif itemName == "soul_torch" 						then glow(0.5 * l, 0.6, 0.5, "textures/particle/blue_glow.png")
+		elseif itemName == "redstone_torch" 					then glow(0.5 * l, 0.6, 0.5, "textures/particle/red_glow.png")
+		elseif itemName == "lantern" 							then glow(0.45 * l, 0.15, 0.5, "textures/particle/orange_glow.png")
+		elseif itemName == "soul_lantern" 						then glow(0.45 * l, 0.15, 0.5, "textures/particle/blue_glow.png")
+		elseif itemName:match("copper_lantern") 				then glow(0.45 * l, 0.15, 0.5, "textures/particle/copper_glow.png")
+		elseif itemName == "lava_bucket" 						then glow(-0.05 * l, 0, 0, "textures/particle/orange_glow.png")
 	end
 end
 

@@ -1,14 +1,34 @@
 -- by omnis._.
 
 -- === CONTEXTS ===
-local l           = context.mainHand and 1 or -1
-local itemName    = I:getName(context.item):gsub("minecraft:", "")
-local isUsingItem = P:isUsingItem(context.player)
-local useAction   = I:getUseAction(context.item)
-local AlexModel   = ${AlexSkinModel}
-local axisIndex   = {x = 1, y = 2, z = 3}
+local l               = context.mainHand and 1 or -1
+local itemName        = I:getName(context.item):gsub("minecraft:", "")
+local itemIsCompat    = IsItemCompat()
+local isUsingItem     = P:isUsingItem(context.player)
+local useAction       = I:getUseAction(context.item)
+local AlexModel       = ${AlexSkinModel}
+local axisIndex       = {x = 1, y = 2, z = 3}
 
 -- === FUNCTIONS ===
+function IsItemCompat()
+    for _, rp in ipairs(ActivePacks) do
+        local pack = PackCompat[rp]
+        for _, i in ipairs(pack[1]) do
+            if
+                (pack.matches == true and itemName:match(i))
+                or (pack.matches == nil and (
+                    itemName == i
+                    or I:isIn(context.item, Tags:getFabricTag(i))
+                    or I:isIn(context.item, Tags:getVanillaTag(i))
+                ))
+            then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 local function itemMatches(tableMatch)
     for _, item in ipairs(tableMatch) do
         if itemName:match(item) then
@@ -34,6 +54,20 @@ local function scale(x, y, z)
     M:scale(context.matrices, x, y, z)
 end
 
+local function renderBlock(render, items, force)
+    for _, i in ipairs(items) do
+        if
+            ((itemName == i
+            or I:isIn(context.item, Tags:getFabricTag(i))
+            or I:isIn(context.item, Tags:getVanillaTag(i)))
+            and not itemIsCompat)
+            or force
+        then
+            renderAsBlock:put(I:getName(context.item), render)
+        end
+    end
+end
+
 local function reorder(v)
     local axStr = v[4]
     if not axStr then
@@ -47,7 +81,7 @@ local function reorder(v)
     return out[1], out[2], out[3]
 end
 
-local function pose(tables)
+local function pose(tables, force)
     for _, t in ipairs(tables) do
         if (t.condition ~= nil and t.condition[1]) or t.condition == nil then
             for _, i in ipairs(t[1]) do
@@ -55,17 +89,23 @@ local function pose(tables)
                     (t.matches == true and itemName:match(i))
                     or (t.matches == nil and (itemName == i or I:isIn(context.item, Tags:getFabricTag(i)) or I:isIn(context.item, Tags:getVanillaTag(i))))
                 then
-                    if t.m then
-                        move(reorder(t.m))
-                    end
-                    if t.r then
-                        rotate(reorder(t.r))
-                    end
-                    if t.s then
-                        if t.s[1] and not t.s[2] and not t.s[3] then
-                            scale(t.s[1], t.s[1], t.s[1])
-                        elseif t.s[1] or t.s[2] or t.s[3] then
-                            scale(reorder(t.s))
+                    local adjust = not itemIsCompat or force
+                    if adjust then
+                        if t.renderAsBlock ~=nil then
+                            renderBlock(t.renderAsBlock, t[1], force)
+                        end
+                        if t.m then
+                            move(reorder(t.m))
+                        end
+                        if t.r then
+                            rotate(reorder(t.r))
+                        end
+                        if t.s then
+                            if t.s[1] and not t.s[2] and not t.s[3] then
+                                scale(t.s[1], t.s[1], t.s[1])
+                            elseif t.s[1] or t.s[2] or t.s[3] then
+                                scale(reorder(t.s))
+                            end
                         end
                     end
                     break
@@ -73,10 +113,6 @@ local function pose(tables)
             end
         end
     end
-end
-
-local function hand(posMainHand, posOffHand)
-    return l == 1 and posMainHand or posOffHand
 end
 
 -- === ITEMS LISTS ===
@@ -126,7 +162,7 @@ local itemLists = {
         "^sugar$", "glistering_melon_slice", "magma_cream", "_nugget", "_ingot", "^stick$", "bone", "_dye", 
         "dragon_breath", "rabbit_foot", "banner_pattern", "pottery_sherd", "smithing_template"
     },
-    exepct = {
+    except = {
         "pink_petals", "wildflowers", "leaf_litter", "bucket", "fishing_rod", "shears", "rail", "fence", "wall",
         "bed_", "_banner$", "candle", "glow_lichen", "sniffer_egg", "sculk_vein", "^torch$", "_torch",
         "hanging_sign", "golem_statue", "comparator", "conduit", "_head", "campfire", "anvil", "brewing_stand",
@@ -138,20 +174,22 @@ local itemLists = {
 }
 
 -- === ITEM TYPE CHECKING ===
-local is2D          = (itemMatches(itemLists.sprites2D) or itemName:match("spawn_egg")) and not itemMatches(itemLists.exepct)
-local isException   = itemMatches(itemLists.hangingPlants) or itemMatches(itemLists.exepct)
-local general3D     = (not isException and not is2D) or itemMatches({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest"})
-local general2D     = not isException and is2D
+local is2D          = (itemMatches(itemLists.sprites2D) or itemName:match("spawn_egg")) and not itemMatches(itemLists.except)
+local isException   = itemMatches(itemLists.hangingPlants) or itemMatches(itemLists.except)
+
+local general3D =
+    ((not isException and not is2D) or itemMatches({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest"}))
+    and not itemIsCompat
+
+local general2D =
+    (not isException and is2D)
+    and not itemIsCompat
 
 -- === NOT RENDER AS BLOCK ===
-local NotRenderAsBlock = {
-    "weeping_vines", "^vine$", "ladder", "sign", "tripwire_hook", "string", "_bars", "resin_clump", "glass_pane", "sugar_cane"
-}
-for _, i in ipairs(NotRenderAsBlock) do
-    if (itemName:match(i) and not isException) or itemName == "vine" then
-        renderAsBlock:put(I:getName(context.item), false)
-    end
-end
+renderBlock(
+    false,
+    {"weeping_vines", "vine", "ladder", "sign", "tripwire_hook", "string", "bars", "resin_clump", "glass_pane", "sugar_cane"}
+)
 
 -- === GENERAL ADJUST ===
 if general3D then
@@ -198,7 +236,7 @@ pose({
     { {"weeping_vines"}, m = {0.105, -0.24, -0.12}, r = {-3, nil, nil}, s = {1.6} },
     { {"twisting_vines"}, m = {0.085, nil, nil} },
     { {"vine", "glow_lichen", "sculk_vein"}, m = {-0.07, -0.35, 0.01}, r = {-7.5, -96, -6.5}, s = {1, 1, 0.2} },
-    { {"sunflower"}, m = {hand(-0.08, -0.02), nil, hand(0.33, -0.07)}, r = {nil, hand(-131.5, 30), nil} },
+    { {"sunflower"}, m = {l == 1 and -0.08 or -0.02, nil, l == 1 and 0.33 or -0.07}, r = {nil, l == 1 and -131.5 or 30, nil} },
     { {"small_dripleaf"}, m = {0.06, nil, -0.015} },
     { {"big_dripleaf"}, m = {0.065, nil, -0.09} },
     { {"chorus_plant"}, m = {0.06, -0.145, -0.09}, s = {1.65} },
@@ -222,7 +260,6 @@ pose({
     { {"campfire"}, m = {0.21, -0.085, -0.095}, r = {-4, -5.5, -1}, s = {1.25}, matches = true },
     { {"lightning_rod"}, m = {0.18, -0.1, 0.02}, r = {-1, -23, nil}, s = {1.3}, matches = true },
     { {"torch", "soul_torch", "copper_torch", "redstone_torch"}, m = {0.07, -0.08, -0.065}, r = {-4.5, -5, -1}, s = {1.2} },
-    { {"end_rod"}, m = {0.195, -0.025, 0.03}, r = {nil, -24, nil}, s = {1.5} },
     { {"end_rod"}, m = {0.195, -0.025, 0.03}, r = {nil, -24, nil}, s = {1.5} },
     { {"grindstone"}, m = {0.16, 0.35, -0.05}, r = {90, nil, 22.5} },
     { {"furnace", "blast_furnace", "smoker", "wooden_shelves", "lectern", "barrel"}, m = {-0.305, nil, 0.27}, r = {-180, nil, 180} },
@@ -349,3 +386,6 @@ if isUsingItem then
         elseif useAction == "drink" and itemName == "milk_bucket" then rotate(-110, 30, 10) move(-0.1, -0.1, 0.1)
     end
 end
+
+-- === PACK COMPATIBILITY ===
+pose(Positions, true)
