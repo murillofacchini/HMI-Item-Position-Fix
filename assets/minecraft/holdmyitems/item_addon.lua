@@ -367,8 +367,9 @@ if (useAction == "drink" or useAction == "eat" or useAction == "toot_horn") and 
 	end
 end
 
-global.foodCount    = 0.0
-global.foodCountO   = 0.0
+global.foodCount          = 0.0;
+global.foodCountO         = 0.0;
+local easedFoodCounter    = Easings:easeInQuart(context.mainHand and foodCount or foodCountO)
 
 -- == BRUSH ANIMATION ==
 if useAction == "brush" then
@@ -544,4 +545,21 @@ end
 if tags({"shovels"}) then
 	M:moveX(mat, -0.09 * l)
 	M:rotateY(mat, 80 * l)
+end
+
+if itemName:match("bucket") then
+	M:moveY(mat, 0.025)
+	M:moveX(mat, -0 * l)
+	M:moveZ(mat, -0.1)
+	M:rotateY(mat, 180)
+	M:rotateX(mat, -82.5)
+	M:rotateZ(mat, -20 * l)
+	if itemName == "milk_bucket" then
+		M:rotateX(mat, -0 * easedFoodCounter)
+		M:rotateZ(mat, 30 * l * easedFoodCounter)
+		M:rotateY(mat, 0 * l * easedFoodCounter)
+		M:moveX(mat, 0 * l * easedFoodCounter)
+		M:moveY(mat, 0.1 * easedFoodCounter)
+		M:moveZ(mat, 0.02 * easedFoodCounter)
+	end
 end

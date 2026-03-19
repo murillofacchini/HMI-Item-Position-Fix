@@ -1,114 +1,100 @@
 -- by omnis._.
 
 -- === CONTEXTS ===
-local l               = context.mainHand and 1 or -1
-local itemName        = I:getName(context.item):gsub("minecraft:", "")
-local itemIsCompat    = IsItemCompat()
-local isUsingItem     = P:isUsingItem(context.player)
-local useAction       = I:getUseAction(context.item)
-local AlexModel       = ${AlexSkinModel}
-local axisIndex       = {x = 1, y = 2, z = 3}
+local l           = context.mainHand and 1 or -1
+local itemName    = I:getName(context.item):gsub("minecraft:", "")
+local isUsingItem = P:isUsingItem(context.player)
+local useAction   = I:getUseAction(context.item)
+local AlexModel   = ${AlexSkinModel}
 
--- === FUNCTIONS ===
-function IsItemCompat()
-    for _, rp in ipairs(ActivePacks) do
-        local pack = PackCompat[rp]
-        for _, i in ipairs(pack[1]) do
-            if
-                (pack.matches == true and itemName:match(i))
-                or (pack.matches == nil and (
-                    itemName == i
-                    or I:isIn(context.item, Tags:getFabricTag(i))
-                    or I:isIn(context.item, Tags:getVanillaTag(i))
-                ))
-            then
-                return true
-            end
+-- === FUNCTIONS AND COMPATIBILITY ===
+-- == Match Item ==
+local function matched(item, match)
+    local list = type(item) == "table" and item or {item}
+
+    local function check(i)
+        if match then
+            return itemName:match(i) ~= nil
         end
+        return itemName == i
+            or I:isIn(context.item, Tags:getFabricTag(i))
+            or I:isIn(context.item, Tags:getVanillaTag(i))
+    end
+
+    for _, i in ipairs(list) do
+        if check(i) then return true end
     end
     return false
 end
 
-local function itemMatches(tableMatch)
-    for _, item in ipairs(tableMatch) do
-        if itemName:match(item) then
-            return true
+-- == Compatibility ==
+local isItemCompat = false
+for _, rp in ipairs(ActivePacks) do
+    local pack = PackCompat[rp]
+    for _, i in ipairs(pack[1]) do
+        if matched(i, pack.matches) then
+            isItemCompat = true
         end
     end
-    return false
 end
 
-local function move(x, y, z)
-    if x then M:moveX(context.matrices, x * l) end
-    if y then M:moveY(context.matrices, y) end
-    if z then M:moveZ(context.matrices, z) end
-end
-
-local function rotate(x, y, z)
-    if x then M:rotateX(context.matrices, x) end
-    if y then M:rotateY(context.matrices, y * l) end
-    if z then M:rotateZ(context.matrices, z * l) end
-end
-
-local function scale(x, y, z)
-    M:scale(context.matrices, x, y, z)
-end
-
+-- == Render Item as Block ==
 local function renderBlock(render, items, force)
     for _, i in ipairs(items) do
-        if
-            ((itemName == i
-            or I:isIn(context.item, Tags:getFabricTag(i))
-            or I:isIn(context.item, Tags:getVanillaTag(i)))
-            and not itemIsCompat)
-            or force
-        then
+        if (matched(i, false) and not isItemCompat) or force then
             renderAsBlock:put(I:getName(context.item), render)
+            return
         end
     end
 end
 
-local function reorder(v)
-    local axStr = v[4]
-    if not axStr then
-        return v[1] or 0, v[2] or 0, v[3] or 0
+-- == Position Processing ==
+local move = {
+    x = function(v) M:moveX(context.matrices, v * l) end,
+    y = function(v) M:moveY(context.matrices, v) end,
+    z = function(v) M:moveZ(context.matrices, v) end
+}
+local rotate = {
+    x = function(v) M:rotateX(context.matrices, v) end,
+    y = function(v) M:rotateY(context.matrices, v * l) end,
+    z = function(v) M:rotateZ(context.matrices, v * l) end
+}
+
+local function process(ops, dataORx, default_y, default_z)
+    if type(dataORx) ~= "table" then
+        if dataORx   then ops.x(dataORx)       end
+        if default_y then ops.y(default_y)  end
+        if default_z then ops.z(default_z)  end
+        return
     end
-    local out = {0, 0, 0}
+    local order = dataORx[4] or "xyz"
     for i = 1, 3 do
-        local axis = axStr:sub(i, i)
-        out[axisIndex[axis]] = v[i] or 0
+        local axis = order:sub(i, i):lower()
+        local val  = dataORx[i]
+        if val and ops[axis] then ops[axis](val) end
     end
-    return out[1], out[2], out[3]
 end
 
 local function pose(tables, force)
     for _, t in ipairs(tables) do
         if (t.condition ~= nil and t.condition[1]) or t.condition == nil then
             for _, i in ipairs(t[1]) do
-                if
-                    (t.matches == true and itemName:match(i))
-                    or (t.matches == nil and (itemName == i or I:isIn(context.item, Tags:getFabricTag(i)) or I:isIn(context.item, Tags:getVanillaTag(i))))
-                then
-                    local adjust = not itemIsCompat or force
-                    if adjust then
-                        if t.renderAsBlock ~=nil then
+                if matched(i, t.matches) then
+                    if not isItemCompat or force then
+                        if t.renderAsBlock ~= nil then
                             renderBlock(t.renderAsBlock, t[1], force)
                         end
-                        if t.m then
-                            move(reorder(t.m))
-                        end
-                        if t.r then
-                            rotate(reorder(t.r))
-                        end
+                        if t.m then process(move, t.m)   end
+                        if t.r then process(rotate, t.r) end
                         if t.s then
                             if t.s[1] and not t.s[2] and not t.s[3] then
-                                scale(t.s[1], t.s[1], t.s[1])
+                                M:scale(t.s[1], t.s[1], t.s[1])
                             elseif t.s[1] or t.s[2] or t.s[3] then
-                                scale(reorder(t.s))
+                                M:scale(t.s[1], t.s[2], t.s[3])
                             end
                         end
                     end
-                    break
+                    return
                 end
             end
         end
@@ -170,20 +156,14 @@ local itemLists = {
         "boat", "raft", "trident", "mace", "cake", "blaze_rod", "breeze_rod", "heavy_core", "item_frame", "painting", 
         "^lantern$", "soul_lantern", "copper_lantern", "_head", "_skull", "pressure_plate", "trapdoor", "carpet", 
         "bamboo", "^vine$", "frogspawn", "turtle_egg", "dried_ghast"
-    },
+    }
 }
 
 -- === ITEM TYPE CHECKING ===
-local is2D          = (itemMatches(itemLists.sprites2D) or itemName:match("spawn_egg")) and not itemMatches(itemLists.except)
-local isException   = itemMatches(itemLists.hangingPlants) or itemMatches(itemLists.except)
-
-local general3D =
-    ((not isException and not is2D) or itemMatches({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest"}))
-    and not itemIsCompat
-
-local general2D =
-    (not isException and is2D)
-    and not itemIsCompat
+local isException   = matched(itemLists.hangingPlants) or matched(itemLists.except, true)
+local is2D          = matched(itemLists.sprites2D, true) or itemName:match("spawn_egg")
+local general3D     = ((not isException and not is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest"}, true)) and not isItemCompat
+local general2D     = not isException and is2D and not isItemCompat
 
 -- === NOT RENDER AS BLOCK ===
 renderBlock(
@@ -193,14 +173,14 @@ renderBlock(
 
 -- === GENERAL ADJUST ===
 if general3D then
-    move(0.05, -0.075, -0.1)
-    rotate(-4, 18, -1)
+    process(move, 0.05, -0.075, -0.1)
+    process(rotate, -4, 18, -1)
 elseif general2D then
-    move(0.035, 0.04, -0.075)
-    rotate(-6.5, -5.5, -1)
+    process(move, 0.035, 0.04, -0.075)
+    process(rotate, -6.5, -5.5, -1)
 end
 if not AlexModel then
-    move(0.035, nil, nil)
+    process(move, 0.035, nil, nil)
 end
 
 -- === INDIVIDUAL ADJUST ===
@@ -288,7 +268,7 @@ pose({
     { {"rails"}, m = {0.165, -0.085, -0.09}, r = {-5.5, -5, -1.5} },
 
     -- Tools & Utilities
-    { {"bucket"}, m = {0.03, -0.02, -0.26}, r = {-95.5, nil, 149}, matches = true, condition = {not isUsingItem} },
+    { {"bucket"}, m = {-0.1, 0.06, -0.095}, r = {6, -3.5, nil}, matches = true, condition = {not isUsingItem} },
     { {"fishing_rod", "_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil}, matches = true },
     { {"pickaxes", "axes", "hoes"}, m = {0.025, -0.115, -0.04}, r = {nil, -8.5, nil} },
     { {"shovels"}, m = {0.005, -0.185, 0.035}, r = {-4, 5.5, -7} },
@@ -378,12 +358,12 @@ pose({
 })
 
 -- === USING ITEM ===
-if isUsingItem then
+if isUsingItem and not isItemCompat then
     if
-        useAction == "trident" then move(nil, nil, -0.1)
-        elseif useAction == "eat" then move(nil, -0.1, 0.1)
-        elseif useAction == "drink" and not itemName == "milk_bucket" then move(nil, -0.05, nil)
-        elseif useAction == "drink" and itemName == "milk_bucket" then rotate(-110, 30, 10) move(-0.1, -0.1, 0.1)
+        useAction == "trident"                                      then process(move, nil, nil, -0.1)
+        elseif useAction == "eat"                                   then process(move, nil, -0.1, 0.1)
+        elseif useAction == "drink" and itemName ~= "milk_bucket"   then process(move, nil, -0.05, nil)
+        elseif useAction == "drink" and itemName == "milk_bucket"   then process(move, -0.03, 0.18, 0.02) process(rotate, nil, -33, nil)
     end
 end
 
