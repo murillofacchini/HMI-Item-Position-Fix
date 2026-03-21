@@ -100,6 +100,7 @@ local easedMapZoomer        = Easings:easeInOutBack(mapZoomer)
 local useAction             = I:getUseAction(context.item)
 local itemName              = I:getName(context.item):gsub("minecraft:", "")
 local torchesPack           = ${rvTorches} or ${refinedTorches}
+local glowing3Darmors		= ${glowing3Darmors}
 
 -- == FUNCTIONS ==
 function easeCustom(t)
@@ -319,6 +320,9 @@ elseif itemName == "painting" or itemName == "item_frame" or itemName == "glow_i
 	context.swingProgress = 0
 	M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -25, 90) + ptAngle, 0, 0.45, 0)
 	M:rotateZ(mat, ywAngle * -1, 0, 0.55, 0)
+elseif glowing3Darmors and tags({"chest_armor"}) then
+    M:rotateX(mat, -(P:getPitch(context.player) * 0.09 + ptAngle * 0.6), -0.129, -0.004, 0.495)
+    M:rotateZ(mat, ywAngle * 0.5, -0.129, -0.004, 0.495)
 else
 	if
 		not I:isBlock(context.item)
@@ -419,6 +423,7 @@ if
 		or itemName == "ender_pearl"
 		or itemName == "ender_eye"
 		or I:isThrowable(context.item)
+		or (glowing3Darmors and tags({"head_armor"}))
 	) and useAction ~= "trident"
 then
     M:rotateX(mat, -10 * switchAnimationVariable)

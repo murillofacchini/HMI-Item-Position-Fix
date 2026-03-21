@@ -1,8 +1,12 @@
 -- by omnis._.
 
--- === CONTEXTS ===
-local l           = context.mainHand and 1 or -1
-local itemName    = I:getName(context.item):gsub("minecraft:", "")
+global.mainHandSwitch           = 0.0;
+global.offHandSwitch            = 0.0;
+
+local l                         = context.mainHand and 1 or -1
+local itemName                  = I:getName(context.item):gsub("minecraft:", "")
+local switch_val                = (context.mainHand and mainHandSwitch) or offHandSwitch
+local switchAnimationVariable   = Easings:easeInBack(M:sin(M:clamp(switch_val, 0.09723, 0.60632) * 3.24 * 1.65 - 0.1))
 
 -- === FUNCTIONS AND COMPATIBILITY ===
 local function matched(item, match)
@@ -83,7 +87,18 @@ local function pose(tables, force)
 end
 
 -- === PACKS COMPATIBILITY ===
+local glowing3Darmors = ${glowing3Darmors} and (table.insert(ActivePacks, "glowing3Darmors") or true)
 
+-- == PACKS INDIVIDUAL ADJUSTS ==
+if glowing3Darmors then
+    pose({
+        { {"chest_armor"}, m = {nil, 0.415, nil} }
+    }, true)
+    if matched("head_armor") then
+        M:rotateX(context.matrices, 10 * switchAnimationVariable)
+        M:rotateZ(context.matrices, 6 * switchAnimationVariable)
+    end
+end
 
 -- === INDIVIDUAL ADJUSTS ===
 pose({
