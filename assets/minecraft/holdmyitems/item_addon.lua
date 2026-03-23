@@ -102,6 +102,7 @@ local itemName              = I:getName(context.item):gsub("minecraft:", "")
 local torchesPack           = ${rvTorches} or ${refinedTorches}
 local glowing3Darmors		= ${glowing3Darmors}
 local a3ds					= ${a3ds}
+local w3di					= ${w3di}
 
 -- == FUNCTIONS ==
 function easeCustom(t)
@@ -483,7 +484,7 @@ if
 	or itemName == "lava_bucket"
 	or itemName == "torch"
 	or itemName:match("_torch")
-	or tags({"lanterns"})
+	or (tags({"lanterns"}) and not w3di)
 then
 	if
 		itemName == "brewing_stand" or itemName == "torch" 		then glow(0.5 * l, 0.6, 0.5, "textures/particle/orange_glow.png")
@@ -495,6 +496,22 @@ then
 		elseif itemName:match("copper_lantern") 				then glow(0.45 * l, 0.15, 0.5, "textures/particle/copper_glow.png")
 		elseif itemName == "lava_bucket" 						then glow(-0.05 * l, 0, 0, "textures/particle/orange_glow.png")
 	end
+end
+
+if
+	w3di
+	and not torchesPack
+	and (
+		tags({"lanterns"})
+		or itemName == "soul_torch"
+		or itemName == "redstone_torch"
+	)
+then
+	if itemName == "soul_torch" 		then glow(0.5 * l, 0.6, 0.5, "textures/particle/b_glow.png") end
+	if itemName == "redstone_torch" 	then glow(0.5 * l, 0.6, 0.5, "textures/particle/r_glow.png") end
+	if itemName == "lantern" 			then glow(0.05 * l, -0.2, -0.2, "textures/particle/orange_glow.png") end
+	if itemName == "soul_lantern" 		then glow(0.05 * l, -0.2, -0.2, "textures/particle/b_glow.png") end
+	if itemName:match("copper_lantern") then glow(0.05 * l, -0.2, -0.2, "textures/particle/copper_glow.png") end
 end
 
 if swingCountPrev ~= P:getSwingCount(context.player) and context.mainHand and itemName == "bell" then

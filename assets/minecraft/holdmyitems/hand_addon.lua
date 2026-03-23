@@ -88,12 +88,20 @@ end
 
 -- === PACKS COMPATIBILITY ===
 local a3ds              = ${a3ds}
+local w3di              = ${w3di}
 local glowing3Darmors   = ${glowing3Darmors}
 
 -- == PACKS INDIVIDUAL ADJUSTS ==
 if a3ds then
     pose({
         { {"lily_pad"}, m = {nil, 0.375, nil} }
+    }, true)
+end
+
+if w3di then
+    pose({
+        { {"copper_torch"}, r = {nil, nil, 10}, m = {nil, nil, 0.05} },
+        { {"elytra"}, m = {nil, 0.415, nil} }
     }, true)
 end
 

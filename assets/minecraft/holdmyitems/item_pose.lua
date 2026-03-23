@@ -28,12 +28,16 @@ local function matched(item, match)
 end
 
 -- == Compatibility ==
-local isItemCompat = false
-for _, rp in ipairs(ActivePacks) do
-    local pack = PackCompat[rp]
-    for _, i in ipairs(pack[1]) do
-        if matched(i, pack.matches) then
-            isItemCompat = true
+ActivePacks           = ActivePacks or {}
+PackCompat            = PackCompat or {}
+local isItemCompat    = false
+if (ActivePacks and next(ActivePacks)) and (PackCompat and next(PackCompat)) then
+    for _, rp in ipairs(ActivePacks) do
+        local pack = PackCompat[rp]
+        for _, i in ipairs(pack[1]) do
+            if matched(i, pack.matches) then
+                isItemCompat = true
+            end
         end
     end
 end
@@ -354,4 +358,7 @@ end
 
 -- === PACK COMPATIBILITY ===
 Positions = Positions or {}
-if Positions and #Positions > 0 then pose(Positions, true) end
+if Positions and next(Positions) then pose(Positions, true) end
+
+UndoPositions = UndoPositions or {}
+if UndoPositions and next(UndoPositions) then pose(UndoPositions, true) end

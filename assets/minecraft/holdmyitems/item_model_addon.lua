@@ -6,6 +6,7 @@ local isUsingItem   = P:isUsingItem(context.player)
 local l             = context.mainHand and 1 or -1
 
 -- === FUNCTION ===
+UndoPositions = {}
 Positions = {}
 local function addPos(tables)
     for _, t in ipairs(tables) do
@@ -88,26 +89,62 @@ PackCompat = {
             "firefly_bush", "crimson_roots", "warped_roots", "nether_sprouts", "tall_grass", 'large_fern',
             "tall_dry_grass", "sunflower", "lilac", "rose_bush", "peony", "pitcher_plant"
         }
+    },
+    w3di = {
+        {
+            -- Functional Blocks
+            "torch", "^lantern$", "soul_lantern", "copper_lantern", "campfire", "end_crystal", "flower_pot", 
+            "armor_stand", "_sign", "ender_eye",
+            -- Redstone Blocks
+            "redstone$", "repeater", "comparator", "lever",
+            -- Tools
+            "bucket", "fishing_rod", "flint_and_steel", "fire_charge", "bone_meal", "shears", "name_tag",
+            "lead", "bundle", "compass", "clock", "map", "book", "wind_charge", "ender_pearl", "elytra",
+            "firework_rocket", "carrot_on_a_stick", "warped_fungus_on_a_stick", "goat_horn", "music_disc",
+            "_boat", "_raft",
+            -- Combat
+            "mace", "nautilus_armor", "totem_of_undying", "snowball", "^egg$", "brown_egg", "blue_egg",
+            -- Foods & Potions
+            "apple", "^chorus_fruit$", "melon_slice", "carrot", "potato", "^beetroot$",
+            "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$", 
+            "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken", 
+            "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$", 
+            "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "potion", "cake",
+            -- Ingredients
+            "coal$", "raw", "^emerald$", "^lapis_lazuli$", "diamond$", "quartz$", "amethyst_shard",
+            "nugget", "ingot", "netherite_scrap", "stick$", "flint$", "bone$", "feather", 
+            "honeycomb", "scute", "slime_ball", "clay_ball", "prismarine_crystals",
+            "nautilus_shell", "heart_of_the_sea", "blaze_rod", "breeze_rod", "shulker_shell",
+            "disc_fragment_5", "bowl", "brick$", "bottle", "glowstone_dust", "gunpowder",
+            "dragon_breath", "blaze_powder", "sugar$", "_banner_pattern",
+            -- Spawn Eggs
+            "spawn_egg"
+        }, matches = true
     }
 }
 
 ActivePacks = {}
-    local a3ds              = ${a3ds} and (table.insert(ActivePacks, "a3ds") or true)
-    local rvTorches         = ${rvTorches} and (table.insert(ActivePacks, "rvTorches") or true)
-    local refinedTorches    = ${refinedTorches} and (table.insert(ActivePacks, "refinedTorches") or true)
-    local refinedBuckets    = ${refinedBuckets} and (table.insert(ActivePacks, "refinedBuckets") or true)
-    local glowing3Dtotem    = ${glowing3Dtotem} and (table.insert(ActivePacks, "glowing3Dtotem") or true)
-    local glowing3Darmors   = ${glowing3Darmors} and (table.insert(ActivePacks, "glowing3Darmors") or true)
-    local bensBundle        = ${bensBundle} and (table.insert(ActivePacks, "bensBundle") or true)
-    local freshDiscs        = ${freshDiscs} and (table.insert(ActivePacks, "freshDiscs") or true)
-    local freshFoods        = ${freshFoods} and (table.insert(ActivePacks, "freshFoods") or true)
-    local freshSeeds        = ${freshSeeds} and (table.insert(ActivePacks, "freshSeeds") or true)
-    local freshOres         = ${freshOresIngots} and (table.insert(ActivePacks, "freshOresIngots") or true)
+    local a3ds              = ${a3ds}               and (table.insert(ActivePacks, "a3ds") or true)
+    local w3di              = ${w3di}               and (table.insert(ActivePacks, "w3di") or true)
+    local rvTorches         = ${rvTorches}          and (table.insert(ActivePacks, "rvTorches") or true)
+    local refinedTorches    = ${refinedTorches}     and (table.insert(ActivePacks, "refinedTorches") or true)
+    local refinedBuckets    = ${refinedBuckets}     and (table.insert(ActivePacks, "refinedBuckets") or true)
+    local glowing3Dtotem    = ${glowing3Dtotem}     and (table.insert(ActivePacks, "glowing3Dtotem") or true)
+    local glowing3Darmors   = ${glowing3Darmors}    and (table.insert(ActivePacks, "glowing3Darmors") or true)
+    local bensBundle        = ${bensBundle}         and (table.insert(ActivePacks, "bensBundle") or true)
+    local freshDiscs        = ${freshDiscs}         and (table.insert(ActivePacks, "freshDiscs") or true)
+    local freshFoods        = ${freshFoods}         and (table.insert(ActivePacks, "freshFoods") or true)
+    local freshSeeds        = ${freshSeeds}         and (table.insert(ActivePacks, "freshSeeds") or true)
+    local freshOres         = ${freshOresIngots}    and (table.insert(ActivePacks, "freshOresIngots") or true)
     local freshFlowers      = ${freshFlowersPlants} and (table.insert(ActivePacks, "freshFlowersPlants") or true)
 
 -- === UNDO ADJUSTS ===
 UndoAdjusts = {
+    a3ds = {
+        totem = { {"totem_of_undying"}, r = {10, 190, 110, "yzx"} }
+    }
 }
+if a3ds and glowing3Dtotem then table.insert(UndoPositions, UndoAdjusts.a3ds.totem) end
 
 -- === INDIVIDUAL RESOURCE PACK ADJUST ===
 if a3ds then
@@ -150,7 +187,7 @@ if a3ds then
         -- Combat
         { {"egg", "brown_egg", "blue_egg"}, m = {0.03, -0.01, -0.085}, r = {-6, -6, nil} },
         { {"snowball"}, m = {0.015, -0.01, -0.085}, r = {-6, -6, nil} },
-        
+
         -- Ingredients
         { {"string"}, m = {0.05, -0.005, -0.075}, r = {-4.5, -4.5, nil}, renderAsBlock = false },
         { {"smithing_template"}, m = {-0.095, -0.11, -0.14}, r = {-5.5, -5, nil}, matches = true },
@@ -171,16 +208,11 @@ if a3ds then
         { {"dyes"}, m = {0.02, nil, -0.105}, r = {-4, -5.5, nil} },
         { {"book", "enchanted_book"}, m = {-0.135, nil, 0.085}, r = {-5, -6, -2} },
         { {"firework_star", "magma_cream"}, m = {0.03, 0.01, -0.01}, r = {-4.5, -5, -1.5} },
-        { {"redstone", "glowstone_dust", "gunpowder", "sugar", "blaze_powder"}, m = {-0.01, -0.02, -0.095}, r = {-8.5, nil, nil} },
+        { {"glowstone_dust", "gunpowder", "sugar", "blaze_powder"}, m = {-0.01, -0.02, -0.095}, r = {-8.5, nil, nil} },
         { {"rabbit_foot"}, m = {-0.01, -0.005, -0.08}, r = {-5, -4.5, nil} },
         { {"ghast_tear"}, m = {0.02, -0.02, -0.05}, r = {-5, -5, -2}, s = {1.3} },
         { {"loom_patterns"}, m = {nil, nil, -0.175} },
     })
-    if glowing3Dtotem then
-        addPos({
-            { {"totem_of_undying"}, m = {-0.02, 0.09, -0.155}, r = {-107, -15.5, -120.5}, s = {0.85} }
-        })
-    end
     if not freshOres then
         addPos({
             { {"resin_clump"}, m = {-0.005, -0.055, -0.095}, r = {-7, -4.5, nil}, renderAsBlock = false },
@@ -194,6 +226,111 @@ if a3ds then
             { {"quartz"}, m = {0.005, 0.07, -0.035}, r = {-6, -7, nil}, s = {0.7} },
             { {"amethyst_shard", "echo_shard"}, m = {0.025, -0.01, -0.055}, r = {-4.5, -5.5, nil} },
             { {"netherite_scrap"}, m = {-0.045, -0.035, -0.13}, r = {-6, -5, -1} },
+            { {"redstone"}, m = {-0.01, -0.02, -0.095}, r = {-8.5, nil, nil} },
+        })
+    end
+end
+
+if w3di then
+    addPos({
+        -- Functional Blocks
+        { {"end_crystal"}, m = {-0.08, -0.225, -0.04} },
+        { {"flower_pot"}, m = {0.025, -0.015, -0.04}, r = {4, -5.5, 3.5} },
+        { {"armor_stand"}, m = {-0.055, -0.015, -0.08}, r = {-4, -9.5, 6} },
+        { {"signs"}, m = {-0.035, 0.02, -0.065}, r = {-4.5, -5, 6.5} },
+
+        -- Redstone Blocks
+        { {"repeater", "comparator"}, r = {-6.5, nil, nil}, condition = {not rvTorches} },
+        { {"lever"}, r = {8.5, nil, nil} },
+        { {"boats"}, r = {3.5, -8, -4.5} },
+
+        -- Tools & Utilities
+        { {"bundles"}, m = {-0.05, -0.015, -0.015}, r = {-6, -11, 2.5}, s = {0.9}, condition = {not bensBundle} },
+        { {"music_discs"}, m = {-0.05, nil, -0.06}, r = {-5.5, -10.5, 2.5}, condition = {not freshDiscs} },
+        { {"disc_fragment_5"}, m = {-0.065, -0.045, -0.005}, r = {-5.5, -9.5, 5.5}, condition = {not freshDiscs} },
+        { {"bucket"}, m = {0.02, 0.05, -0.09}, r = {-94.5, -21, 180}, matches = true },
+        { {"flint_and_steel"}, m = {0.05, -0.015, -0.145}, r = {3.5, -6, 4.5} },
+        { {"shears"}, m = {nil, -0.085, -0.085}, r = {-40.5, 10, 24} },
+        { {"lead"}, m = {0.075, -0.03, -0.08}, r = {nil, -26, 10} },
+        { {"compasses", "clock"}, m = {-0.005, -0.03, -0.16}, r = {5.5, -9.5, 7.5} },
+        { {"map"}, m = {-0.045, 0.035, -0.035}, r = {-5, -9.5, 5} },
+        { {"writable_book", "written_book"}, m = {nil, nil, -0.115} },
+        { {"wind_charge"}, m = {-0.02, -0.03, -0.06}, r = {-3.5, -11, 3} },
+        { {"ender_eye", "ender_pearl"}, m = {-0.015, -0.01, -0.005}, r = {-4, -10, 3} },
+        { {"goat_horn"}, m = {-0.015, nil, -0.15}, r = {14, -9, 5.5} },
+        { {"firework_rocket"}, m = {-0.03, nil, -0.03}, r = {-6, -13.5, 4.5} },
+        { {"elytra"}, m = {nil, -0.32, nil}, r = {-131.5, nil, nil} },
+
+        -- Combat
+        { {"totem_of_undying"}, m = {-0.06, nil, -0.045}, r = {-7.5, nil, nil}, condition = {not glowing3Dtotem} },
+        { {"nautilus_armor", "nautilus_shell"}, m = {-0.055, 0.04, 0.01}, r = {-4.5, -9.5, 6}, matches = true },
+        { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {0.01, -0.015, -0.05}, r = {-6, -5.5, 3} },
+
+        -- Foods & Drinks
+        { {"bottle", "potion", "dragon_breath"}, m = {-0.055, nil, -0.035}, r = {-4.5, -7, 4}, matches = true },
+
+        -- Ingredients
+        { {"bone_meal", "gunpowder", "glowstone_dust", "sugar"}, m = {-0.1, 0.015, 0.035}, r = {-3, -11, nil} },
+        { {"stick"}, m = {0.01, 0.01, -0.02}, r = {-2, -2, -1.5} },
+        { {"blaze_rod", "breeze_rod"}, m = {-0.005, 0.01, -0.02}, r = {-2, -2, -1.5} },
+        { {"bone"}, m = {-0.025, -0.105, -0.025}, r = {-0.5, -0.5, -1} },
+        { {"honeycomb"}, m = {-0.07, -0.005, -0.065}, r = {-4.5, -9.5, 5.5} },
+        { {"turtle_scute", "armadillo_scute"}, m = {-0.045, -0.005, -0.035}, r = {-7, -6, 4} },
+        { {"fire_charge"}, m = {0.015, -0.035, -0.07}, r = {-5.5, -6.5, 3.5} },
+        { {"slime_ball"}, m = {-0.05, -0.005, -0.015}, r = {-5.5, -6, 4.5} },
+        { {"clay_ball"}, m = {-0.055, -0.01, -0.055}, r = {-6, -11, 3.5} },
+        { {"prismarine_crystals"}, m = {-0.17, 0.04, 0.105}, r = {nil, 90.5, nil}, s = {1.3} },
+        { {"heart_of_the_sea"}, m = {-0.045, 0.02, -0.02}, r = {-3.5, -6, 4}, s = {0.9} },
+        { {"shulker_shell"}, m = {-0.035, -0.055, -0.085}, r = {-5, -10, 6} },
+        { {"book", "enchanted_book"}, m = {-0.1, nil, -0.01}, r = {nil, -8.5, nil} },
+        { {"fermented_spider_eye"}, m = {-0.025, -0.085, -0.045}, r = {0.5, nil, 4} },
+        { {"blaze_powder"}, m = {-0.01, -0.03, -0.045}, r = {-13, -47, nil} }
+    })
+    if not (rvTorches or refinedTorches) then
+        addPos({
+            { {"copper_torch"}, m = {0.07, -0.15, -0.07}, r = {-4.5, -5, -1.5}, s = {1.35} },
+            { {"torch", "redstone_torch", "soul_torch"}, m = {0.005, -0.07, -0.08}, r = {-5, nil, -1.5} },
+            { {"lanterns"}, m = {0.03, -0.515, 0.04}, r = {4.5, -5.5, nil}, s = {0.7} },
+        })
+    end
+    if not freshFoods then
+        addPos({
+            { {"apple", "^chorus_fruit$"}, m = {-0.05, -0.01, -0.035}, r = {-5.5, -5.5, 3}, matches = true },
+            { {"melon_slice"}, m = {-0.045, -0.03, -0.105}, r = {-5, -6, nil}, matches = true },
+            { {"carrot"}, m = {-0.045, -0.085, -0.08}, r = {-9.5, -9.5, 6}, matches = true },
+            { {"beef", "porkchop","mutton", "rotten_flesh"}, m = {-0.05, -0.005, -0.025}, r = {-5, -6, 3.5}, matches = true },
+            { {"potato", "bread"}, m = {-0.05, -0.005, -0.035}, r = {-6, -5.5, 3.5}, matches = true },
+            { {"_stew", "_soup", "bowl"}, m = {0.01, -0.015, -0.105}, r = {-7, -6.5, -1}, matches = true },
+            { {"spider_eye"}, m = {-0.07, -0.14, -0.115}, r = {-6, -6.5, 2} },
+            { {"sweet_berries"}, m = {0.025, 0.085, -0.12}, r = {-5.5, -4.5, 7.5} },
+            { {"glow_berries"}, m = {-0.06, -0.01, -0.07} },
+            { {"dried_kelp"}, m = {-0.095, 0.02, -0.005}, r = {nil, -4, nil} },
+            { {"beetroot"}, m = {-0.045, -0.01, -0.08}, r = {-5.5, -10, 6.5} },
+            { {"chicken", "cooked_chicken"}, m = {-0.06, -0.005, -0.025}, r = {-5.5, -5.5, 3.5} },
+            { {"rabbit", "cooked_rabbit"}, m = {-0.055, 0.01, 0.065}, r = {-5.5, -5.5, 4.5} },
+            { {"cod", "cooked_cod"}, m = {-0.115, -0.005, -0.065}, r = {-5, -7, 5} },
+            { {"salmon", "cooked_salmon"}, m = {-0.09, -0.005, -0.085}, r = {-5, -7, 5} },
+            { {"tropical_fish"}, m = {-0.065, -0.005, -0.075}, r = {-3, -5, 4} },
+            { {"pufferfish"}, m = {-0.075, nil, nil}, r = {-4.5, -5.5, 2.5} },
+            { {"cookie"}, m = {-0.06, -0.005, -0.02}, r = {-5, -5.5, 3.5} },
+            { {"cake"}, m = {-0.03, 0.125, -0.085}, r = {3.5, -22.5, 3}, s = {0.9} },
+            { {"pumpkin_pie"}, m = {-0.125, nil, 0.01}, r = {-7, -6, 3} },
+        })
+    end
+    if not freshOres then
+        addPos({
+            { {"coal$"}, m = {-0.045, nil, nil}, r = {-4.5, -11, 4}, matches = true },
+            { {"raw_"}, m = {-0.045, nil, -0.035}, r = {-6, -6.5, 4.5}, matches = true },
+            { {"nugget"}, m = {-0.06, 0.055, -0.035}, r = {-7.5, -10, 6.5}, matches = true },
+            {  {"_ingot", "brick$"}, m = {-0.03, -0.005, -0.03}, r = {-8, -21.5, 4}, matches = true },
+            { {"emerald"}, m = {-0.05, 0.01, -0.035}, r = {-6, -4.5, 5.5}, s = {0.85} },
+            { {"lapis_lazuli"}, m = {-0.105, 0.08, 0.06}, r = {-5, -5.5, 5.5} },
+            { {"diamond"}, m = {-0.045, 0.015, -0.035}, r = {-5.5, -5.5, 5.5}, s = {0.8} },
+            { {"quartz"}, m = {-0.035, -0.005, 0.07}, r = {1, 79.5, 2} },
+            { {"amethyst_shard"}, m = {-0.05, 0.02, -0.06}, r = {-7, -9.5, 3.5} },
+            { {"netherite_scrap"}, m = {-0.05, nil, -0.08}, r = {-3, nil, nil} },
+            { {"flint"}, m = {-0.05, -0.145, -0.12}, r = {4.5, -5.5, 4.5} },
+            { {"redstone"}, m = {-0.1, 0.015, 0.035}, r = {-3, -11, nil} }
         })
     end
 end
