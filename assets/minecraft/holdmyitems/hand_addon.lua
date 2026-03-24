@@ -67,20 +67,22 @@ end
 
 local function pose(tables, force)
     for _, t in ipairs(tables) do
-        for _, i in ipairs(t[1]) do
-            if matched(i, t.matches) then
-                if not isItemCompat or force then
-                    if t.m then process(move, t.m)   end
-                    if t.r then process(rotate, t.r) end
-                    if t.s then
-                        if t.s[2] == nil and t.s[3] == nil then
-                            M:scale(t.s[1], t.s[1], t.s[1])
-                        else
-                            M:scale(t.s[1], t.s[2], t.s[3])
+        if (t.condition ~= nil and t.condition[1]) or t.condition == nil then
+            for _, i in ipairs(t[1]) do
+                if matched(i, t.matches) then
+                    if not isItemCompat or force then
+                        if t.m then process(move, t.m)   end
+                        if t.r then process(rotate, t.r) end
+                        if t.s then
+                            if t.s[2] == nil and t.s[3] == nil then
+                                M:scale(context.matrices, t.s[1], t.s[1], t.s[1])
+                            else
+                                M:scale(context.matrices, t.s[1], t.s[2], t.s[3])
+                            end
                         end
                     end
+                    return
                 end
-                return
             end
         end
     end
@@ -90,6 +92,56 @@ end
 local a3ds              = ${a3ds}
 local w3di              = ${w3di}
 local glowing3Darmors   = ${glowing3Darmors}
+local glowing3Dtotem    = ${glowing3Dtotem}
+local rvTorches         = ${rvTorches}
+local refinedTorches    = ${refinedTorches}
+local refinedBuckets    = ${refinedBuckets}
+local freshFoods        = ${freshFoods}
+local freshOres         = ${freshOresIngots}
+local freshDiscs        = ${freshDiscs}
+
+-- == UNDO ADJUSTS ==
+local handUndoAdjusts = {
+    w3di = {
+        totem = {
+            { {"totem_of_undying"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10} }
+        },
+        musicDiscs = {
+            { {"music_disc"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10} }
+        },
+        bucket = {
+            { {"bucket"}, m = {0, -0.1, nil, "yzx"}, r = {5, -10, nil, "yzx"}, matches = true }
+        },
+        torches = {
+            { {"torch", "soul_torch", "redstone_torch"}, m = {-0.05, nil, nil, "zxy"}, r = {-10, nil, nil, "zyx"} },
+            { {"lanterns"}, m = {-0.1, -0.05, nil, "zyx"} },
+            { {"campfire", "soul_campfire"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10} },
+            { {"repeater", "comparator"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10}, condition = {rvTorches} },
+        },
+        foods = {
+            { {
+                "beef", "porkchop", "mutton", "rotten_flesh", "^chicken$", "cooked_chicken", "^rabbit$", "cooked_rabbit",
+                "apple", "melon_slice", "_berries", "^chorus_fruit$", "carrot", "^beetroot$", "potato", "^dried_kelp$",
+                "^cod$", "cooked_cod", "^salmon$", "cooked_salmon", "^tropical_fish$", "^pufferfish$", "bread", "cookie",
+                "cake", "pumpkin_pie", "^spider_eye$", "_soup", "_stew", "bowl"
+            }, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10}, matches = true },
+        },
+        ores = {
+            { {
+                "coal$", "raw_", "^emerald$", "^diamond$", "^lapis_lazuli$", "_nugget", "^quartz$", "amethyst_shard",
+                "_ingot", "brick$", "netherite_scrap", "^flint$"
+            }, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10}, matches = true },
+        }
+    }
+}
+if w3di then
+    if glowing3Dtotem               then pose(handUndoAdjusts.w3di.totem, true)         end
+    if freshFoods                   then pose(handUndoAdjusts.w3di.foods, true)         end
+    if freshOres                    then pose(handUndoAdjusts.w3di.ores, true)          end
+    if freshDiscs                   then pose(handUndoAdjusts.w3di.musicDiscs, true)    end
+    if refinedBuckets               then pose(handUndoAdjusts.w3di.bucket, true)        end
+    if rvTorches or refinedTorches  then pose(handUndoAdjusts.w3di.torches, true)       end
+end
 
 -- == PACKS INDIVIDUAL ADJUSTS ==
 if a3ds then
@@ -100,7 +152,7 @@ end
 
 if w3di then
     pose({
-        { {"copper_torch"}, r = {nil, nil, 10}, m = {nil, nil, 0.05} },
+        { {"copper_torch"}, r = {nil, nil, 10}, m = {nil, nil, 0.05}, condition = {not (rvTorches or refinedTorches)} },
         { {"elytra"}, m = {nil, 0.415, nil} }
     }, true)
 end

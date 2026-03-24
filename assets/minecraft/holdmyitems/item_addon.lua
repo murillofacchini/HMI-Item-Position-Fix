@@ -103,6 +103,7 @@ local torchesPack           = ${rvTorches} or ${refinedTorches}
 local glowing3Darmors		= ${glowing3Darmors}
 local a3ds					= ${a3ds}
 local w3di					= ${w3di}
+local refinedBuckets		= ${refinedBuckets}
 
 -- == FUNCTIONS ==
 function easeCustom(t)
@@ -484,7 +485,7 @@ if
 	or itemName == "lava_bucket"
 	or itemName == "torch"
 	or itemName:match("_torch")
-	or (tags({"lanterns"}) and not w3di)
+	or (tags({"lanterns"}) and not (w3di or torchesPack))
 then
 	if
 		itemName == "brewing_stand" or itemName == "torch" 		then glow(0.5 * l, 0.6, 0.5, "textures/particle/orange_glow.png")
@@ -499,8 +500,7 @@ then
 end
 
 if
-	w3di
-	and not torchesPack
+	w3di and not torchesPack
 	and (
 		tags({"lanterns"})
 		or itemName == "soul_torch"
@@ -580,7 +580,7 @@ if tags({"shovels"}) then
 	M:rotateY(mat, 80 * l)
 end
 
-if itemName:match("bucket") then
+if itemName:match("bucket") and not refinedBuckets then
 	M:moveY(mat, 0.025)
 	M:moveX(mat, -0 * l)
 	M:moveZ(mat, -0.1)

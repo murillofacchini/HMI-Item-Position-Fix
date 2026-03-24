@@ -88,13 +88,17 @@ local function pose(tables, force)
                         if t.renderAsBlock ~= nil then
                             renderBlock(t.renderAsBlock, t[1], force)
                         end
-                        if t.m then process(move, t.m)   end
-                        if t.r then process(rotate, t.r) end
-                        if t.s then
-                            if t.s[2] == nil and t.s[3] == nil then
-                                M:scale(context.matrices, t.s[1], t.s[1], t.s[1])
-                            else
-                                M:scale(context.matrices, t.s[1], t.s[2], t.s[3])
+                        local opsOrder = t.ops or "mrs"
+                        for j = 1, #opsOrder do
+                            local op = opsOrder:sub(j, j):lower()
+                            if op == "m" and t.m then process(move, t.m) end
+                            if op == "r" and t.r then process(rotate, t.r) end
+                            if op == "s" and t.s then
+                                if t.s[2] == nil and t.s[3] == nil then
+                                    M:scale(context.matrices, t.s[1], t.s[1], t.s[1])
+                                else
+                                    M:scale(context.matrices, t.s[1], t.s[2], t.s[3])
+                                end
                             end
                         end
                     end
@@ -360,5 +364,5 @@ end
 Positions = Positions or {}
 if Positions and next(Positions) then pose(Positions, true) end
 
-UndoPositions = UndoPositions or {}
-if UndoPositions and next(UndoPositions) then pose(UndoPositions, true) end
+ItemsUndoAdjusts = ItemsUndoAdjusts or {}
+if ItemsUndoAdjusts and next(ItemsUndoAdjusts) then pose(ItemsUndoAdjusts, true) end
