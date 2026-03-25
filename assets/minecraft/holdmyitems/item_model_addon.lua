@@ -161,7 +161,6 @@ ItemsUndoAdjusts = {
             { {"music_disc"}, s = {1/1.35}, r = {-50, -95, 50, "zyx"}, m = {0.13, 0.205, 0.08, "zyx"}, ops = "srm", matches = true }
         },
         bucket = {
-            { {"milk_bucket"}, m = {0.025, 0.1, -0.32}, r = {-165.5, nil, 150}, s = {0.9}, condition = {isUsingItem} },
             { {"milk_bucket"}, m = {-0.175, -0.1, -0.125}, r = {-5.5, 180, -12}, s = {1/1.05} },
             { {"bucket"}, m = {0.06, -0.03, -0.035}, r = {14, 6.5, 18.5}, s = {1/1.05}, matches = true }
         },
@@ -488,10 +487,8 @@ end
 
 if freshFoods then
     addPos({
-        { {"spider_eye"}, m = {-0.01, -0.13, -0.19}, r = {-5.5, 1.5, 34.5}, condition = {not isUsingItem} },
-        { {"spider_eye"}, m = {0.08, -0.015, -0.065}, r = {-5.5, 1.5, 34.5}, condition = {isUsingItem} },
-        { {"_soup", "_stew", "bowl"}, m = {0.07, -0.025, -0.03}, r = {1.5, -4.5, -1}, matches = true, prox = true },
-        { {"_soup", "_stew"}, m = {nil, nil, 0.05}, r = {-33, -15, 35}, matches = true, condition = {isUsingItem and w3di} },
+        { {"spider_eye"}, m = {-0.01, -0.13, -0.19}, r = {-5.5, 1.5, 34.5} },
+        { {"_soup", "_stew", "bowl"}, m = {0.07, -0.025, -0.03}, r = {1.5, -4.5, -1}, matches = true },
         { {"beef", "porkchop"}, m = {0.06, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
         { {"mutton"}, m = {0.025, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
         { {"apple"}, m = {0.075, 0.015, -0.07}, r = {2, -0.5, nil}, matches = true },

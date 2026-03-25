@@ -370,31 +370,77 @@ else
 end
 
 -- == EAT & DRINK ANIMATION ==
-if (useAction == "drink" or useAction == "eat" or useAction == "toot_horn") and context.mainHand then
-    M:moveX(mat, 0.02 	* l * foodCount)
-    M:moveZ(mat, -0.05 	* foodCount)
-    if useAction == "eat" or useAction == "toot_horn" then
-        M:rotateX(mat, -23 * foodCount * foodCount)
-        M:rotateZ(mat, -12 * l * foodCount * foodCount)
+local function process(op, progress, exp, x, y, z)
+    local t = M:pow(progress, exp)
+
+    if op == "move" then
+        if x then M:moveX(mat, x * t * l) end
+        if y then M:moveY(mat, y * t)     end
+        if z then M:moveZ(mat, z * t)     end
+    elseif op == "rotate" then
+        if x then M:rotateX(mat, x * t)     end
+        if y then M:rotateY(mat, y * t * l) end
+        if z then M:rotateZ(mat, z * t * l) end
     end
-    M:rotateY(mat, -50 * l * foodCount * foodCount)
+end
+local function eatDrinkAnimation(useAction, progress, move, rotate)
+    local function m(default, override)
+        if override ~= nil then return override else return default end
+    end
+
+    local mx = move   and m(nil,  move[1])   or nil
+    local my = move   and m(nil,  move[2])   or nil
+    local mz = move   and m(-0.05, move[3])  or -0.05
+    local rx = rotate and m(nil,  rotate[1]) or nil
+    local ry = rotate and m(-50,  rotate[2]) or -50
+    local rz = rotate and m(nil,  rotate[3]) or nil
+
+    process("move", progress, 1, 0.02, my, mz)
+    process("move", progress, 1, mx, nil, nil)
+
+    if useAction == "eat" or useAction == "toot_horn" then
+        local ex = rotate and m(-23, rotate[1]) or -23
+        local ez = rotate and m(-12, rotate[3]) or -12
+        process("rotate", progress, 2,  ex,  nil,  ez)
+    end
+    process("rotate", progress, 2,  rx,  ry,  rz)
     if useAction == "drink" then
-        M:rotateX(mat, 15 * foodCount * foodCount)
+        local dx = rotate and m(15, rotate[1]) or 15
+        process("rotate", progress, 2,  dx,  nil,  nil)
+    end
+end
+local progress = context.mainHand and foodCount or foodCountO
+
+local specialCases = {
+    {
+        check = function() return freshFoods and w3di and useAction == "eat" and (itemName:match("_soup") or itemName:match("_stew")) end,
+        move = {0.15, -0.05, -0.1}, rotate = {-5, -10, 30}
+    },
+    {
+        check = function() return freshFoods and w3di and useAction == "eat" and itemName == "spider_eye" end,
+        move = {0.1, 0.05, 0.05}, rotate = {nil, nil, nil}
+    },
+	{
+		check = function() return w3di and refinedBuckets and itemName == "milk_bucket" end,
+		move = {-0.3, 0.2, 0.2}, rotate = {-20, nil, -10}
+	},
+	{
+		check = function() return not w3di and refinedBuckets and itemName == "milk_bucket" end,
+		move = {0.02, 0.06, -0.1}, rotate = {nil, -60, nil}
+	}
+}
+
+local matched = false
+for _, case in ipairs(specialCases) do
+    if case.check() then
+        eatDrinkAnimation(useAction, progress, case.move, case.rotate)
+        matched = true
+		break
     end
 end
 
-if (useAction == "drink" or useAction == "eat" or useAction == "toot_horn") and not context.mainHand then
-	M:moveX(mat, 0.02 	* l * foodCountO)
-	M:moveZ(mat, -0.05 	* foodCountO)
-	if useAction == "eat" or useAction == "toot_horn" then
-		M:rotateX(mat, -23 * foodCountO * foodCountO)
-		M:rotateZ(mat, -12 * l * foodCountO * foodCountO)
-	end
-	M:rotateY(mat, -50 * l * foodCountO * foodCountO)
-	if useAction == "drink" then
-		M:rotateX(mat, 15 * foodCountO * foodCountO)
-	end
-end
+local isGenericAction = useAction == "eat" or useAction == "drink" or useAction == "toot_horn"
+local _ = (not matched and isGenericAction) and eatDrinkAnimation(useAction, progress)
 
 global.foodCount          = 0.0;
 global.foodCountO         = 0.0;
@@ -592,7 +638,7 @@ if tags({"shovels"}) then
 	M:rotateY(mat, 80 * l)
 end
 
-if itemName:match("bucket") and not refinedBuckets then
+if itemName:match("bucket") and not (refinedBuckets and w3di) then
 	M:moveY(mat, 0.025)
 	M:moveX(mat, -0 * l)
 	M:moveZ(mat, -0.1)
