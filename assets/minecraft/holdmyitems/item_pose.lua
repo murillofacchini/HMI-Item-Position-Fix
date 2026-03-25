@@ -198,7 +198,7 @@ pose({
     -- Natural Blocks
     { itemLists.hangingPlants, m = {0.105, -0.59, -0.025} },
     { {"amethyst_bud", "amethyst_cluster"}, m = {0.04, nil, -0.005}, matches = true, condition = {itemName ~= "small_amethyst_bud"} },
-    { {"_mushroom", "fungus"}, m = {0.07, nil, -0.02}, matches = true, condition = {itemName ~= "warped_fungus_on_a_stick"} },
+    { {"_mushroom", "_fungus$"}, m = {0.07, nil, -0.02}, matches = true, condition = {itemName ~= "warped_fungus_on_a_stick"} },
     { {"_grass", "_roots", "nether_sprouts"}, m = {0.05, nil, nil}, matches = true, condition = {itemName ~= "grass_block"} },
     { {"fern", "pointed_dripstone"}, m = {0.07, nil, -0.01}, matches = true },
     { {"bush", "lilac", "peony", "pitcher_plant", "_coral$", "_coral_fan", "cobweb"}, m = {0.055, nil, -0.025}, matches = true },
@@ -267,7 +267,6 @@ pose({
     { {"fishing_rod", "_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil}, matches = true },
     { {"pickaxes", "axes", "hoes"}, m = {0.025, -0.115, -0.04}, r = {nil, -8.5, nil} },
     { {"shovels"}, m = {0.005, -0.185, 0.035}, r = {-4, 5.5, -7} },
-    { {"warped_fungus_on_a_stick"}, m = {nil, 0.035, -0.03} },
     { {"flint_and_steel"}, m = {-0.055, 0.035, nil} },
     { {"fire_charge"}, m = {-0.025, -0.035, 0.03} },
     { {"shears"}, m = {0.03, -0.075, -0.065}, r = {-55, -4, 50} },
@@ -355,9 +354,11 @@ pose({
 if isUsingItem and not isItemCompat then
     if
         useAction == "trident"                                      then process(move, nil, nil, -0.1)
-        elseif useAction == "eat"                                   then process(move, nil, -0.1, 0.1)
+        elseif useAction == "toot_horn"                             then process(move, 0.095, nil, 0.145)
+        elseif useAction == "eat" and itemName ~= "sweet_berries"   then process(move, nil, -0.1, 0.1)
+        elseif useAction == "eat" and itemName == "sweet_berries"   then process(move, nil, 0.065, nil) process(rotate, nil, 80, nil)
         elseif useAction == "drink" and itemName ~= "milk_bucket"   then process(move, nil, -0.05, nil)
-        elseif useAction == "drink" and itemName == "milk_bucket"   then process(move, -0.03, 0.18, 0.02) process(rotate, nil, -33, nil)
+        elseif useAction == "drink" and itemName == "milk_bucket"   then process(move, 0.05, 0.18, -0.165) process(rotate, nil, -22, nil)
     end
 end
 

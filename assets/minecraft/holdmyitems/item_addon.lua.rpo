@@ -4,6 +4,8 @@
     refinedTorches:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedTorches",
     refinedBuckets:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedBuckets",
     glowing3Darmors:    "HMIItemPositionFix.ItemsResourcePacksCompatibility.Glowing3DArmors",
+    glowing3Dtotem:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.Glowing3DTotem",
+    freshFoods:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshFoods",
     a3ds:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Actually3DStuff",
     w3di:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Weskerson3DItems"
   }

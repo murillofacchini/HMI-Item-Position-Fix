@@ -101,9 +101,11 @@ local useAction             = I:getUseAction(context.item)
 local itemName              = I:getName(context.item):gsub("minecraft:", "")
 local torchesPack           = ${rvTorches} or ${refinedTorches}
 local glowing3Darmors		= ${glowing3Darmors}
+local glowing3Dtotem		= ${glowing3Dtotem}
 local a3ds					= ${a3ds}
 local w3di					= ${w3di}
 local refinedBuckets		= ${refinedBuckets}
+local freshFoods			= ${freshFoods}
 
 -- == FUNCTIONS ==
 function easeCustom(t)
@@ -231,30 +233,43 @@ if useAction == "spear" then
     M:moveY(mat, -0.25 	* M:clamp(M:sin(Easings:easeInOutSine(hic) * 6.28), 0, 1))
 end
 
+local invertedAxis =
+    (glowing3Darmors and tags({"head_armor"}))
+    or (glowing3Dtotem and itemName == "totem_of_undying")
+    or (freshFoods and (
+        itemName == "cake"
+        or itemName == "pumpkin_pie"
+        or itemName == "bowl"
+        or itemName:match("_stew")
+        or itemName:match("_soup")
+    ))
+
 if (useAction ~= "block" and useAction ~= "crossbow") or tags({"swords"}) then
-	if not (glowing3Darmors and (tags({"head_armor", "foot_armor"}) or itemName:match("horse_armor"))) then
-		M:moveZ(mat, -0.05 	* swing_rot)
-		M:moveY(mat, -0.05 	* swing_rot)
-		M:rotateX(mat, 10 	* swing_rot)
-		M:rotateX(mat, -30 	* swing_rot)
-		M:rotateX(mat, -10 	* swing_hit)
-	elseif glowing3Darmors then
-		if tags({"head_armor"}) then
-			M:moveX(mat, -0.05 * swing_rot)
-			M:moveY(mat, -0.05 	* swing_rot)
-		elseif tags({"foot_armor"}) or itemName:match("horse_armor") then
-			M:moveZ(mat, -0.05 * swing_rot)
-			M:moveY(mat, -0.05 	* swing_rot)
-		end
+
+    if invertedAxis then
+        M:moveX(mat, -0.05 * swing_rot)
+        M:moveY(mat, -0.05 * swing_rot)
+		M:rotateZ(mat, 10  * swing_rot)
+        M:rotateZ(mat, -30 * swing_rot)
+        M:rotateZ(mat, -10 * swing_hit)
+    else
+        M:moveZ(mat, -0.05 * swing_rot)
+        M:moveY(mat, -0.05 * swing_rot)
+        M:rotateX(mat, 10  * swing_rot)
+        M:rotateX(mat, -30 * swing_rot)
+        M:rotateX(mat, -10 * swing_hit)
     end
 
-    if not tags({"swords"}) and not (glowing3Darmors and (tags({"head_armor", "foot_armor"}) or itemName:match("horse_armor"))) then
+    if tags({"swords"}) then
+        M:moveY(mat, -0.1  * Easings:easeInOutBack(swing))
+        M:rotateX(mat, -60 * Easings:easeInOutBack(swing))
+    elseif not invertedAxisX and not invertedAxisZ then
         if useAction == "trident" or useAction == "spear" then
-            M:moveZ(mat, -0.1 * swing_rot)
+            M:moveZ(mat, -0.1  * swing_rot)
             M:moveY(mat, -0.05 * swing_rot)
             if useAction == "spear" then
                 M:moveY(mat, -0.15 * swing_hit)
-                M:rotateX(mat, -5 * swing_hit)
+                M:rotateX(mat, -5  * swing_hit)
             end
             M:rotateX(mat, -10 * swing_rot)
             M:rotateX(mat, -15 * swing_hit)
@@ -264,31 +279,28 @@ if (useAction ~= "block" and useAction ~= "crossbow") or tags({"swords"}) then
                 M:rotateX(mat, -45 * swing_sword_tilt)
             end
             M:moveY(mat, 0.05 * swing_hit)
-            M:moveY(mat, 0.3 * swingOverall)
+            M:moveY(mat, 0.3  * swingOverall)
         else
             M:moveZ(mat, -0.05 * swing_rot)
             M:moveY(mat, -0.05 * swing_rot)
             M:rotateX(mat, -10 * swing_rot)
             M:rotateX(mat, -25 * swing_hit)
         end
-
-	elseif tags({"swords"}) then
-		M:moveY(mat, -0.1 * Easings:easeInOutBack(swing))
-		M:rotateX(mat, -60 * Easings:easeInOutBack(swing))
     end
 
     if tags({"shovels"}) then
-        M:moveY(mat, 0.12 * swing_sword_tilt)
-        M:moveZ(mat, 0.05 * swing_sword_tilt)
-        M:rotateX(mat, 10 * swing_sword_tilt)
+        M:moveY(mat, 0.12  * swing_sword_tilt)
+        M:moveZ(mat, 0.05  * swing_sword_tilt)
+        M:rotateX(mat, 10  * swing_sword_tilt)
         M:rotateX(mat, -30 * swingOverall)
-        M:rotateX(mat, 20 * swing_rot)
-        M:rotateX(mat, 10 * swing_hit_second)
+        M:rotateX(mat, 20  * swing_rot)
+        M:rotateX(mat, 10  * swing_hit_second)
     end
 
     if useAction == "bow" then
         M:moveX(mat, -0.065 * l)
     end
+
 end
 
 -- == PHYSICS ==
@@ -595,4 +607,10 @@ if itemName:match("bucket") and not refinedBuckets then
 		M:moveY(mat, 0.1 * easedFoodCounter)
 		M:moveZ(mat, 0.02 * easedFoodCounter)
 	end
+end
+
+-- === PACKS CORRECTIONS ===
+
+if w3di and a3ds and (itemName:match("_banner_pattern") or itemName == "name_tag") then
+    M:rotateX(mat, -(M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle + ywAngle * 0.5), 0, -0.13, 0)
 end

@@ -48,7 +48,7 @@ PackCompat = {
     }, matches = true },
     freshFlowersPlants = {
         {
-        "pale_hanging_moss", "_mushroom$", "_fungus", "dandelion", "poppy", "blue_orchid", "allium",
+        "pale_hanging_moss", "_mushroom$", "_fungus$", "dandelion", "poppy", "blue_orchid", "allium",
         "azure_bluet", "tulip", "oxeye_daisy", "cornflower", "lily_of_the_valley", "^torchflower$",
         "cacutus_flower", "eyeblossom", "wither_rose", "pink_petals", "wildflowers", "leaf_litter",
         "spore_blossom", "bamboo", "sugar_cane", "^vine$", "sunflower", "lilac", "peony", "pitcher_plant",
@@ -209,46 +209,47 @@ ItemsUndoAdjusts = {
             s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm" },
             { {"armor_stand"}, s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm" },
             { {"boats"}, s = {1/1.35}, r = {-4, -180, 120, "yzx"}, m = {nil, -0.15, nil}, ops = "srm" },
-            { {"name_tag", "_banner_pattern"}, s = {1/1.4}, r = {180, 130, nil, "zxy"}, m = {-0.1, 0.15, nil, "zyx"}, ops = "srm" },
+            { {"name_tag", "_banner_pattern"}, s = {1/1.4}, r = {180, 130, nil, "zxy"}, m = {-0.1, 0.15, nil, "zyx"}, ops = "srm", matches = true },
             { {"ender_eye", "ender_pearl"}, s = {1/1.05}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr" },
             { {"fishing_rod"}, s = {1/1.2}, m = {0.1, 0.1, nil}, r = {1, 10, 70, "yzx"}, ops = "smr" },
             { {"flint_and_steel"}, s = {1/1.1}, r = {5, 10, nil, "zxy"}, ops = "srm" },
             { {"fire_charge"}, s = {1/1.25}, r = {nil, nil, 5}, ops = "srm" },
             { {"shears"}, s = {1/1.3, 1/1.4, 1/1.3}, m = {0.1, -0.05, nil, "zxy"}, r = {25, 30, 45, "yxz"}, ops = "smr" },
             { {"lead"}, s = {1/1.2, 1, 1}, r = {nil, -24.5, 10}, m = {-0.025, 0.2, nil, "xzy"}, ops = "srm" },
-            { {"compass", "clock"}, s = {1/1.2}, r = {-4, 10, 7, "yxz"}, m = {0, -0.01, -0.03, "yzx"}, ops = "srm" },
+            { {"compass"}, s = {1/1.2}, r = {-4, 10, 7, "yxz"}, m = {0, -0.01, -0.03, "yzx"}, ops = "srm" },
             { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm" },
             { {"firework_rocket"}, s = {1/1.2}, m = {0.03, 0, nil, "zxy"}, ops = "smr", prox = true },
             { {"firework_rocket"}, s = {1/1.05}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr" },
             { {"carrot_on_a_stick"}, s = {1/1.2}, m = {0.1, 0.1, nil}, r = {1, 60, nil, "yxz"}, ops = "smr" },
-            { {"goat_horn"}, s = {1/1.3}, m = {0.05, -0.05, nil, "zxy"}, r = {nil, nil, 5}, ops = "smr" },
+            { {"goat_horn"}, s = {1/1.3}, m = {0.05, -0.05, nil, "zxy"}, r = {nil, nil, 5}, ops = "smr", prox = true },
+            { {"goat_horn"}, m = {-0.095, 0.09, -0.12}, r = {nil, -52, nil}, condition = {isUsingItem} },
             { {"egg", "blue_egg", "brown_egg", "snowball"}, r = {nil, nil, 5} },
             { {"loom_patterns"}, s = {1/1.4}, r = {180, 130, nil, "zxy"}, m = {-0.1, 0.15, nil, "zyx"}, ops = "srm" },
             { {"stick", "bone", "blaze_rod", "breeze_rod"}, m = {0.05, 0.07, 0.05, "yzx"}, r = {4, nil, -85, "zxy"} },
             { {"slime_ball"}, s = {1/1.05}, m = {0.05, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
             { {"clay_ball"}, m = {-0.055, 0.015, nil}, r = {-3, 0, 6} },
             { {"heart_of_the_sea"}, s = {1/1.35}, m = {0.05, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"} },
-            { {"book", "enchanted_book"}, s = {1/1.1, 1/1.2, 1/1.1}, r = {-40, 20, 30, "yxz"}, m = {-0.2, -0.07, -0.1, "yzx"}, ops = "srm" }
+            { {"book", "enchanted_book"}, s = {1/1.1, 1/1.2, 1/1.1}, r = {-40, 20, 30, "yxz"}, m = {-0.2, -0.07, -0.1, "yzx"}, ops = "srm" },
+            { {"totem_of_undying"}, s = {1/1.2}, m = {-0.015, -0.005, -0.02}, r = {51, 140, 30.5}, ops = "smr", condition = {glowing3Dtotem} },
         }
     }
 }
 if a3ds and w3di then
     addUndoAdj(ItemsUndoAdjusts.w3di.a3dsCompat)
-    if not glowing3Dtotem           then addUndoAdj(ItemsUndoAdjusts.w3di.totem)        end
-    if not bensBundle               then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)      end
-    if not freshOres                then addUndoAdj(ItemsUndoAdjusts.w3di.ores)         end
-end
-if a3ds then
-    if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.a3ds.totem)        end
+    if not bensBundle               then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
+    if not freshOres                then addUndoAdj(ItemsUndoAdjusts.w3di.ores)          end
+    if not glowing3Dtotem           then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
+elseif a3ds and not w3di then
+    if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.a3ds.totem)         end
 end
 if w3di then
-    if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.w3di.totem)        end
-    if refinedBuckets               then addUndoAdj(ItemsUndoAdjusts.w3di.bucket)       end
-    if freshOres                    then addUndoAdj(ItemsUndoAdjusts.w3di.ores)         end
-    if freshFoods                   then addUndoAdj(ItemsUndoAdjusts.w3di.foods)        end
-    if freshDiscs                   then addUndoAdj(ItemsUndoAdjusts.w3di.musicDiscs)   end
-    if bensBundle                   then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)      end
-    if rvTorches or refinedTorches  then addUndoAdj(ItemsUndoAdjusts.w3di.torches)      end
+    if refinedBuckets               then addUndoAdj(ItemsUndoAdjusts.w3di.bucket)        end
+    if freshOres                    then addUndoAdj(ItemsUndoAdjusts.w3di.ores)          end
+    if freshFoods                   then addUndoAdj(ItemsUndoAdjusts.w3di.foods)         end
+    if freshDiscs                   then addUndoAdj(ItemsUndoAdjusts.w3di.musicDiscs)    end
+    if bensBundle                   then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
+    if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
+    if rvTorches or refinedTorches  then addUndoAdj(ItemsUndoAdjusts.w3di.torches)       end
 end
 
 -- === INDIVIDUAL RESOURCE PACK ADJUST ===
@@ -258,7 +259,7 @@ if a3ds then
         { {"vine", "weeping_vines", "twisting_vines"}, renderAsBlock = false },
         { {"frogspawn"}, m = {-0.06, 0.04, -0.025}, r = {-4, -5.5, -2}, renderAsBlock = false },
         { {"bamboo"}, m = {0.005, nil, -0.03}, r = {-5.5, -5, -1}, s = {0.8}, renderAsBlock = false },
-        { {"_mushroom$", "_fungus"}, m = {0.01, -0.03, -0.075}, r = {-5, -4, -1}, matches = true },
+        { {"_mushroom$", "_fungus$"}, m = {0.01, -0.03, -0.075}, r = {-5, -4, -1}, matches = true },
         { {"azalea", "flowering_azalea"}, m = {0.065, -0.095, -0.17}, r = {-6, 29, nil} },
         { {"cactus_flower"}, m = {-0.09, 0.1, 0.03}, r = {-2.5, -22.5, nil} },
         { {"sugar_cane"}, m = {0.015, nil, -0.105}, r = {nil, -5.5, nil}, s = {0.9} },
@@ -291,6 +292,7 @@ if a3ds then
         { {"egg", "brown_egg", "blue_egg"}, m = {0.03, -0.01, -0.085}, r = {-6, -6, nil} },
         { {"snowball"}, m = {0.015, -0.01, -0.085}, r = {-6, -6, nil} },
         -- Ingredients
+        { {"flint"}, m = {0.03, 0.06, -0.08}, r = {14.5, 12.5, -8}, condition = {freshOres} },
         { {"string"}, m = {0.05, -0.005, -0.075}, r = {-4.5, -4.5, nil}, renderAsBlock = false },
         { {"smithing_template"}, m = {-0.095, -0.11, -0.14}, r = {-5.5, -5, nil}, matches = true },
         { {"_key"}, m = {0.015, nil, -0.085}, r = {-6, -5.5, nil}, matches = true },
@@ -350,7 +352,8 @@ if w3di then
         { {"bundles"}, m = {-0.05, -0.015, -0.015}, r = {-6, -11, 2.5}, s = {0.9}, condition = {not bensBundle} },
         { {"music_discs"}, m = {-0.05, nil, -0.06}, r = {-5.5, -10.5, 2.5}, condition = {not freshDiscs} },
         { {"disc_fragment_5"}, m = {-0.065, -0.045, -0.005}, r = {-5.5, -9.5, 5.5}, condition = {not freshDiscs} },
-        { {"bucket"}, m = {0.02, 0.05, -0.09}, r = {-94.5, -21, 180}, matches = true, condition = {not refinedBuckets} },
+        { {"bucket"}, m = {0.02, 0.05, -0.09}, r = {-94.5, -21, 180}, matches = true, condition = {not refinedBuckets}, prox = true },
+        { {"milk_bucket"}, m = {0.125, nil, 0.035}, r = {30, -10, -60}, condition = {not refinedBuckets and isUsingItem} },
         { {"flint_and_steel"}, m = {0.05, -0.015, -0.145}, r = {3.5, -6, 4.5} },
         { {"shears"}, m = {nil, -0.085, -0.085}, r = {-40.5, 10, 24} },
         { {"lead"}, m = {0.075, -0.03, -0.08}, r = {nil, -26, 10} },
@@ -359,7 +362,8 @@ if w3di then
         { {"writable_book", "written_book"}, m = {nil, nil, -0.115} },
         { {"wind_charge"}, m = {-0.02, -0.03, -0.06}, r = {-3.5, -11, 3} },
         { {"ender_eye", "ender_pearl"}, m = {-0.015, -0.01, -0.005}, r = {-4, -10, 3} },
-        { {"goat_horn"}, m = {-0.015, nil, -0.15}, r = {14, -9, 5.5} },
+        { {"goat_horn"}, m = {-0.015, nil, -0.15}, r = {14, -9, 5.5}, prox = true },
+        { {"goat_horn"}, m = {0.055, nil, 0.04}, condition = {isUsingItem} },
         { {"firework_rocket"}, m = {-0.03, nil, -0.03}, r = {-6, -13.5, 4.5} },
         { {"elytra"}, m = {nil, -0.32, nil}, r = {-131.5, nil, nil} },
         -- Combat
@@ -392,17 +396,17 @@ if w3di then
         addPos({
             { {"copper_torch"}, m = {0.07, -0.15, -0.07}, r = {-4.5, -5, -1.5}, s = {1.35} },
             { {"torch", "redstone_torch", "soul_torch"}, m = {0.005, -0.07, -0.08}, r = {-5, nil, -1.5} },
-            { {"lanterns"}, m = {0.03, -0.515, 0.04}, r = {4.5, -5.5, nil}, s = {0.7} },
+            { {"lanterns"}, m = {0.015, -0.515, 0.14}, r = {-17, -5.5, nil}, s = {0.7} },
         })
     end
     if not freshFoods then
         addPos({
             { {"apple", "^chorus_fruit$"}, m = {-0.05, -0.01, -0.035}, r = {-5.5, -5.5, 3}, matches = true },
             { {"melon_slice"}, m = {-0.045, -0.03, -0.105}, r = {-5, -6, nil}, matches = true },
-            { {"carrot"}, m = {-0.045, -0.085, -0.08}, r = {-9.5, -9.5, 6}, matches = true },
             { {"beef", "porkchop","mutton", "rotten_flesh"}, m = {-0.05, -0.005, -0.025}, r = {-5, -6, 3.5}, matches = true },
             { {"potato", "bread"}, m = {-0.05, -0.005, -0.035}, r = {-6, -5.5, 3.5}, matches = true },
             { {"_stew", "_soup", "bowl"}, m = {0.01, -0.015, -0.105}, r = {-7, -6.5, -1}, matches = true },
+            { {"carrot", "golden_carrot"}, m = {-0.045, -0.085, -0.08}, r = {-9.5, -9.5, 6} },
             { {"spider_eye"}, m = {-0.07, -0.14, -0.115}, r = {-6, -6.5, 3} },
             { {"sweet_berries"}, m = {0.025, 0.085, -0.12}, r = {-5.5, -4.5, 7.5} },
             { {"glow_berries"}, m = {-0.06, -0.01, -0.07} },
@@ -449,7 +453,7 @@ end
 if refinedTorches then
     addPos({
         { {"torch", "soul_torch", "redstone_torch", "copper_torch"}, m = {0.035, nil, -0.04}, r = {-5, -4.5, nil} },
-        { {"lanterns"}, m = {-0.04, -0.48, 0.115}, r = {-8.5, 9, nil} },
+        { {"lanterns"}, m = {-0.04, -0.48, 0.3}, r = {-38, 9, nil} },
     })
 end
 
@@ -486,13 +490,14 @@ if freshFoods then
     addPos({
         { {"spider_eye"}, m = {-0.01, -0.13, -0.19}, r = {-5.5, 1.5, 34.5}, condition = {not isUsingItem} },
         { {"spider_eye"}, m = {0.08, -0.015, -0.065}, r = {-5.5, 1.5, 34.5}, condition = {isUsingItem} },
-        { {"_soup", "_stew", "bowl"}, m = {0.07, -0.025, -0.03}, r = {1.5, -4.5, -1}, matches = true },
+        { {"_soup", "_stew", "bowl"}, m = {0.07, -0.025, -0.03}, r = {1.5, -4.5, -1}, matches = true, prox = true },
+        { {"_soup", "_stew"}, m = {nil, nil, 0.05}, r = {-33, -15, 35}, matches = true, condition = {isUsingItem and w3di} },
         { {"beef", "porkchop"}, m = {0.06, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
         { {"mutton"}, m = {0.025, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
         { {"apple"}, m = {0.075, 0.015, -0.07}, r = {2, -0.5, nil}, matches = true },
         { {"melon_slice"}, m = {0.03, nil, -0.055}, r = {2, -0.5, nil}, matches = true },
-        { {"carrot"}, m = {-0.04, -0.035, -0.05}, r = {nil, -5, 3}, matches = true },
         { {"potato"}, m = {0.025, -0.01, -0.105}, r = {-5, -5, nil}, s = {1.15}, matches = true },
+        { {"carrot", "golden_carrot"}, m = {-0.04, -0.035, -0.05}, r = {nil, -5, 3} },
         { {"sweet_berries"}, m = {-0.035, nil, -0.055}, r = {nil, -4, nil} },
         { {"glow_berries"}, m = {0.015, -0.055, -0.095} },
         { {"chorus_fruit"}, m = {0.1, -0.055, -0.085}, r = {nil, -5.5, nil} },
@@ -545,7 +550,7 @@ if freshFlowers then
         { {"^dead.*fan$"}, m = {nil, -0.06, -0.165}, r = {16, 36.5, -17}, matches = true },
         { {"^dead.*coral$"}, m = {0.055, -0.075, -0.09}, r = {10.5, -6, -2.5}, matches = true },
         { {"_coral$", "_coral_fan"}, m = {0.155, -0.06, -0.055}, r = {-6, -5, nil}, matches = true },
-        { {"_mushroom$", "_fungus"}, m = {0.02, -0.03, -0.035}, r = {-5.5, -5.5, -2}, matches = true },
+        { {"_mushroom$", "_fungus$"}, m = {0.02, -0.03, -0.035}, r = {-5.5, -5.5, -2}, matches = true },
         { {"small_flowers"}, m = {-0.005, -0.015, -0.015}, r = {-9.5, nil, nil} },
         { {"wildflowers", "leaf_litter", "pink_petals"}, m = {nil, -0.19, -0.05}, r = {-72.5, 0.5, -1} },
         { {"bamboo"}, m = {0.02, 0.02, -0.025}, r = {-6, -5.5, -2} },
