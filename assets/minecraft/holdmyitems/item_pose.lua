@@ -3,8 +3,6 @@
 -- === CONTEXTS ===
 local l           = context.mainHand and 1 or -1
 local itemName    = I:getName(context.item):gsub("minecraft:", "")
-local isUsingItem = P:isUsingItem(context.player)
-local useAction   = I:getUseAction(context.item)
 local AlexModel   = ${AlexSkinModel}
 
 -- === FUNCTIONS AND COMPATIBILITY ===
@@ -150,7 +148,7 @@ local itemLists = {
         "repeater", "button", "hopper", "pickaxe", "axe", "shovel", "hoe", "sword", "_on_a_stick", 
         "boat", "raft", "trident", "mace", "cake", "blaze_rod", "breeze_rod", "heavy_core", "item_frame", "painting", 
         "^lantern$", "soul_lantern", "copper_lantern", "_head", "_skull", "pressure_plate", "trapdoor", "carpet", 
-        "bamboo", "^vine$", "frogspawn", "turtle_egg", "dried_ghast"
+        "bamboo", "^vine$", "frogspawn", "turtle_egg", "dried_ghast", "_spear"
     }
 }
 
@@ -290,8 +288,7 @@ pose({
     { {"nautilus_armor"}, m = {-0.04, -0.075, -0.005}, matches = true },
     { {"swords"}, m = {0.025, nil, -0.05}, r = {nil, -5, nil} },
     { {"mace"}, m = {0.025, -0.06, -0.05}, r = {nil, -5, nil} },
-    { {"trident"}, m = {-0.005, nil, 0.1}, r = {nil, 19, nil} },
-    { {"spears"}, m = {-0.07, nil, 0.1}, r = {nil, -14, 180} },
+    { {"trident"}, m = {-0.02, nil, nil}, r = {nil, 20, nil} },
     { {"shield"}, m = {-0.035, 0.06, 0.005}, r = {-1.5, -22.5, nil}, s = {0.8, 1, 1} },
     { {"head_armor", "foot_armor"}, m = {nil, -0.11, -0.005} },
     { {"leg_armor"}, m = {nil, -0.035, -0.005} },
@@ -349,13 +346,6 @@ pose({
     -- Spawn Eggs
     { {"_spawn_egg"}, m = {-0.01, -0.04, nil}, matches = true }
 })
-
--- === USING ITEM ===
-if isUsingItem and not isItemCompat then
-    if
-        useAction == "trident"                                      then process(move, nil, nil, -0.1)
-    end
-end
 
 -- === PACK COMPATIBILITY ===
 if isItemCompat then

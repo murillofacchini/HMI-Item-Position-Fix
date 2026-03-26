@@ -623,7 +623,7 @@ if itemName == "trident" or itemName == "mace" then itemSwingSpeed:put(context.i
 -- == TRIDENT AND SPEAR POSE ==
 if useAction == "trident" then
     M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    M:moveZ(mat,  -0.1)
+    if P:isUsingItem(context.player) then M:moveZ(mat,  -0.1) end
     M:rotateY(mat,  40 * l)
     M:rotateX(mat, -90 * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
     M:rotateZ(mat, -45 * l * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
