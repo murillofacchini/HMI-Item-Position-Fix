@@ -7,7 +7,10 @@
       AlexSkinModel:          false,
       Weskerson3DItems:       false,
       Actually3DStuff:        false,
+      RVChestsAndBoxes:       false,
       RVTorches:              false,
+      PatoRefinedTorches:     false,
+      PatoRefinedBuckets:     false,
       Glowing3DArmors:        false,
       Glowing3DTotem:         false,
       BensBundle:             false,
@@ -15,14 +18,11 @@
       FreshFoods:             false,
       FreshOresAndIngots:     false,
       FreshSeeds:             false,
-      FreshMusicDiscs:        false,
-      PatoRefinedBuckets:     false,
-      PatoRefinedTorches:     false
+      FreshMusicDiscs:        false
     },
     OtherResourcePacksCompatibility: {
-      FreshAnimationsPlayerExtension: false,
-      NotEnoughAnimations:            false,
-      GoussHandPoses:                 false
+      GoussHandPoses:                 false,
+      NNEActionSwords:                false
     }
   }
 }

@@ -106,6 +106,8 @@ local a3ds					= ${a3ds}
 local w3di					= ${w3di}
 local refinedBuckets		= ${refinedBuckets}
 local freshFoods			= ${freshFoods}
+local gousPoses			    = ${gousPoses}
+local nneSwords			    = ${nneSwords}
 
 -- == FUNCTIONS ==
 function easeCustom(t)
@@ -200,20 +202,25 @@ yawSpeedO = yawSpeedO * M:pow(DAMPING, context.deltaTime * 30)
 yawAngleO = yawAngleO + yawSpeedO * context.deltaTime * 30
 
 -- == TOOL ANIMATIONS ==
-context.swingProgress = tags({"pickaxes"}) and easeCustom(context.swingProgress) or easeCustomSec(context.swingProgress)
+if tags({"pickaxes"}) then
+    context.swingProgress = easeCustom(context.swingProgress)
+else
+    context.swingProgress = easeCustomSec(context.swingProgress)
+end
 
 if context.swingProgress < 0.70016 then
     swing_rot = M:sin(M:clamp(context.swingProgress, 0, 0.308) * 5.1)
 else
     swing_rot = M:sin(M:clamp(context.swingProgress, 0.70016, 1) * 5.1 - 2)
 end
-swing_rot = swing_rot * swing_rot * swing_rot
 
 if context.swingProgress < 0.65245 then
     swing_sword_tilt = M:sin(M:clamp(context.swingProgress, 0, 0.16675) * 3.14 * 3)
 else
     swing_sword_tilt = M:sin(M:clamp(context.swingProgress, 0.65245, 1) * 4.4 - 1.3)
 end
+
+swing_rot = swing_rot * swing_rot * swing_rot
 
 if context.swingProgress < 0.65594 then
     swing_hit_second = M:sin(M:clamp(context.swingProgress, 0.16561, 0.32991) * 4.78 * 2 + 4.7)
@@ -222,64 +229,51 @@ else
 end
 
 if useAction == "spear" then
+    M:rotateZ(mat, 180 * l)
+
     M:rotateZ(mat, -180 * Easings:easeInOutBack(M:clamp(sw * 2, 0, 1)) * l)
-    M:moveZ(mat, -0.2 	* Easings:easeInOutSine(Easings:easeInOutBack(sc * 0.8)))
-    M:moveY(mat, -0.05 	* Easings:easeInOutBack(scd))
-    M:rotateX(mat, -70 	* Easings:easeInOutBack(sc * 0.8))
-    M:rotateX(mat, -8 	* Easings:easeInOutBack(scd))
-    M:rotateY(mat, 60 	* Easings:easeInOutBack(sc * 0.8) * l)
-    M:rotateY(mat, -30 	* Easings:easeInOutBack(scd) * l)
-    M:rotateY(mat, -60 	* Easings:easeOutBack(sck) * sck * l)
-    M:moveY(mat, -0.25 	* M:clamp(M:sin(Easings:easeInOutSine(hic) * 6.28), 0, 1))
+    M:moveZ(mat, -0.2 * Easings:easeInOutSine(Easings:easeInOutBack(sc * 0.8)))
+
+    M:moveY(mat, -0.05 * Easings:easeInOutBack(scd))
+
+    M:rotateX(mat, -70 * Easings:easeInOutBack(sc * 0.8))
+    M:rotateX(mat, -8 * Easings:easeInOutBack(scd))
+    M:rotateY(mat, 60 * Easings:easeInOutBack(sc * 0.8) * l)
+    M:rotateY(mat, -30 * Easings:easeInOutBack(scd) * l)
+
+    M:rotateY(mat, -60 * Easings:easeOutBack(sck) * sck * l)
+
+    M:moveY(mat, -0.25 * M:clamp(M:sin(Easings:easeInOutSine(hic) * 6.28), 0, 1))
 end
-
-local invertedAxis =
-    (glowing3Darmors and tags({"head_armor"}))
-    or (glowing3Dtotem and itemName == "totem_of_undying")
-    or (freshFoods and (
-        itemName == "cake"
-        or itemName == "pumpkin_pie"
-        or itemName == "bowl"
-        or itemName:match("_stew")
-        or itemName:match("_soup")
-    ))
-
 if (useAction ~= "block" and useAction ~= "crossbow") or tags({"swords"}) then
+    M:moveZ(mat, -0.05 * swing_rot)
+    M:moveY(mat, -0.05 * swing_rot)
+    M:rotateX(mat, 10 * swing_rot)
+    M:rotateX(mat, -30 * swing_rot)
+    M:rotateX(mat, -10 * swing_hit)
 
-    if invertedAxis then
-        M:moveX(mat, -0.05 * swing_rot)
-        M:moveY(mat, -0.05 * swing_rot)
-		M:rotateZ(mat, 10  * swing_rot)
-        M:rotateZ(mat, -30 * swing_rot)
-        M:rotateZ(mat, -10 * swing_hit)
-    else
-        M:moveZ(mat, -0.05 * swing_rot)
-        M:moveY(mat, -0.05 * swing_rot)
-        M:rotateX(mat, 10  * swing_rot)
-        M:rotateX(mat, -30 * swing_rot)
-        M:rotateX(mat, -10 * swing_hit)
-    end
-
-    if tags({"swords"}) then
-        M:moveY(mat, -0.1  * Easings:easeInOutBack(swing))
-        M:rotateX(mat, -60 * Easings:easeInOutBack(swing))
-    elseif not invertedAxisX and not invertedAxisZ then
+    if not tags({"swords"}) then
         if useAction == "trident" or useAction == "spear" then
-            M:moveZ(mat, -0.1  * swing_rot)
+            M:moveZ(mat, -0.1 * swing_rot)
             M:moveY(mat, -0.05 * swing_rot)
+
             if useAction == "spear" then
                 M:moveY(mat, -0.15 * swing_hit)
-                M:rotateX(mat, -5  * swing_hit)
+                M:rotateX(mat, -5 * swing_hit)
             end
+
             M:rotateX(mat, -10 * swing_rot)
             M:rotateX(mat, -15 * swing_hit)
+
             if useAction == "trident" then
                 M:rotateX(mat, -45 * swingOverall)
             else
                 M:rotateX(mat, -45 * swing_sword_tilt)
             end
+
             M:moveY(mat, 0.05 * swing_hit)
-            M:moveY(mat, 0.3  * swingOverall)
+            M:moveY(mat, 0.3 * swingOverall)
+
         else
             M:moveZ(mat, -0.05 * swing_rot)
             M:moveY(mat, -0.05 * swing_rot)
@@ -289,18 +283,23 @@ if (useAction ~= "block" and useAction ~= "crossbow") or tags({"swords"}) then
     end
 
     if tags({"shovels"}) then
-        M:moveY(mat, 0.12  * swing_sword_tilt)
-        M:moveZ(mat, 0.05  * swing_sword_tilt)
-        M:rotateX(mat, 10  * swing_sword_tilt)
+        M:moveY(mat, 0.12 * swing_sword_tilt)
+        M:moveZ(mat, 0.05 * swing_sword_tilt)
+        M:rotateX(mat, 10 * swing_sword_tilt)
         M:rotateX(mat, -30 * swingOverall)
-        M:rotateX(mat, 20  * swing_rot)
-        M:rotateX(mat, 10  * swing_hit_second)
+        M:rotateX(mat, 20 * swing_rot)
+        M:rotateX(mat, 10 * swing_hit_second)
     end
+
+    if tags({"swords"}) and not nneSwords then
+        swing = M:sin(context.swingProgress * 3.14)
+        M:moveY(mat, -0.1 * Easings:easeInOutBack(swing))
+        M:rotateX(mat, -60 * Easings:easeInOutBack(swing))
+     end
 
     if useAction == "bow" then
         M:moveX(mat, -0.065 * l)
     end
-
 end
 
 -- == PHYSICS ==
@@ -412,6 +411,24 @@ end
 local progress = context.mainHand and foodCount or foodCountO
 
 local specialCases = {
+    -- Without Packs
+    {
+        check = function() return not (w3di or a3ds) and useAction == "toot_horn" end,
+        move = {nil, nil, nil}, rotate = {nil, -12, nil}
+    },
+    {
+        check = function() return not (freshFoods or w3di) and useAction == "eat" and itemName == "sweet_berries" end,
+        move = {nil, nil, 0.05}, rotate = {nil, 10, nil}
+    },
+    {
+        check = function() return not (w3di or refinedBuckets) and useAction == "drink" and itemName == "milk_bucket" end,
+        move = {0.15, 0.14, -0.18}, rotate = {nil, -60, 5}
+    },
+    {
+        check = function() return not (w3di or freshFoods) and useAction == "eat" and itemName ~= "milk_bucket" end,
+        move = {-0.05, -0.07, 0.05}
+    },
+    -- With Packs
     {
         check = function() return freshFoods and w3di and useAction == "eat" and (itemName:match("_soup") or itemName:match("_stew")) end,
         move = {0.15, -0.05, -0.1}, rotate = {-5, -10, 30}
@@ -659,4 +676,12 @@ end
 
 if w3di and a3ds and (itemName:match("_banner_pattern") or itemName == "name_tag") then
     M:rotateX(mat, -(M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle + ywAngle * 0.5), 0, -0.13, 0)
+end
+
+if itemName == "shears" and gousPoses then
+    if not context.bl then
+        M:moveZ(mat, 0.1)
+        M:rotateY(mat, 180)
+    end
+    M:rotateZ(mat, 45)
 end

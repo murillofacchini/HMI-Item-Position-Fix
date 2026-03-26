@@ -7,6 +7,9 @@
     glowing3Dtotem:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.Glowing3DTotem",
     freshFoods:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshFoods",
     a3ds:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Actually3DStuff",
-    w3di:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Weskerson3DItems"
+    w3di:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Weskerson3DItems",
+
+    gousPoses:          "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses",
+    nneSwords:          "HMIItemPositionFix.OtherResourcePacksCompatibility.NNEActionSwords"
   }
 }

@@ -157,13 +157,13 @@ local itemLists = {
 -- === ITEM TYPE CHECKING ===
 local isException   = matched(itemLists.hangingPlants) or matched(itemLists.except, true)
 local is2D          = matched(itemLists.sprites2D, true) or itemName:match("spawn_egg")
-local general3D     = ((not isException and not is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest"}, true)) and not isItemCompat
+local general3D     = ((not isException and not is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest", "waxed.*chain"}, true)) and not isItemCompat
 local general2D     = not isException and is2D and not isItemCompat
 
 -- === NOT RENDER AS BLOCK ===
 renderBlock(
     false,
-    {"weeping_vines", "vine", "ladder", "sign", "tripwire_hook", "string", "bars", "resin_clump", "glass_pane", "sugar_cane"}
+    {"weeping_vines", "vine", "ladder", "signs", "tripwire_hook", "string", "bars", "resin_clump", "glass_pane", "sugar_cane"}
 )
 
 -- === GENERAL ADJUST ===
@@ -184,8 +184,8 @@ pose({
     { {"_trapdoor", "_pressure_plate"}, m = {0.18, -0.08, -0.065}, r = {-7.5, -6, nil}, matches = true },
     { {"doors"}, m = {-0.065, -0.32, 0.334}, r = {nil, -110.5, nil} },
     { {"bars"}, m = {nil, nil, -0.01} },
-    { {"fences", "fence_gates", "walls"}, m = {0.175, -0.085, -0.075}, r = {-3.5, -5.5, -1} },
-    { {"fence_gates"}, m = {nil, -0.105, -0.065} },
+    { {"fences", "walls"}, m = {0.175, -0.085, -0.075}, r = {-3.5, -5.5, -1} },
+    { {"fence_gates"}, m = {0.17, -0.185, -0.09}, r = {-4.5, -5, -1.5} },
     { {"chains"}, m = {0.06, nil, -0.01} },
 
     -- Colored Blocks
@@ -200,12 +200,12 @@ pose({
     { {"amethyst_bud", "amethyst_cluster"}, m = {0.04, nil, -0.005}, matches = true, condition = {itemName ~= "small_amethyst_bud"} },
     { {"_mushroom", "_fungus$"}, m = {0.07, nil, -0.02}, matches = true, condition = {itemName ~= "warped_fungus_on_a_stick"} },
     { {"_grass", "_roots", "nether_sprouts"}, m = {0.05, nil, nil}, matches = true, condition = {itemName ~= "grass_block"} },
-    { {"fern", "pointed_dripstone"}, m = {0.07, nil, -0.01}, matches = true },
+    { {"fern", "pointed_dripstone"}, m = {0.06, nil, -0.01}, matches = true },
     { {"bush", "lilac", "peony", "pitcher_plant", "_coral$", "_coral_fan", "cobweb"}, m = {0.055, nil, -0.025}, matches = true },
+    { {"torchflower"}, m = {0.01, 0.035, 0.07}, r = {nil, -35, nil} },
     { {"small_flowers"}, m = {0.065, nil, -0.015} },
     { {"saplings"}, m = {0.075, nil, -0.045}, s = {1.25} },
     { {"small_amethyst_bud"}, m = {nil, -0.03, 0.015} },
-    { {"torchflower"}, m = {-0.065, 0.035, 0.075}, r = {nil, -31.5, nil} },
     { {"cactus_flower"}, m = {0.07, nil, -0.03}, s = {1.2} },
     { {"bamboo"}, m = {0.4, -0.15, -0.25}, r = {-3.5, -4.5, nil}, s = {2.4, 1.5, 2.4} },
     { {"weeping_vines"}, m = {0.105, -0.24, -0.12}, r = {-3, nil, nil}, s = {1.6} },
@@ -215,10 +215,10 @@ pose({
     { {"small_dripleaf"}, m = {0.06, nil, -0.015} },
     { {"big_dripleaf"}, m = {0.065, nil, -0.09} },
     { {"chorus_plant"}, m = {0.06, -0.145, -0.09}, s = {1.65} },
-    { {"frogspawn"}, m = {0.17, -0.11, -0.08}, r = {-6.5, -5.5, -1} },
-    { {"turtle_egg"}, m = {0.25, -0.195, -0.19}, r = {-5.5, -5.5, -0.5}, s = {1.7} },
-    { {"sniffer_egg"}, m = {0.145, -0.1, -0.05}, r = {-6.5, -5.5, -1} },
-    { {"dried_ghast"}, m = {-0.2, -0.105, 0.25}, r = {-4, 175, nil}, s = {1.25} },
+    { {"frogspawn"}, m = {0.17, -0.08, -0.08}, r = {-6.5, -5.5, -1} },
+    { {"turtle_egg"}, m = {0.25, -0.165, -0.19}, r = {-5.5, -5.5, -0.5}, s = {1.7} },
+    { {"sniffer_egg"}, m = {0.175, -0.08, -0.05}, r = {-6.5, -5.5, -1} },
+    { {"dried_ghast"}, m = {-0.2, -0.06, 0.27}, r = {-4, 175, nil}, s = {1.25} },
     { {"parrot_food"}, m = {-0.04, -0.07, -0.01} },
     { {"beetroot_seeds"}, m = {nil, 0.035, nil} },
     { {"torchflower_seeds"}, m = {nil, -0.03, nil} },
@@ -237,13 +237,13 @@ pose({
     { {"torch", "soul_torch", "copper_torch", "redstone_torch"}, m = {0.07, -0.08, -0.065}, r = {-4.5, -5, -1}, s = {1.2} },
     { {"end_rod"}, m = {0.195, -0.025, 0.03}, r = {nil, -24, nil}, s = {1.5} },
     { {"grindstone"}, m = {0.16, 0.35, -0.05}, r = {90, nil, 22.5} },
-    { {"furnace", "blast_furnace", "smoker", "wooden_shelves", "lectern", "barrel"}, m = {-0.305, nil, 0.27}, r = {-180, nil, 180} },
+    { {"furnace", "blast_furnace", "smoker", "lectern", "barrel"}, m = {-0.305, nil, 0.27}, r = {-180, nil, 180} },
     { {"anvil", "brewing_stand"}, m = {-0.105, -0.09, -0.13}, r = {-6, 84.5, -1} },
     { {"end_crystal"}, m = {-0.125, -0.065, 0.23}, r = {nil, -29.5, nil} },
     { {"conduit"}, m = {0.22, -0.22, -0.1}, r = {-5.5, -6, -1}, s = {1.3} },
     { {"scaffolding"}, m = {0.13, -0.265, 0.025}, r = {nil, -23, nil} },
     { {"flower_pot"}, m = {0.19, -0.035, 0.05}, r = {-1.5, -24, nil}, s = {1.4} },
-    { {"wooden_shelves"}, m = {nil, -0.005, 0.01}, r = {0.5, -23, nil} },
+    { {"wooden_shelves"}, m = {-0.315, -0.005, 0.28}, r = {0.5, 157, nil} },
     { {"signs"}, m = {-0.02, nil, 0.015} },
     { {"ender_eye", "ender_pearl"}, m = {-0.045, nil, 0.03} },
     { {"copper_golem_statues"}, m = {-0.005, 0.515, -0.385}, r = {175.5, -131.5, -3}, s = {1.4} },
@@ -263,7 +263,7 @@ pose({
     { {"rails"}, m = {0.165, -0.085, -0.09}, r = {-5.5, -5, -1.5} },
 
     -- Tools & Utilities
-    { {"bucket"}, m = {-0.1, 0.06, -0.095}, r = {6, -3.5, nil}, matches = true, condition = {not isUsingItem} },
+    { {"bucket"}, m = {-0.045, -0.025, -0.03}, r = {nil, -7, nil}, s = {1.2}, matches = true },
     { {"fishing_rod", "_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil}, matches = true },
     { {"pickaxes", "axes", "hoes"}, m = {0.025, -0.115, -0.04}, r = {nil, -8.5, nil} },
     { {"shovels"}, m = {0.005, -0.185, 0.035}, r = {-4, 5.5, -7} },
@@ -354,17 +354,14 @@ pose({
 if isUsingItem and not isItemCompat then
     if
         useAction == "trident"                                      then process(move, nil, nil, -0.1)
-        elseif useAction == "toot_horn"                             then process(move, 0.095, nil, 0.145)
-        elseif useAction == "eat" and itemName ~= "sweet_berries"   then process(move, nil, -0.1, 0.1)
-        elseif useAction == "eat" and itemName == "sweet_berries"   then process(move, nil, 0.065, nil) process(rotate, nil, 80, nil)
-        elseif useAction == "drink" and itemName ~= "milk_bucket"   then process(move, nil, -0.05, nil)
-        elseif useAction == "drink" and itemName == "milk_bucket"   then process(move, 0.05, 0.18, -0.165) process(rotate, nil, -22, nil)
     end
 end
 
 -- === PACK COMPATIBILITY ===
-Positions = Positions or {}
-if Positions and next(Positions) then pose(Positions, true) end
+if isItemCompat then
+    Positions = Positions or {}
+    if Positions and next(Positions) then pose(Positions, true) end
 
-ItemsUndoAdjusts = ItemsUndoAdjusts or {}
-if ItemsUndoAdjusts and next(ItemsUndoAdjusts) then pose(ItemsUndoAdjusts, true) end
+    ItemsUndoAdjusts = ItemsUndoAdjusts or {}
+    if ItemsUndoAdjusts and next(ItemsUndoAdjusts) then pose(ItemsUndoAdjusts, true) end
+end

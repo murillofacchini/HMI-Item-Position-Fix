@@ -4,6 +4,7 @@
     w3di:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Weskerson3DItems",
     a3ds:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Actually3DStuff",
     rvTorches:          "HMIItemPositionFix.ItemsResourcePacksCompatibility.RVTorches",
+    rvChests:           "HMIItemPositionFix.ItemsResourcePacksCompatibility.RVChestsAndBoxes",
     glowing3Darmors:    "HMIItemPositionFix.ItemsResourcePacksCompatibility.Glowing3DArmors",
     glowing3Dtotem:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.Glowing3DTotem",
     bensBundle:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.BensBundle",
@@ -13,6 +14,8 @@
     freshSeeds:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshSeeds",
     refinedBuckets:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedBuckets",
     refinedTorches:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedTorches",
-    freshDiscs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshMusicDiscs"
+    freshDiscs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshMusicDiscs",
+
+    gousPoses:          "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses"
   }
 }

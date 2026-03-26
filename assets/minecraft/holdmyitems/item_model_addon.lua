@@ -28,6 +28,8 @@ PackCompat = {
     glowing3Darmors = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor"}, matches = true },
     freshSeeds = { {"_seeds"}, matches = true },
     bensBundle = { {"bundles"} },
+    gousPoses = { {"shears"} },
+    rvChests = { {"chest$", "shulker_box", "barrel"}, matches = true },
     rvTorches = { {
         "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", "repeater", "comparator", 
         "campfire", "soul_campfire"} },
@@ -134,6 +136,7 @@ PackCompat = {
 ActivePacks = {}
     local a3ds              = ${a3ds}               and (table.insert(ActivePacks, "a3ds") or true)
     local w3di              = ${w3di}               and (table.insert(ActivePacks, "w3di") or true)
+    local rvChests          = ${rvChests}           and (table.insert(ActivePacks, "rvChests") or true)
     local rvTorches         = ${rvTorches}          and (table.insert(ActivePacks, "rvTorches") or true)
     local refinedTorches    = ${refinedTorches}     and (table.insert(ActivePacks, "refinedTorches") or true)
     local refinedBuckets    = ${refinedBuckets}     and (table.insert(ActivePacks, "refinedBuckets") or true)
@@ -145,12 +148,16 @@ ActivePacks = {}
     local freshSeeds        = ${freshSeeds}         and (table.insert(ActivePacks, "freshSeeds") or true)
     local freshOres         = ${freshOresIngots}    and (table.insert(ActivePacks, "freshOresIngots") or true)
     local freshFlowers      = ${freshFlowersPlants} and (table.insert(ActivePacks, "freshFlowersPlants") or true)
+    local gousPoses         = ${gousPoses}               and (table.insert(ActivePacks, "gousPoses") or true)
 
 -- === UNDO ADJUSTS ===
 ItemsUndoAdjusts = {
     a3ds = {
         totem = {
             { {"totem_of_undying"}, r = {10, 190, 110, "yzx"} }
+        },
+        shears = {
+            { {"shears"}, m = {nil, -0.075, -0.065}, r = {-14.5, 2.5, -35.5} }
         }
     },
     w3di = {
@@ -166,6 +173,9 @@ ItemsUndoAdjusts = {
         },
         bundles = {
             { {"bundle"}, s = {1/1.3}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr", matches = true }
+        },
+        shears = {
+            { {"shears"}, s = {1/1.3, 1/1.4, 1/1.3}, m = {0.1, -0.05, nil, "zxy"}, r = {25, 30, 45, "yxz"}, ops = "smr" },
         },
         torches = {
             { {"torch", "soul_torch", "redstone_torch"}, s = {1/1.35}, r = {0, 5, nil, "zyx"}, m = {-0.07, 0.085, nil}, ops = "srm" },
@@ -213,7 +223,6 @@ ItemsUndoAdjusts = {
             { {"fishing_rod"}, s = {1/1.2}, m = {0.1, 0.1, nil}, r = {1, 10, 70, "yzx"}, ops = "smr" },
             { {"flint_and_steel"}, s = {1/1.1}, r = {5, 10, nil, "zxy"}, ops = "srm" },
             { {"fire_charge"}, s = {1/1.25}, r = {nil, nil, 5}, ops = "srm" },
-            { {"shears"}, s = {1/1.3, 1/1.4, 1/1.3}, m = {0.1, -0.05, nil, "zxy"}, r = {25, 30, 45, "yxz"}, ops = "smr" },
             { {"lead"}, s = {1/1.2, 1, 1}, r = {nil, -24.5, 10}, m = {-0.025, 0.2, nil, "xzy"}, ops = "srm" },
             { {"compass"}, s = {1/1.2}, r = {-4, 10, 7, "yxz"}, m = {0, -0.01, -0.03, "yzx"}, ops = "srm" },
             { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm" },
@@ -230,6 +239,7 @@ ItemsUndoAdjusts = {
             { {"heart_of_the_sea"}, s = {1/1.35}, m = {0.05, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"} },
             { {"book", "enchanted_book"}, s = {1/1.1, 1/1.2, 1/1.1}, r = {-40, 20, 30, "yxz"}, m = {-0.2, -0.07, -0.1, "yzx"}, ops = "srm" },
             { {"totem_of_undying"}, s = {1/1.2}, m = {-0.015, -0.005, -0.02}, r = {51, 140, 30.5}, ops = "smr", condition = {glowing3Dtotem} },
+            { {"shears"}, m = {nil, -0.155, -0.15}, r = {-7, 10, -32.5}, s = {0.9}, condition = {gousPoses} }
         }
     }
 }
@@ -238,8 +248,10 @@ if a3ds and w3di then
     if not bensBundle               then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
     if not freshOres                then addUndoAdj(ItemsUndoAdjusts.w3di.ores)          end
     if not glowing3Dtotem           then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
+    if not gousPoses                then addUndoAdj(ItemsUndoAdjusts.w3di.shears)        end
 elseif a3ds and not w3di then
     if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.a3ds.totem)         end
+    if gousPoses                    then addUndoAdj(ItemsUndoAdjusts.a3ds.shears)        end
 end
 if w3di then
     if refinedBuckets               then addUndoAdj(ItemsUndoAdjusts.w3di.bucket)        end
@@ -353,8 +365,8 @@ if w3di then
         { {"disc_fragment_5"}, m = {-0.065, -0.045, -0.005}, r = {-5.5, -9.5, 5.5}, condition = {not freshDiscs} },
         { {"bucket"}, m = {0.02, 0.05, -0.09}, r = {-94.5, -21, 180}, matches = true, condition = {not refinedBuckets}, prox = true },
         { {"milk_bucket"}, m = {0.125, nil, 0.035}, r = {30, -10, -60}, condition = {not refinedBuckets and isUsingItem} },
+        { {"shears"}, m = {nil, -0.085, -0.085}, r = {-40.5, 10, 24}, condition = {not gousPoses} },
         { {"flint_and_steel"}, m = {0.05, -0.015, -0.145}, r = {3.5, -6, 4.5} },
-        { {"shears"}, m = {nil, -0.085, -0.085}, r = {-40.5, 10, 24} },
         { {"lead"}, m = {0.075, -0.03, -0.08}, r = {nil, -26, 10} },
         { {"compasses", "clock"}, m = {-0.005, -0.03, -0.16}, r = {5.5, -9.5, 7.5} },
         { {"map"}, m = {-0.045, 0.035, -0.035}, r = {-5, -9.5, 5} },
