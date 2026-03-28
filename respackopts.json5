@@ -24,6 +24,12 @@
     OtherResourcePacksCompatibility: {
       GoussHandPoses:                 false,
       NNEActionSwords:                false
+    },
+    HMISettings: {
+      InspectKeybind: {
+        type: "integer",
+        default: 74
+      }
     }
   }
 }

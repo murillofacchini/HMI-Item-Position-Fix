@@ -664,6 +664,20 @@ local bc           = context.mainHand and easedBowSec or easedBowSecO
 usingItem:put("minecraft:bow",    bc >= 0.1)
 useDuration:put("minecraft:bow",  Easings:cubicEase(bc) * 20)
 
+-- == INSPECT ANIMATION ==
+if KeyBindManager:isKeyPressed(${inspectKeybind} ~= 0 and ${inspectKeybind} or 67) then
+    inspectionSpin = inspectionSpin + 0.025 * dt
+else
+    inspectionSpin = 0
+end
+inspectionSpin = M:clamp(inspectionSpin, 0, 1)
+
+if isSword or isPickaxe or isAxe or useAction == "trident" and context.mainHand then
+    M:moveX(mat, -0.2 * l * inspectionCounter)
+    M:rotateX(mat, -360 * Easings:easeInOutBack(inspectionSpin), 0, 0, 0.15)
+end
+prevAge = P:getAge(context.player)
+
 -- == SOME POSITIONS ==
 if itemName == "dragon_head" then
 	M:moveY(mat, 0.25)
