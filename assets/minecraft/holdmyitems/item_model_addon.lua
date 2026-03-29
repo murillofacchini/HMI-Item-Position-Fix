@@ -24,7 +24,7 @@ PackCompat = {
     refinedBuckets = { {"bucket"}, matches = true },
     freshDiscs = { {"music_disc", "disc_fragment_5"}, matches = true },
     glowing3Dtotem = { {"totem_of_undying"} },
-    glowing3Darmors = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor"}, matches = true },
+    glowing3Darmors = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor", "elytra"}, matches = true },
     freshSeeds = { {"_seeds"}, matches = true },
     bensBundle = { {"bundles"} },
     gousPoses = { {"shears"} },
@@ -184,6 +184,9 @@ ItemsUndoAdjusts = {
         shears = {
             { {"shears"}, s = {1/1.3, 1/1.4, 1/1.3}, m = {0.1, -0.05, nil, "zxy"}, r = {25, 30, 45, "yxz"}, ops = "smr" },
         },
+        elytra = {
+            { {"elytra"}, m = {0.025, 0.095, 0.16}, r = {58.5, -1.5, -1} }
+        },
         torches = {
             { {"torch", "soul_torch", "redstone_torch"}, s = {1/1.35}, r = {0, 5, nil, "zyx"}, m = {-0.07, 0.085, nil}, ops = "srm" },
             { {"lanterns"}, m = {0.045, 0.015, -0.07}, r = {6, -13, nil}, s = {0.6}, condition = {refinedTorches} },
@@ -265,6 +268,7 @@ if w3di then
     if freshDiscs                   then addUndoAdj(ItemsUndoAdjusts.w3di.musicDiscs)    end
     if bensBundle                   then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
     if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
+    if glowing3Darmors               then addUndoAdj(ItemsUndoAdjusts.w3di.elytra)       end
     if rvTorches or refinedTorches  then addUndoAdj(ItemsUndoAdjusts.w3di.torches)       end
 end
 
@@ -485,7 +489,7 @@ if glowing3Darmors then
         { {"chest_armor"}, m = {nil, -0.26, 0.085}, r = {58, 180, -15} },
         { {"leg_armor"}, m = {-0.04, -0.385, -0.205}, r = {-2, nil, 7.5} },
         { {"foot_armor"}, m = {-0.095, -0.01, -0.02}, r = {nil, 82, nil} },
-        { {"elytra"}, m = {-0.04, -0.03, -0.045}, r = {-11, nil, 10} }
+        { {"elytra"}, m = {-0.005, -0.22, nil}, r = {-80, -9.5, 4.5} }
     })
 end
 

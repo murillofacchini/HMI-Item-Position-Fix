@@ -6,25 +6,25 @@ The **Hold My Items** mod brings visible first-person hands and stunning animati
 
 This pack includes full compatibility support for the most popular 3D resource packs. When multiple packs are active at the same time, their item positioning adjustments can stack and conflict with each other — by manually enabling the corresponding toggles in the settings, this pack applies the correct corrections for every combination, so everything stays perfectly aligned no matter what you're running.
 
-| Compat | Pack                          | Details/Notes                                                                            |
-| ------ | ----------------------------- | ---------------------------------------------------------------------------------------- |
-| ✅     | **Actually 3D Stuff**         | Incompatible with Fresh Flowers and Plants; Limited compatibility with Gous's Hand Poses |
-| ✅     | **Weskerson's 3D Items**      | Limited compatibility with Refined Torches; Currently incompatible with Gous's Hand Poses|
-| ✅     | **Weskerson's Nature**        | ---                                                                                      |
-| ✅     | **R&V Chests & Boxes**        | ---                                                                                      |
-| ✅     | **R&V Torches**               | Incompatible with Pato's Refined Torches                                                 |
-| ✅     | **Pato's Refined Torches**    | Incompatible with R&V Torches; Limited compatibility with W3DI                           |
-| ✅     | **Pato's Refined Buckets**    | ---                                                                                      |
-| ✅     | **Glowing 3D Armors**         | ---                                                                                      |
-| ✅     | **Glowing 3D Totem**          | ---                                                                                      |
-| ✅     | **Fresh Flowers and Plants**  | Incompatible with Actually 3D Stuff                                                      |
-| ✅     | **Fresh Foods**               | ---                                                                                      |
-| ✅     | **Fresh Ores And Ingots**     | ---                                                                                      |
-| ✅     | **Fresh Seeds**               | ---                                                                                      |
-| ✅     | **Fresh Music Discs**         | ---                                                                                      |
-| ✅     | **Ben's Bundle**              | ---                                                                                      |
-| ✅     | **NNE Action Swords**         | ---                                                                                      |
-| ✅     | **Gous's Hand Poses**         | Currently incompatible with W3DI; Limited compatibility with Actually 3D Stuff           |
+| Compat | Pack                             | Details/Notes                                                                            |
+| ------ | -------------------------------- | ---------------------------------------------------------------------------------------- |
+| ✅     | **Actually 3D Stuff** (A3DS)     | Incompatible with Fresh Flowers and Plants; Limited compatibility with Gous's Hand Poses |
+| ✅     | **Weskerson's 3D Items** (W3DI)  | Limited compatibility with Refined Torches; Currently incompatible with Gous's Hand Poses|
+| ✅     | **Weskerson's Nature**           | ---                                                                                      |
+| ✅     | **R&V Chests & Boxes**           | ---                                                                                      |
+| ✅     | **R&V Torches**                  | Incompatible with Pato's Refined Torches                                                 |
+| ✅     | **Pato's Refined Torches**       | Incompatible with R&V Torches; Limited compatibility with W3DI                           |
+| ✅     | **Pato's Refined Buckets**       | ---                                                                                      |
+| ✅     | **Glowing 3D Armors**            | ---                                                                                      |
+| ✅     | **Glowing 3D Totem**             | ---                                                                                      |
+| ✅     | **Fresh Flowers and Plants**     | Incompatible with A3DS                                                                   |
+| ✅     | **Fresh Foods**                  | ---                                                                                      |
+| ✅     | **Fresh Ores And Ingots**        | ---                                                                                      |
+| ✅     | **Fresh Seeds**                  | ---                                                                                      |
+| ✅     | **Fresh Music Discs**            | ---                                                                                      |
+| ✅     | **Ben's Bundle**                 | ---                                                                                      |
+| ✅     | **NNE Action Swords**            | ---                                                                                      |
+| ✅     | **Gous's Hand Poses**            | Currently incompatible with W3DI; Limited compatibility with A3DS                        |
 
 > To enable compatibility with the packs listed above, you must have the Respackopts mod installed. It adds a settings menu to your resource packs screen where you can toggle support for each pack individually.
 
@@ -80,7 +80,6 @@ For some reason, the clock model breaks when using `A3DS` together with `W3DI`. 
 
 ## The EMF Problem
 
-HMI may cause visual glitches when used together with the Entity Model Features (EMF) mod. To fix this, install Mod Menu, open the Mods menu and locate EMF. Inside the mod's options, navigate to the Models section and, in the Player Settings, turn on "Prevent first person player animations".
-
+HMI may cause visual glitches when used together with the Entity Model Features (EMF) mod. To fix this, install Mod Menu, open the Mods menu, and locate EMF. In its options, navigate to the Models section and, under Player Settings, turn on "Prevent first person player animations".
 
 > Found a bug or have a suggestion? Join our [Discord](https://discord.com/channels/1453136992534663319/1453138060538675272) or report it in the [HMI Addon Channel](https://discord.com/channels/1346575587787014326/1469563796648366234) or on the [github project](https://github.com/murillofacchini/HMI-Item-Position-Fix/issues)!

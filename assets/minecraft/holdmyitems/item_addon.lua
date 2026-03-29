@@ -399,6 +399,11 @@ else
 	end
 end
 
+if itemName == "elytra" and glowing3Darmors and not w3di then
+    M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
+	M:rotateZ(mat, ywAngle * -0.7, -0.1 * l, 0, 0.1)
+end
+
 -- == EAT & DRINK ANIMATION ==
 local function process(op, progress, exp, x, y, z)
     local t = M:pow(progress, exp)
