@@ -109,8 +109,8 @@ PackCompat = {
             -- Natural Blocks
             "turtle_egg",
             -- Functional Blocks
-            "torch", "^lantern$", "soul_lantern", "copper_lantern", "campfire", "end_crystal", "flower_pot", 
-            "armor_stand", "_sign", "ender_eye",
+            "^torch$", "soul_torch", "copper_torch", "^lantern$", "soul_lantern", "copper_lantern", "campfire", 
+            "end_crystal", "flower_pot", "armor_stand", "_sign", "ender_eye",
             -- Redstone Blocks
             "redstone$", "repeater", "comparator", "lever",
             -- Tools
@@ -122,13 +122,13 @@ PackCompat = {
             "mace", "nautilus_armor", "totem_of_undying", "snowball", "^egg$", "brown_egg", "blue_egg",
             -- Foods & Potions
             "apple", "^chorus_fruit$", "melon_slice", "carrot", "potato", "^beetroot$",
-            "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$", 
-            "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken", 
-            "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$", 
+            "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$",
+            "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken",
+            "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
             "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "potion", "cake",
             -- Ingredients
             "coal$", "raw", "^emerald$", "^lapis_lazuli$", "diamond$", "quartz$", "amethyst_shard",
-            "nugget", "ingot", "netherite_scrap", "stick$", "flint$", "bone$", "feather", 
+            "nugget", "ingot", "netherite_scrap", "stick$", "flint$", "bone$", "feather",
             "honeycomb", "scute", "slime_ball", "clay_ball", "prismarine_crystals",
             "nautilus_shell", "heart_of_the_sea", "blaze_rod", "breeze_rod", "shulker_shell",
             "disc_fragment_5", "bowl", "brick$", "bottle", "glowstone_dust", "gunpowder",
@@ -268,7 +268,7 @@ if w3di then
     if freshDiscs                   then addUndoAdj(ItemsUndoAdjusts.w3di.musicDiscs)    end
     if bensBundle                   then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
     if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
-    if glowing3Darmors               then addUndoAdj(ItemsUndoAdjusts.w3di.elytra)       end
+    if glowing3Darmors              then addUndoAdj(ItemsUndoAdjusts.w3di.elytra)        end
     if rvTorches or refinedTorches  then addUndoAdj(ItemsUndoAdjusts.w3di.torches)       end
 end
 
@@ -304,13 +304,13 @@ if a3ds then
         { {"compass"}, m = {0.015, 0.06, -0.03}, r = {-6.5, -5, -2} },
         { {"map", "paper"}, m = {0.025, -0.02, -0.055}, r = {-6.5, -5, nil} },
         { {"writable_book"}, m = {nil, nil, -0.09} },
-        { {"firework_rocket"}, m = {-0.025, -0.08, -0.16}, r = {-6, -7, nil} },
+        { {"firework_rocket"}, m = {0.035, -0.01, -0.07}, r = {-6, -5.5, -1.5}, s = {0.9} },
         { {"saddle"}, m = {-0.025, nil, nil} },
         { {"boats"}, r = {nil, -37.5, nil} },
         { {"goat_horn"}, m = {0.015, 0.09, nil}, r = {nil, -4, -1.5} },
         -- Combat
         { {"totem_of_undying"}, m = {0.025, -0.02, -0.055}, condition = {not glowing3Dtotem and w3di} },
-        { {"egg", "brown_egg", "blue_egg"}, m = {0.03, -0.01, -0.085}, r = {-6, -6, nil} },
+        { {"egg", "brown_egg", "blue_egg"}, m = {0.03, nil, -0.085}, r = {-6, -6, nil}, s = {1.2} },
         { {"snowball"}, m = {0.015, -0.01, -0.085}, r = {-6, -6, nil} },
         -- Ingredients
         { {"flint"}, m = {0.03, 0.06, -0.08}, r = {14.5, 12.5, -8}, condition = {freshOres} },

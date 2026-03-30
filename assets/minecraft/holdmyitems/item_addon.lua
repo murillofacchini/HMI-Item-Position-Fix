@@ -448,7 +448,8 @@ local function applyTransform(op, progress, exp, x, y, z)
     if z then op.z(z * t) end
 end
 
-local function eatDrinkAnimation(useAction, progress, movePos, rotatePos)
+-- Animation
+local function eatDrinkAnimation(use, progress, movePos, rotatePos)
     local function m(default, override)
         if override ~= nil then return override else return default end
     end
@@ -467,7 +468,7 @@ local function eatDrinkAnimation(useAction, progress, movePos, rotatePos)
     applyTransform(move, progress, 1, 0.02, moveVals.y, moveVals.z)
     applyTransform(move, progress, 1, moveVals.x, nil, nil)
 
-    if useAction == "eat" or useAction == "toot_horn" then
+    if use == "eat" or use == "toot_horn" then
         local ex = rotatePos and m(-23, rotatePos[1]) or -23
         local ez = rotatePos and m(-12, rotatePos[3]) or -12
         applyTransform(rotate, progress, 2,  ex,  nil,  ez)
@@ -475,7 +476,7 @@ local function eatDrinkAnimation(useAction, progress, movePos, rotatePos)
 
     applyTransform(rotate, progress, 2,  rotateVals.x,  rotateVals.y,  rotateVals.z)
 
-    if useAction == "drink" then
+    if use == "drink" then
         local dx = rotatePos and m(15, rotatePos[1]) or 15
         applyTransform(rotate, progress, 2,  dx,  nil,  nil)
     end
@@ -511,11 +512,19 @@ local specialCases = {
     },
 	{
 		check = function() return w3di and refinedBuckets and matched("milk_bucket") end,
-		move = {-0.3, 0.2, 0.2}, rotate = {-20, nil, -10}
+		move = {-0.3, 0.2, 0.15}, rotate = {-20, -60, -10}
 	},
 	{
 		check = function() return not w3di and refinedBuckets and matched("milk_bucket") end,
 		move = {0.02, 0.06, -0.1}, rotate = {nil, -60, nil}
+	},
+    {
+		check = function() return w3di and matched("milk_bucket") end,
+		move = {nil, -0.05, -0.1}, rotate = {-10, -30, -55}
+	},
+    {
+		check = function() return w3di and not freshFoods and matched("sweet_berries") end,
+		move = {nil, nil, 0.05}
 	}
 }
 

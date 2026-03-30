@@ -5,8 +5,8 @@
   conf: {
     ItemsResourcePacksCompatibility: {
       AlexSkinModel:          false,
-      Weskerson3DItems:       false,
       WeskersonNature:        false,
+      Weskerson3DItems:       false,
       Actually3DStuff:        false,
       RVChestsAndBoxes:       false,
       RVTorches:              false,
