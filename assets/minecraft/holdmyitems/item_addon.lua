@@ -121,13 +121,23 @@ function easeCustomSec(t)
     return 3 * t * (1 - t) * (1 - t) * 0.44 + 3 * t2 * (1 - t) * 0.94 + t3
 end
 
-local function tags(itemsTags)
-	for _, i in ipairs(itemsTags) do
-		if I:isIn(context.item, Tags:getFabricTag(i)) or I:isIn(context.item, Tags:getVanillaTag(i)) then
-			return true
-		end
-	end
-	return false
+local function matched(items, match)
+    local list = type(items) == "table" and items or {items}
+
+    local function check(item)
+        if match then
+            return itemName:match(item) ~= nil
+        end
+        return itemName == item
+            or I:isIn(context.item, Tags:getFabricTag(item))
+            or I:isIn(context.item, Tags:getVanillaTag(item))
+    end
+
+    for _, i in ipairs(list) do
+        if check(i) then
+            return true
+        end
+    end
 end
 
 local function glow(x, y, z, texture)
@@ -157,15 +167,15 @@ local function particle(x, y, z, texture, size, tick)
 end
 
 -- == CALC ==
-local isSword        = tags({"swords"})
-local isShovel       = tags({"shovels"})
-local isAxe          = tags({"axes"})
-local isHangingSign  = tags({"hanging_signs"})
-local isPickaxe      = tags({"pickaxes"})
-local isNugget       = tags({"nuggets"})
-local isMusicDisc    = tags({"music_discs"})
-local isSpearTag     = tags({"spears"})
-local isSkull        = tags({"skulls"})
+local isSword        = matched({"swords"})
+local isShovel       = matched({"shovels"})
+local isAxe          = matched({"axes"})
+local isHangingSign  = matched({"hanging_signs"})
+local isPickaxe      = matched({"pickaxes"})
+local isNugget       = matched({"nuggets"})
+local isMusicDisc    = matched({"music_discs"})
+local isSpearTag     = matched({"spears"})
+local isSkull        = matched({"skulls"})
 
 -- Brush
 brushSpeedM = brushSpeedM + (M:sin(foodCountSec * 4.14) * brushCounter) * dt
@@ -209,6 +219,34 @@ yawSpeedO = yawSpeedO + (M:sin(walk) * 3 * walkSmoother + (M:sin(context.offHand
 yawSpeedO = yawSpeedO - GRAVITY * yawAngleO * dt
 yawSpeedO = yawSpeedO * M:pow(DAMPING, dt)
 yawAngleO = yawAngleO + yawSpeedO * dt
+
+-- == INVERTED AXIS CHECKING ==
+local invertAxisRules = {
+    {
+        pack = w3di and a3ds,
+        items = {"shears", "ender_pearl", "ender_eye", "firework_rocket"},
+    },
+    {
+        pack = glowing3Darmors,
+        items = {"head_armor"},
+    },
+    {
+        pack = glowing3Dtotem,
+        items = {"totem_of_undying"},
+    },
+    {
+        pack = freshFoods,
+        items = {"cake", "pumpkin_pie", "bowl", "_stew", "_soup"},
+    }
+}
+
+local invertedAxis = false
+for _, rule in ipairs(invertAxisRules) do
+    if rule.pack and matched(rule.items) then
+        invertedAxis = true
+        break
+    end
+end
 
 -- == TOOL ANIMATIONS ==
 if isPickaxe then
@@ -254,21 +292,6 @@ if useAction == "spear" then
 
     M:moveY(mat, -0.25 * M:clamp(M:sin(Easings:easeInOutSine(hic) * 6.28), 0, 1))
 end
-
-local invertedAxis =
-    (glowing3Darmors and tags({"head_armor"}))
-    or (glowing3Dtotem and itemName == "totem_of_undying")
-    or (w3di and a3ds and (
-        itemName == "shears"
-        or itemName == "ender_pearl"
-        or itemName == "ender_eye"))
-    or (freshFoods and (
-        itemName == "cake"
-        or itemName == "pumpkin_pie"
-        or itemName == "bowl"
-        or itemName:match("_stew")
-        or itemName:match("_soup")
-    ))
 
 if (useAction ~= "block" and useAction ~= "crossbow") or isSword then
 
@@ -375,7 +398,7 @@ elseif itemName == "painting" or itemName == "item_frame" or (itemName == "glow_
 	context.swingProgress = 0
 	M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -25, 90) + ptAngle, 0, 0.45, 0)
 	M:rotateZ(mat, ywAngle * -1, 0, 0.55, 0)
-elseif glowing3Darmors and tags({"chest_armor"}) then
+elseif glowing3Darmors and matched({"chest_armor"}) then
     M:rotateX(mat, -(P:getPitch(context.player) * 0.09 + ptAngle * 0.6), -0.129, -0.004, 0.495)
     M:rotateZ(mat, ywAngle * 0.5, -0.129, -0.004, 0.495)
 else
@@ -405,43 +428,56 @@ if itemName == "elytra" and glowing3Darmors and not w3di then
 end
 
 -- == EAT & DRINK ANIMATION ==
-local function process(op, progress, exp, x, y, z)
+-- Animations Helpers
+local move = {
+    x = function(v) M:moveX(mat, v * l) end,
+    y = function(v) M:moveY(mat, v) end,
+    z = function(v) M:moveZ(mat, v) end
+}
+local rotate = {
+    x = function(v) M:rotateX(mat, v) end,
+    y = function(v) M:rotateY(mat, v * l) end,
+    z = function(v) M:rotateZ(mat, v * l) end
+}
+
+local function applyTransform(op, progress, exp, x, y, z)
     local t = M:pow(progress, exp)
 
-    if op == "move" then
-        if x then M:moveX(mat, x * t * l) end
-        if y then M:moveY(mat, y * t)     end
-        if z then M:moveZ(mat, z * t)     end
-    elseif op == "rotate" then
-        if x then M:rotateX(mat, x * t)     end
-        if y then M:rotateY(mat, y * t * l) end
-        if z then M:rotateZ(mat, z * t * l) end
-    end
+    if x then op.x(x * t) end
+    if y then op.y(y * t) end
+    if z then op.z(z * t) end
 end
-local function eatDrinkAnimation(useAction, progress, move, rotate)
+
+local function eatDrinkAnimation(useAction, progress, movePos, rotatePos)
     local function m(default, override)
         if override ~= nil then return override else return default end
     end
 
-    local mx = move   and m(nil,  move[1])   or nil
-    local my = move   and m(nil,  move[2])   or nil
-    local mz = move   and m(-0.05, move[3])  or -0.05
-    local rx = rotate and m(nil,  rotate[1]) or nil
-    local ry = rotate and m(-50,  rotate[2]) or -50
-    local rz = rotate and m(nil,  rotate[3]) or nil
+    local moveVals = {
+        x = movePos and m(nil, movePos[1]) or nil,
+        y = movePos and m(nil, movePos[2]) or nil,
+        z = movePos and m(-0.05, movePos[3]) or -0.05
+    }
+    local rotateVals = {
+        x = rotatePos and m(nil, rotatePos[1]) or nil,
+        y = rotatePos and m(-50, rotatePos[2]) or -50,
+        z = rotatePos and m(nil, rotatePos[3]) or nil
+    }
 
-    process("move", progress, 1, 0.02, my, mz)
-    process("move", progress, 1, mx, nil, nil)
+    applyTransform(move, progress, 1, 0.02, moveVals.y, moveVals.z)
+    applyTransform(move, progress, 1, moveVals.x, nil, nil)
 
     if useAction == "eat" or useAction == "toot_horn" then
-        local ex = rotate and m(-23, rotate[1]) or -23
-        local ez = rotate and m(-12, rotate[3]) or -12
-        process("rotate", progress, 2,  ex,  nil,  ez)
+        local ex = rotatePos and m(-23, rotatePos[1]) or -23
+        local ez = rotatePos and m(-12, rotatePos[3]) or -12
+        applyTransform(rotate, progress, 2,  ex,  nil,  ez)
     end
-    process("rotate", progress, 2,  rx,  ry,  rz)
+
+    applyTransform(rotate, progress, 2,  rotateVals.x,  rotateVals.y,  rotateVals.z)
+
     if useAction == "drink" then
-        local dx = rotate and m(15, rotate[1]) or 15
-        process("rotate", progress, 2,  dx,  nil,  nil)
+        local dx = rotatePos and m(15, rotatePos[1]) or 15
+        applyTransform(rotate, progress, 2,  dx,  nil,  nil)
     end
 end
 local progress = context.mainHand and foodCount or foodCountO
@@ -449,51 +485,52 @@ local progress = context.mainHand and foodCount or foodCountO
 local specialCases = {
     -- Without Packs
     {
-        check = function() return not (w3di or a3ds) and useAction == "toot_horn" end,
+        check = function() return not (w3di or a3ds) and matched("goat_horn") end,
         move = {nil, nil, nil}, rotate = {nil, -12, nil}
     },
     {
-        check = function() return not (freshFoods or w3di) and useAction == "eat" and itemName == "sweet_berries" end,
+        check = function() return not (freshFoods or w3di) and matched("sweet_berries") end,
         move = {nil, nil, 0.05}, rotate = {nil, 10, nil}
     },
     {
-        check = function() return not (w3di or refinedBuckets) and useAction == "drink" and itemName == "milk_bucket" end,
+        check = function() return not (w3di or refinedBuckets) and matched("milk_bucket") end,
         move = {0.15, 0.14, -0.18}, rotate = {nil, -60, 5}
     },
     {
-        check = function() return not (w3di or freshFoods) and useAction == "eat" and itemName ~= "milk_bucket" end,
+        check = function() return not (w3di or freshFoods) and itemName ~= "milk_bucket" end,
         move = {-0.05, -0.07, 0.05}
     },
     -- With Packs
     {
-        check = function() return freshFoods and w3di and useAction == "eat" and (itemName:match("_soup") or itemName:match("_stew")) end,
+        check = function() return freshFoods and w3di and matched({"_soup", "_stew"}) end,
         move = {0.15, -0.05, -0.1}, rotate = {-5, -10, 30}
     },
     {
-        check = function() return freshFoods and w3di and useAction == "eat" and itemName == "spider_eye" end,
+        check = function() return freshFoods and w3di and matched("spider_eye") end,
         move = {0.1, 0.05, 0.05}, rotate = {nil, nil, nil}
     },
 	{
-		check = function() return w3di and refinedBuckets and itemName == "milk_bucket" end,
+		check = function() return w3di and refinedBuckets and matched("milk_bucket") end,
 		move = {-0.3, 0.2, 0.2}, rotate = {-20, nil, -10}
 	},
 	{
-		check = function() return not w3di and refinedBuckets and itemName == "milk_bucket" end,
+		check = function() return not w3di and refinedBuckets and matched("milk_bucket") end,
 		move = {0.02, 0.06, -0.1}, rotate = {nil, -60, nil}
 	}
 }
 
-local matched = false
+local caseMatched = false
 for _, case in ipairs(specialCases) do
     if case.check() then
         eatDrinkAnimation(useAction, progress, case.move, case.rotate)
-        matched = true
+        caseMatched = true
 		break
     end
 end
 
-local isGenericAction = useAction == "eat" or useAction == "drink" or useAction == "toot_horn"
-local _ = (not matched and isGenericAction) and eatDrinkAnimation(useAction, progress)
+if not caseMatched and (useAction == "eat" or useAction == "drink" or useAction == "toot_horn") then
+    eatDrinkAnimation(useAction, progress)
+end
 
 global.foodCount          = 0.0;
 global.foodCountO         = 0.0;
@@ -543,11 +580,9 @@ local switchAnimationVariable   = Easings:easeInBack(M:sin(M:clamp(activeSwitch,
 
 if
 	(
-		tags({"bundles", "skulls", "music_discs", "nuggets"})
-		or itemName == "ender_pearl"
-		or itemName == "ender_eye"
+		matched({"bundles", "skulls", "music_discs", "nuggets", "ender_pearl", "ender_eye"})
+        or (glowing3Darmors and matched({"head_armor"}))
 		or I:isThrowable(context.item)
-		or (glowing3Darmors and tags({"head_armor"}))
 	) and useAction ~= "trident"
 then
     M:rotateX(mat, -10 * switchAnimationVariable)

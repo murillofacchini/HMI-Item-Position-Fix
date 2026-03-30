@@ -9,32 +9,23 @@ local switch_val                = (context.mainHand and mainHandSwitch) or offHa
 local switchAnimationVariable   = Easings:easeInBack(M:sin(M:clamp(switch_val, 0.09723, 0.60632) * 3.24 * 1.65 - 0.1))
 
 -- === FUNCTIONS AND COMPATIBILITY ===
-local matchedCache = { [0] = {}, [1] = {} }
-local function matched(item, match)
-    local list = type(item) == "table" and item or {item}
-    local cache = matchedCache[match and 1 or 0]
+local function matched(items, match)
+    local list = type(items) == "table" and items or {items}
 
-    local function check(i)
-        local cached = cache[i]
-        if cached ~= nil then return cached end
-
-        local result
+    local function check(item)
         if match then
-            result = (itemName:match(i) ~= nil)
-        else
-            result = itemName == i
-                or I:isIn(context.item, Tags:getFabricTag(i))
-                or I:isIn(context.item, Tags:getVanillaTag(i))
+            return itemName:match(item) ~= nil
         end
-
-        cache[i] = result
-        return result
+        return itemName == item
+            or I:isIn(context.item, Tags:getFabricTag(item))
+            or I:isIn(context.item, Tags:getVanillaTag(item))
     end
 
     for _, i in ipairs(list) do
-        if check(i) then return true end
+        if check(i) then
+            return true
+        end
     end
-    return false
 end
 
 -- == Compatibility ==

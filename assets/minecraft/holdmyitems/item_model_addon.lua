@@ -5,14 +5,14 @@
 local l = context.mainHand and 1 or -1
 
 -- === FUNCTION ===
-Positions = {}
+Positions = {} -- executed by item_pose
 local function addPos(tables)
     for _, t in ipairs(tables) do
         table.insert(Positions, t)
     end
 end
 
-ItemsUndoAdjusts = {}
+ItemsUndoAdjusts = {} -- executed by item_pose
 local function addUndoAdj(tables)
     for _, t in ipairs(tables) do
         table.insert(ItemsUndoAdjusts, t)
