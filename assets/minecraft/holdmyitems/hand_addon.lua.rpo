@@ -13,6 +13,7 @@
     freshSeeds:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshSeeds",
     refinedBuckets:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedBuckets",
     refinedTorches:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedTorches",
-    freshDiscs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshMusicDiscs"
+    freshDiscs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshMusicDiscs",
+    better3Dbooks:      "HMIItemPositionFix.ItemsResourcePacksCompatibility.BrayAndCyberBetterFresher3DBooks"
   }
 }

@@ -112,6 +112,7 @@ local refinedBuckets    = ${refinedBuckets}
 local freshFoods        = ${freshFoods}
 local freshOres         = ${freshOresIngots}
 local freshDiscs        = ${freshDiscs}
+local better3Dbooks     = ${better3Dbooks}
 local bensBundle        = ${bensBundle}
 
 -- == UNDO ADJUSTS ==
@@ -128,6 +129,10 @@ local handUndoAdjusts = {
         },
         bundles = {
             { {"bundle"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10} }
+        },
+        books = {
+            { {"writable_book"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10}, condition = {w3di and not a3ds} },
+            { {"book", "enchanted_book", "written_book"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10} }
         },
         torches = {
             { {"torch", "soul_torch", "redstone_torch"}, m = {-0.05, nil, nil, "zxy"}, r = {-10, nil, nil, "zyx"} },
@@ -180,6 +185,7 @@ if w3di then
     if freshOres                    then pose(handUndoAdjusts.w3di.ores, true)          end
     if freshDiscs                   then pose(handUndoAdjusts.w3di.musicDiscs, true)    end
     if refinedBuckets               then pose(handUndoAdjusts.w3di.bucket, true)        end
+    if better3Dbooks                then pose(handUndoAdjusts.w3di.books, true)         end
     if rvTorches or refinedTorches  then pose(handUndoAdjusts.w3di.torches, true)       end
 end
 

@@ -16,6 +16,7 @@
     refinedTorches:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedTorches",
     freshDiscs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshMusicDiscs",
     wNature:            "HMIItemPositionFix.ItemsResourcePacksCompatibility.WeskersonNature",
+    better3Dbooks:      "HMIItemPositionFix.ItemsResourcePacksCompatibility.BrayAndCyberBetterFresher3DBooks",
 
     gousPoses:          "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses"
   }

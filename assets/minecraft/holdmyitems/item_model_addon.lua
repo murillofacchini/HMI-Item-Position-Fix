@@ -28,10 +28,11 @@ PackCompat = {
     freshSeeds = { {"_seeds"}, matches = true },
     bensBundle = { {"bundles"} },
     gousPoses = { {"shears"} },
+    better3Dbooks = { {"book", "enchanted_book", "writable_book", "written_book"} },
     rvChests = { {"chest$", "shulker_box", "barrel"}, matches = true },
     rvTorches = { {
-        "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", "repeater", "comparator", 
-        "campfire", "soul_campfire"} },
+        "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", "repeater", "comparator",
+        "campfire", "soul_campfire", "candle"} },
     refinedTorches = { {
         "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", 
         "campfire", "soul_campfire"} },
@@ -155,6 +156,7 @@ ActivePacks = {}
     local freshSeeds        = ${freshSeeds}         and (table.insert(ActivePacks, "freshSeeds") or true)
     local freshOres         = ${freshOresIngots}    and (table.insert(ActivePacks, "freshOresIngots") or true)
     local freshFlowers      = ${freshFlowersPlants} and (table.insert(ActivePacks, "freshFlowersPlants") or true)
+    local better3Dbooks     = ${better3Dbooks}      and (table.insert(ActivePacks, "better3Dbooks") or true)
     local gousPoses         = ${gousPoses}          and (table.insert(ActivePacks, "gousPoses") or true)
 
 -- === UNDO ADJUSTS ===
@@ -165,6 +167,9 @@ ItemsUndoAdjusts = {
         },
         shears = {
             { {"shears"}, m = {nil, -0.025, -0.065}, r = {-14.5, 2.5, -35.5} }
+        },
+        books = {
+            { {"writable_book"}, m = {nil, -0.1, nil}, r = {-25, nil, nil} }
         }
     },
     w3di = {
@@ -186,6 +191,12 @@ ItemsUndoAdjusts = {
         },
         elytra = {
             { {"elytra"}, m = {0.025, 0.095, 0.16}, r = {58.5, -1.5, -1} }
+        },
+        books = {
+            { {"writable_book"}, s = {1/1.1}, m = {0.02, -0.055, -0.055}, r = {1.5, nil, 6}, condition = {a3ds} },
+            { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm", condition = {not a3ds} },
+            { {"written_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm" },
+            { {"book", "enchanted_book"}, s = {1/1.1, 1/1.2, 1/1.1}, r = {-40, 20, 30, "yxz"}, m = {-0.2, -0.07, -0.1, "yzx"}, ops = "srm" }
         },
         torches = {
             { {"torch", "soul_torch", "redstone_torch"}, s = {1/1.35}, r = {0, 5, nil, "zyx"}, m = {-0.07, 0.085, nil}, ops = "srm" },
@@ -224,6 +235,7 @@ ItemsUndoAdjusts = {
             { {"flint"}, s = {1/1.3}, r = {5, 10, nil, "zxy"}, ops = "srm" }
         },
         a3dsCompat = {
+            { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm", condition = {not better3Dbooks} },
             { {"bone_meal", "map", "honeycomb", "nautilus_shell", "gunpowder", "glowstone_dust", "blaze_powder", "sugar"},
             s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm" },
             { {"armor_stand"}, s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm" },
@@ -235,7 +247,6 @@ ItemsUndoAdjusts = {
             { {"fire_charge"}, s = {1/1.25}, r = {nil, nil, 5}, ops = "srm" },
             { {"lead"}, s = {1/1.2, 1, 1}, r = {nil, -24.5, 10}, m = {-0.025, 0.2, nil, "xzy"}, ops = "srm" },
             { {"compass"}, s = {1/1.2}, r = {-4, 10, 7, "yxz"}, m = {0, -0.01, -0.03, "yzx"}, ops = "srm" },
-            { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm" },
             { {"firework_rocket"}, s = {1/1.2}, m = {0.03, 0, nil, "zxy"}, ops = "smr", prox = true },
             { {"firework_rocket"}, s = {1/1.05}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr" },
             { {"carrot_on_a_stick"}, s = {1/1.2}, m = {0.1, 0.1, nil}, r = {1, 60, nil, "yxz"}, ops = "smr" },
@@ -259,6 +270,7 @@ if a3ds and w3di then
 elseif a3ds and not w3di then
     if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.a3ds.totem)         end
     if gousPoses                    then addUndoAdj(ItemsUndoAdjusts.a3ds.shears)        end
+    if better3Dbooks                then addUndoAdj(ItemsUndoAdjusts.a3ds.books)         end
 end
 if w3di then
     if refinedBuckets               then addUndoAdj(ItemsUndoAdjusts.w3di.bucket)        end
@@ -268,6 +280,7 @@ if w3di then
     if bensBundle                   then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
     if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
     if glowing3Darmors              then addUndoAdj(ItemsUndoAdjusts.w3di.elytra)        end
+    if better3Dbooks                then addUndoAdj(ItemsUndoAdjusts.w3di.books)         end
     if rvTorches or refinedTorches  then addUndoAdj(ItemsUndoAdjusts.w3di.torches)       end
 end
 
@@ -292,6 +305,7 @@ if a3ds then
         { {"item_frame", "painting"}, m = {-0.03, -0.62, 0.2}, r = {-39, -6, nil} },
         -- Tools & Utilities
         { {"bundles"}, m = {0.015, 0.03, -0.055}, r = {-4, -5.5, nil}, condition = {not bensBundle} },
+        { {"writable_book"}, m = {nil, nil, -0.09}, condition = {not better3Dbooks} },
         { {"minecart"}, m = {nil, 0.045, nil}, matches = true },
         { {"ender_eye"}, m = {0.03, -0.01, -0.08}, r = {-4.5, -6, nil} },
         { {"ender_pearl"}, m = {0.01, -0.005, -0.08}, r = {-4.5, -6, nil} },
@@ -302,7 +316,6 @@ if a3ds then
         { {"lead"}, m = {0.125, -0.13, -0.215}, r = {-5.5, -4, -1}, s = {0.9} },
         { {"compass"}, m = {0.015, 0.06, -0.03}, r = {-6.5, -5, -2} },
         { {"map", "paper"}, m = {0.025, -0.02, -0.055}, r = {-6.5, -5, nil} },
-        { {"writable_book"}, m = {nil, nil, -0.09} },
         { {"firework_rocket"}, m = {0.035, -0.01, -0.07}, r = {-6, -5.5, -1.5}, s = {0.9} },
         { {"saddle"}, m = {-0.025, nil, nil} },
         { {"boats"}, r = {nil, -37.5, nil} },
@@ -313,7 +326,7 @@ if a3ds then
         { {"snowball"}, m = {0.015, -0.01, -0.085}, r = {-6, -6, nil} },
         -- Ingredients
         { {"flint"}, m = {0.03, 0.06, -0.08}, r = {14.5, 12.5, -8}, condition = {freshOres} },
-        { {"book", "enchanted_book"}, m = {-0.135, nil, 0.085}, r = {-5, -6, -2}, condition = {not w3di} },
+        { {"book", "enchanted_book"}, m = {-0.135, nil, 0.085}, r = {-5, -6, -2}, condition = {not (w3di or better3Dbooks)} },
         { {"string"}, m = {0.05, -0.005, -0.075}, r = {-4.5, -4.5, nil}, renderAsBlock = false },
         { {"smithing_template"}, m = {-0.095, -0.11, -0.14}, r = {-5.5, -5, nil}, matches = true },
         { {"_key"}, m = {0.015, nil, -0.085}, r = {-6, -5.5, nil}, matches = true },
@@ -375,11 +388,11 @@ if w3di then
         { {"bucket"}, m = {0.02, 0.05, -0.09}, r = {-94.5, -21, 180}, matches = true, condition = {not refinedBuckets} },
         { {"shears"}, m = {nil, -0.085, -0.085}, r = {-40.5, 10, 24}, condition = {not gousPoses} },
         { {"elytra"}, m = {nil, -0.32, nil}, r = {-131.5, nil, nil}, condition = {not glowing3Darmors} },
+        { {"writable_book", "written_book"}, m = {0.07, 0.065, -0.09}, r = {10, -26, 13}, condition = {not better3Dbooks} },
         { {"flint_and_steel"}, m = {0.05, -0.015, -0.145}, r = {3.5, -6, 4.5} },
         { {"lead"}, m = {0.075, -0.03, -0.08}, r = {nil, -26, 10} },
         { {"compasses", "clock"}, m = {-0.005, -0.03, -0.16}, r = {5.5, -9.5, 7.5} },
         { {"map"}, m = {-0.045, 0.035, -0.035}, r = {-5, -9.5, 5} },
-        { {"writable_book", "written_book"}, m = {nil, nil, -0.115} },
         { {"wind_charge"}, m = {-0.02, -0.03, -0.06}, r = {-3.5, -11, 3} },
         { {"ender_eye", "ender_pearl"}, m = {-0.015, -0.01, -0.005}, r = {-4, -10, 3} },
         { {"goat_horn"}, m = {-0.015, nil, -0.15}, r = {14, -9, 5.5} },
@@ -391,6 +404,7 @@ if w3di then
         -- Foods & Drinks
         { {"bottle", "potion", "dragon_breath"}, m = {-0.055, nil, -0.035}, r = {-4.5, -7, 4}, matches = true },
         -- Ingredients
+        { {"book", "enchanted_book"}, m = {-0.1, nil, -0.01}, r = {nil, -8.5, nil}, condition = {not better3Dbooks} },
         { {"bone_meal", "gunpowder", "glowstone_dust", "sugar"}, m = {-0.1, 0.015, 0.035}, r = {-3, -11, nil} },
         { {"stick"}, m = {0.01, 0.01, -0.02}, r = {-2, -2, -1.5} },
         { {"blaze_rod", "breeze_rod"}, m = {-0.005, 0.01, -0.02}, r = {-2, -2, -1.5} },
@@ -403,7 +417,6 @@ if w3di then
         { {"prismarine_crystals"}, m = {-0.17, 0.04, 0.105}, r = {nil, 90.5, nil}, s = {1.3} },
         { {"heart_of_the_sea"}, m = {-0.045, 0.02, -0.02}, r = {-3.5, -6, 4}, s = {0.9} },
         { {"shulker_shell"}, m = {-0.035, -0.055, -0.085}, r = {-5, -10, 6} },
-        { {"book", "enchanted_book"}, m = {-0.1, nil, -0.01}, r = {nil, -8.5, nil} },
         { {"fermented_spider_eye"}, m = {-0.025, -0.085, -0.045}, r = {0.5, nil, 4} },
         { {"blaze_powder"}, m = {-0.01, -0.03, -0.045}, r = {-13, -47, nil} },
         { {"feather"}, m = {-0.055, -0.02, -0.03}, r = {nil, -10, 6} },
@@ -461,8 +474,8 @@ end
 
 if rvTorches then
     addPos({
-        { {"torch", "soul_torch", "redstone_torch", "copper_torch"}, m = {0.01, -0.075, -0.035}, r = {-5, -5.5, nil} },
         { {"repeater", "comparator"}, m = {-0.045, -0.02, -0.035}, r = {-6, -16, 2.5}, renderAsBlock = false },
+        { {"torch", "soul_torch", "redstone_torch", "copper_torch"}, m = {0.01, -0.075, -0.035}, r = {-5, -5.5, nil} },
         { {"lanterns"}, m = {0.07, -0.545, 0.155}, r = {-25, -5.5, nil} },
         { {"campfire", "soul_campfire"}, m = {-0.08, 0.185, 0.255}, r = {8, -9.5, -2.5} }
     })
@@ -581,6 +594,12 @@ if freshFlowers then
         { {"sea_pickle"}, m = {0.025, -0.025, -0.04}, r = {-5, -7, nil} },
         { {"seagrass"}, m = {0.225, -0.17, -0.18}, r = {-11, -11.5, nil} },
         { {"kelp"}, m = {-0.045, -0.01, -0.06}, r = {14.5, -14, -9.5} }
+    })
+end
+
+if better3Dbooks then
+    addPos({
+        { {"book", "enchanted_book", "writable_book", "written_book"}, r = {-12.5, -15.5, nil} }
     })
 end
 

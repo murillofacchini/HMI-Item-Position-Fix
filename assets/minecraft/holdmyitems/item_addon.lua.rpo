@@ -8,6 +8,7 @@
     freshFoods:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshFoods",
     a3ds:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Actually3DStuff",
     w3di:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Weskerson3DItems",
+    better3Dbooks:      "HMIItemPositionFix.ItemsResourcePacksCompatibility.BrayAndCyberBetterFresher3DBooks",
 
     gousPoses:          "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses",
     nneSwords:          "HMIItemPositionFix.OtherResourcePacksCompatibility.NNEActionSwords",

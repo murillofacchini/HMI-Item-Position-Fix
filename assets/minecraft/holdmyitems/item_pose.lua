@@ -300,14 +300,14 @@ pose({
     { {"nautilus_armor"}, m = {-0.04, -0.075, -0.005}, matches = true },
     { {"swords"}, m = {0.025, nil, -0.05}, r = {nil, -5, nil} },
     { {"mace"}, m = {0.025, -0.06, -0.05}, r = {nil, -5, nil} },
-    { {"trident"}, m = {-0.02, nil, nil}, r = {nil, 20, nil} },
+    { {"trident"}, m = {-0.03, nil, nil} },
     { {"shield"}, m = {-0.035, 0.06, 0.005}, r = {-1.5, -22.5, nil}, s = {0.8, 1, 1} },
     { {"head_armor", "foot_armor"}, m = {nil, -0.11, -0.005} },
     { {"leg_armor"}, m = {nil, -0.035, -0.005} },
     { {"wolf_armor"}, m = {-0.005, -0.285, -0.015} },
     { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {-0.02, -0.045, 0.015} },
     { {"arrows"}, m = {nil, nil, 0.02} },
-    { {"bow"}, m = {0.005, nil, 0.07}, r = {nil, -25.5, -10.5} },
+    { {"bow"}, m = {-0.03, nil, 0.07}, r = {nil, -25.5, -10.5} },
     { {"crossbow"}, m = {-0.12, 0.08, 0.065}, r = {nil, -11, nil} },
 
     -- Foods & Drinks

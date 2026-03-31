@@ -98,13 +98,16 @@ local itemName              = I:getName(context.item):gsub("minecraft:", "")
 
 -- == RESOURCE PACKS ==
 
-local torchesPack           = ${rvTorches} or ${refinedTorches}
+local rvTorches             = ${rvTorches}
+local refinedTorches        = ${refinedTorches}
+local torchesPack           = rvTorches or refinedTorches
 local glowing3Darmors		= ${glowing3Darmors}
 local glowing3Dtotem		= ${glowing3Dtotem}
 local a3ds					= ${a3ds}
 local w3di					= ${w3di}
 local refinedBuckets		= ${refinedBuckets}
 local freshFoods			= ${freshFoods}
+local better3Dbooks			= ${better3Dbooks}
 local gousPoses			    = ${gousPoses}
 local nneSwords			    = ${nneSwords}
 
@@ -223,11 +226,8 @@ yawAngleO = yawAngleO + yawSpeedO * dt
 -- == INVERTED AXIS CHECKING ==
 local invertAxisRules = {
     {
-        pack = w3di and a3ds,
-        items = {
-            "shears", "ender_pearl", "ender_eye", "firework_rocket", "boats", "name_tag", "banner_pattern", "stick",
-            "blaze_rod", "breeze_rod", "totem_of_undying", "bone"
-        },
+        pack = better3Dbooks and w3di,
+        items = {"book", "enchanted_book", "writable_book", "written_book"},
     },
     {
         pack = glowing3Darmors,
@@ -240,6 +240,13 @@ local invertAxisRules = {
     {
         pack = freshFoods,
         items = {"cake", "pumpkin_pie", "bowl", "_stew", "_soup"},
+    },
+    {
+        pack = w3di and a3ds,
+        items = {
+            "shears", "ender_pearl", "ender_eye", "firework_rocket", "boats", "name_tag", "banner_pattern", "stick",
+            "blaze_rod", "breeze_rod", "totem_of_undying", "bone"
+        },
     }
 }
 
@@ -690,11 +697,12 @@ if itemName == "trident" or itemName == "mace" then itemSwingSpeed:put(context.i
 -- == TRIDENT AND SPEAR POSE ==
 if useAction == "trident" then
     M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    if P:isUsingItem(context.player) then M:moveZ(mat,  -0.1) end
+    M:moveZ(mat, -0.1 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
     M:rotateY(mat,  40 * l)
     M:rotateX(mat, -90 * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
     M:rotateZ(mat, -45 * l * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
 end
+
 if useAction == "spear" then
     M:moveZ(mat, -0.1)
     M:rotateY(mat, 10 * l)
@@ -769,4 +777,12 @@ if itemName == "shears" and gousPoses then
         M:rotateY(mat, 180)
     end
     M:rotateZ(mat, 45)
+end
+
+if rvTorches and matched("candle", true) then
+    renderAsBlock:put(I:getName(context.item), false)
+    M:moveX(mat, -0.05 * l)
+    M:rotateX(mat, -8)
+    M:rotateY(mat, -10 * l)
+    M:rotateZ(mat, 6 * l)
 end
