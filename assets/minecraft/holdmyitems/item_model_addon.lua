@@ -34,14 +34,14 @@ PackCompat = {
         "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", "repeater", "comparator",
         "campfire", "soul_campfire", "candle"} },
     refinedTorches = { {
-        "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", 
+        "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns",
         "campfire", "soul_campfire"} },
     freshFoods = { {
-        "apple", "chorus_fruit", "melon_slice", "carrot", "potato", "^beetroot$",
+        "apple", "^chorus_fruit$", "melon_slice", "carrot", "potato", "^beetroot$",
         "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$",
         "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken",
         "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
-        "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "cake"
+        "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "cake", "_pressure_plate"
     }, matches = true },
     freshOresIngots = { {
         "redstone$", "coal$", "raw", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$",
@@ -520,6 +520,7 @@ end
 
 if freshFoods then
     addPos({
+        { {"_pressure_plate"}, m = {0.125, -0.02, 0.345}, r = {-119.5, -4.5, -7.5}, matches = true }, -- fresh foods changes the position of all items whose ID contains "plate", so this correction is necessary
         { {"_soup", "_stew", "bowl"}, m = {0.07, -0.025, -0.03}, r = {1.5, -4.5, -1}, matches = true },
         { {"beef", "porkchop"}, m = {0.06, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
         { {"mutton"}, m = {0.025, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
