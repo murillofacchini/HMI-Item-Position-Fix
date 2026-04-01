@@ -104,6 +104,7 @@ end
 -- === PACKS COMPATIBILITY ===
 local a3ds              = ${a3ds}
 local w3di              = ${w3di}
+local just3Darmors      = ${just3Darmors}
 local glowing3Darmors   = ${glowing3Darmors}
 local glowing3Dtotem    = ${glowing3Dtotem}
 local rvTorches         = ${rvTorches}
@@ -128,7 +129,7 @@ local handUndoAdjusts = {
             { {"bucket"}, m = {0, -0.1, nil, "yzx"}, r = {5, -10, nil, "yzx"}, matches = true }
         },
         bundles = {
-            { {"bundle"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10} }
+            { {"bundles"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10} }
         },
         books = {
             { {"writable_book"}, m = {0.09, 0.09, -0.05}, r = {nil, nil, -10}, condition = {w3di and not a3ds} },
@@ -174,19 +175,19 @@ local handUndoAdjusts = {
 
 if w3di and a3ds then
     pose(handUndoAdjusts.w3di.a3dsCompat, true)
-    if not freshOres                then pose(handUndoAdjusts.w3di.ores, true)          end
-    if not glowing3Dtotem           then pose(handUndoAdjusts.w3di.totem, true)         end
-    if not bensBundle               then pose(handUndoAdjusts.w3di.bundles, true)       end
+    if not freshOres                    then pose(handUndoAdjusts.w3di.ores, true)          end
+    if not glowing3Dtotem               then pose(handUndoAdjusts.w3di.totem, true)         end
+    if not bensBundle                   then pose(handUndoAdjusts.w3di.bundles, true)       end
 end
 if w3di then
-    if glowing3Dtotem               then pose(handUndoAdjusts.w3di.totem, true)         end
-    if bensBundle                   then pose(handUndoAdjusts.w3di.bundles, true)       end
-    if freshFoods                   then pose(handUndoAdjusts.w3di.foods, true)         end
-    if freshOres                    then pose(handUndoAdjusts.w3di.ores, true)          end
-    if freshDiscs                   then pose(handUndoAdjusts.w3di.musicDiscs, true)    end
-    if refinedBuckets               then pose(handUndoAdjusts.w3di.bucket, true)        end
-    if better3Dbooks                then pose(handUndoAdjusts.w3di.books, true)         end
-    if rvTorches or refinedTorches  then pose(handUndoAdjusts.w3di.torches, true)       end
+    if glowing3Dtotem                   then pose(handUndoAdjusts.w3di.totem, true)         end
+    if bensBundle                       then pose(handUndoAdjusts.w3di.bundles, true)       end
+    if freshFoods                       then pose(handUndoAdjusts.w3di.foods, true)         end
+    if freshOres                        then pose(handUndoAdjusts.w3di.ores, true)          end
+    if freshDiscs                       then pose(handUndoAdjusts.w3di.musicDiscs, true)    end
+    if refinedBuckets                   then pose(handUndoAdjusts.w3di.bucket, true)        end
+    if better3Dbooks                    then pose(handUndoAdjusts.w3di.books, true)         end
+    if rvTorches or refinedTorches      then pose(handUndoAdjusts.w3di.torches, true)       end
 end
 
 -- == PACKS INDIVIDUAL ADJUSTS ==
@@ -199,7 +200,7 @@ end
 if w3di then
     pose({
         { {"copper_torch"}, r = {nil, nil, 10}, m = {nil, nil, 0.05}, condition = {not (rvTorches or refinedTorches)} },
-        { {"elytra"}, m = {nil, 0.415, nil} }
+        { {"elytra"}, m = {nil, 0.415, nil}, condition = {not just3Darmors} }
     }, true)
 end
 

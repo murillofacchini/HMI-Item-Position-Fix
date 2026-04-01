@@ -1,5 +1,8 @@
 -- by omnis._.
--- using item_model_addon.lua because it doesn't overwrite and to better separate compatibility between packs
+
+-- using hand_relative_addon.lua (despite the name) because it doesn't overwrite and better separates compatibility between packs
+-- Positions and ItemsUndoAdjusts are defined here but actually applied in item_pose
+-- the old item_model_addon caused a delay in the HMI, leaving the items temporarily misaligned
 -- it is what it is, you gotta make do with what you've got
 
 local l = context.mainHand and 1 or -1
@@ -25,6 +28,7 @@ PackCompat = {
     freshDiscs = { {"music_disc", "disc_fragment_5"}, matches = true },
     glowing3Dtotem = { {"totem_of_undying"} },
     glowing3Darmors = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor", "elytra"}, matches = true },
+    just3Darmors = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor", "wolf_armor", "nautilus_armor", "elytra"}, matches = true },
     freshSeeds = { {"_seeds"}, matches = true },
     bensBundle = { {"bundles"} },
     gousPoses = { {"shears"} },
@@ -32,7 +36,7 @@ PackCompat = {
     rvChests = { {"chest$", "shulker_box", "barrel"}, matches = true },
     rvTorches = { {
         "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", "repeater", "comparator",
-        "campfire", "soul_campfire", "candle"} },
+        "campfire", "soul_campfire", "candles"} },
     refinedTorches = { {
         "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns",
         "campfire", "soul_campfire"} },
@@ -150,6 +154,7 @@ ActivePacks = {}
     local refinedBuckets    = ${refinedBuckets}     and (table.insert(ActivePacks, "refinedBuckets") or true)
     local glowing3Dtotem    = ${glowing3Dtotem}     and (table.insert(ActivePacks, "glowing3Dtotem") or true)
     local glowing3Darmors   = ${glowing3Darmors}    and (table.insert(ActivePacks, "glowing3Darmors") or true)
+    local just3Darmors      = ${just3Darmors}        and (table.insert(ActivePacks, "just3Darmors") or true)
     local bensBundle        = ${bensBundle}         and (table.insert(ActivePacks, "bensBundle") or true)
     local freshDiscs        = ${freshDiscs}         and (table.insert(ActivePacks, "freshDiscs") or true)
     local freshFoods        = ${freshFoods}         and (table.insert(ActivePacks, "freshFoods") or true)
@@ -184,7 +189,7 @@ ItemsUndoAdjusts = {
             { {"bucket"}, m = {0.06, -0.03, -0.035}, r = {14, 6.5, 18.5}, s = {1/1.05}, matches = true }
         },
         bundles = {
-            { {"bundle"}, s = {1/1.3}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr", matches = true }
+            { {"bundles"}, s = {1/1.3}, m = {0.05, 0.05, 0.01, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr" }
         },
         shears = {
             { {"shears"}, s = {1/1.3, 1/1.4, 1/1.3}, m = {0.1, -0.05, nil, "zxy"}, r = {25, 30, 45, "yxz"}, ops = "smr" },
@@ -234,6 +239,9 @@ ItemsUndoAdjusts = {
             { {"netherite_scrap"}, s = {1/1.15}, r = {-15, 0.3, 5, "yxz"}, ops = "srm" },
             { {"flint"}, s = {1/1.3}, r = {5, 10, nil, "zxy"}, ops = "srm" }
         },
+        nautilusArmor = {
+            { {"nautilus_armor"}, s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm", matches = true }
+        },
         a3dsCompat = {
             { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm", condition = {not better3Dbooks} },
             { {"bone_meal", "map", "honeycomb", "nautilus_shell", "gunpowder", "glowstone_dust", "blaze_powder", "sugar"},
@@ -263,25 +271,26 @@ ItemsUndoAdjusts = {
 }
 if a3ds and w3di then
     addUndoAdj(ItemsUndoAdjusts.w3di.a3dsCompat)
-    if not bensBundle               then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
-    if not freshOres                then addUndoAdj(ItemsUndoAdjusts.w3di.ores)          end
-    if not glowing3Dtotem           then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
-    if not gousPoses                then addUndoAdj(ItemsUndoAdjusts.w3di.shears)        end
+    if not bensBundle                   then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
+    if not freshOres                    then addUndoAdj(ItemsUndoAdjusts.w3di.ores)          end
+    if not glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
+    if not gousPoses                    then addUndoAdj(ItemsUndoAdjusts.w3di.shears)        end
 elseif a3ds and not w3di then
-    if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.a3ds.totem)         end
-    if gousPoses                    then addUndoAdj(ItemsUndoAdjusts.a3ds.shears)        end
-    if better3Dbooks                then addUndoAdj(ItemsUndoAdjusts.a3ds.books)         end
+    if glowing3Dtotem                   then addUndoAdj(ItemsUndoAdjusts.a3ds.totem)         end
+    if gousPoses                        then addUndoAdj(ItemsUndoAdjusts.a3ds.shears)        end
+    if better3Dbooks                    then addUndoAdj(ItemsUndoAdjusts.a3ds.books)         end
 end
 if w3di then
-    if refinedBuckets               then addUndoAdj(ItemsUndoAdjusts.w3di.bucket)        end
-    if freshOres                    then addUndoAdj(ItemsUndoAdjusts.w3di.ores)          end
-    if freshFoods                   then addUndoAdj(ItemsUndoAdjusts.w3di.foods)         end
-    if freshDiscs                   then addUndoAdj(ItemsUndoAdjusts.w3di.musicDiscs)    end
-    if bensBundle                   then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
-    if glowing3Dtotem               then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
-    if glowing3Darmors              then addUndoAdj(ItemsUndoAdjusts.w3di.elytra)        end
-    if better3Dbooks                then addUndoAdj(ItemsUndoAdjusts.w3di.books)         end
-    if rvTorches or refinedTorches  then addUndoAdj(ItemsUndoAdjusts.w3di.torches)       end
+    if refinedBuckets                   then addUndoAdj(ItemsUndoAdjusts.w3di.bucket)        end
+    if freshOres                        then addUndoAdj(ItemsUndoAdjusts.w3di.ores)          end
+    if freshFoods                       then addUndoAdj(ItemsUndoAdjusts.w3di.foods)         end
+    if freshDiscs                       then addUndoAdj(ItemsUndoAdjusts.w3di.musicDiscs)    end
+    if bensBundle                       then addUndoAdj(ItemsUndoAdjusts.w3di.bundles)       end
+    if glowing3Dtotem                   then addUndoAdj(ItemsUndoAdjusts.w3di.totem)         end
+    if better3Dbooks                    then addUndoAdj(ItemsUndoAdjusts.w3di.books)         end
+    if just3Darmors                     then addUndoAdj(ItemsUndoAdjusts.w3di.nautilusArmor) end
+    if glowing3Darmors or just3Darmors  then addUndoAdj(ItemsUndoAdjusts.w3di.elytra)        end
+    if rvTorches or refinedTorches      then addUndoAdj(ItemsUndoAdjusts.w3di.torches)       end
 end
 
 -- === INDIVIDUAL RESOURCE PACK ADJUST ===
@@ -387,7 +396,7 @@ if w3di then
         { {"disc_fragment_5"}, m = {-0.065, -0.045, -0.005}, r = {-5.5, -9.5, 5.5}, condition = {not freshDiscs} },
         { {"bucket"}, m = {0.02, 0.05, -0.09}, r = {-94.5, -21, 180}, matches = true, condition = {not refinedBuckets} },
         { {"shears"}, m = {nil, -0.085, -0.085}, r = {-40.5, 10, 24}, condition = {not gousPoses} },
-        { {"elytra"}, m = {nil, -0.32, nil}, r = {-131.5, nil, nil}, condition = {not glowing3Darmors} },
+        { {"elytra"}, m = {nil, -0.32, nil}, r = {-131.5, nil, nil}, condition = {not (glowing3Darmors or just3Darmors)} },
         { {"writable_book", "written_book"}, m = {0.07, 0.065, -0.09}, r = {10, -26, 13}, condition = {not better3Dbooks} },
         { {"flint_and_steel"}, m = {0.05, -0.015, -0.145}, r = {3.5, -6, 4.5} },
         { {"lead"}, m = {0.075, -0.03, -0.08}, r = {nil, -26, 10} },
@@ -399,7 +408,8 @@ if w3di then
         { {"firework_rocket"}, m = {-0.03, nil, -0.03}, r = {-6, -13.5, 4.5} },
         -- Combat
         { {"totem_of_undying"}, m = {-0.06, nil, -0.045}, r = {-7.5, nil, nil}, condition = {not glowing3Dtotem} },
-        { {"nautilus_armor", "nautilus_shell"}, m = {-0.055, 0.04, 0.01}, r = {-4.5, -9.5, 6}, matches = true },
+        { {"nautilus_armor"}, m = {-0.055, 0.04, 0.01}, r = {-4.5, -9.5, 6}, matches = true, condition = {not just3Darmors} },
+        { {"nautilus_shell"}, m = {-0.055, 0.04, 0.01}, r = {-4.5, -9.5, 6}, matches = true },
         { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {0.01, -0.015, -0.05}, r = {-6, -5.5, 3} },
         -- Foods & Drinks
         { {"bottle", "potion", "dragon_breath"}, m = {-0.055, nil, -0.035}, r = {-4.5, -7, 4}, matches = true },
@@ -491,6 +501,17 @@ end
 if glowing3Dtotem then
     addPos({
         { {"totem_of_undying"}, m = {-0.015, 0.115, -0.14}, r = {-3, 50, -8.5}, s = {0.85} }
+    })
+end
+
+if just3Darmors then
+    addPos({
+        { {"horse_armor"}, m = {-0.035, -0.03, -0.045}, r = {-8, 3.5, -5.5}, matches = true },
+        { {"nautilus_armor"}, m = {0.03, 0.015, -0.105}, r = {-4.5, 20, nil}, matches = true },
+        { {"turtle_helmet"}, m = {0.02, 0.01, 0.035}, r = {2.5, -4.5, -4}, matches = true },
+        { {"head_armor"}, m = {0.005, nil, nil}, r = {8, nil, -1.5} },
+        { {"leg_armor"}, m = {0.04, nil, nil} },
+        { {"wolf_armor"}, m = {0.055, -0.125, -0.14}, r = {6.5, -15.5, 2} }
     })
 end
 

@@ -108,6 +108,7 @@ local w3di					= ${w3di}
 local refinedBuckets		= ${refinedBuckets}
 local freshFoods			= ${freshFoods}
 local better3Dbooks			= ${better3Dbooks}
+local bensBundle			= ${bensBundle}
 local gousPoses			    = ${gousPoses}
 local nneSwords			    = ${nneSwords}
 local beashAnimations	    = ${beashAnimations}
@@ -130,7 +131,9 @@ local function matched(items, match)
 
     local function check(item)
         if match then
-            return itemName:match(item) ~= nil
+            if itemName:find(item) then
+                return true
+            end
         end
         return itemName == item
             or I:isIn(context.item, Tags:getFabricTag(item))
@@ -228,11 +231,11 @@ yawAngleO = yawAngleO + yawSpeedO * dt
 local invertAxisRules = {
     {
         pack = better3Dbooks and w3di,
-        items = {"book", "enchanted_book", "writable_book", "written_book"},
+        items = {"^book$", "enchanted_book", "writable_book", "written_book"},
     },
     {
         pack = glowing3Darmors,
-        items = {"head_armor"},
+        items = {"_helmet"},
     },
     {
         pack = glowing3Dtotem,
@@ -241,6 +244,10 @@ local invertAxisRules = {
     {
         pack = freshFoods,
         items = {"cake", "pumpkin_pie", "bowl", "_stew", "_soup"},
+    },
+    {
+        pack = w3di and bensBundle,
+        items = {"bundle"},
     },
     {
         pack = w3di and a3ds,
@@ -253,7 +260,7 @@ local invertAxisRules = {
 
 local invertedAxis = false
 for _, rule in ipairs(invertAxisRules) do
-    if rule.pack and matched(rule.items) then
+    if rule.pack and matched(rule.items, true) then
         invertedAxis = true
         break
     end
@@ -698,7 +705,7 @@ if itemName == "trident" or itemName == "mace" then itemSwingSpeed:put(context.i
 -- == TRIDENT AND SPEAR POSE ==
 if useAction == "trident" then
     M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    M:moveZ(mat, -0.1 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+    M:moveZ(mat, -0.08 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
     M:rotateY(mat,  40 * l)
     M:rotateX(mat, -90 * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
     M:rotateZ(mat, -45 * l * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))

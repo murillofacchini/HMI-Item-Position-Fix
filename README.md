@@ -2,6 +2,10 @@
 
 The **Hold My Items** mod brings visible first-person hands and stunning animations to the game, but it shifts the position of items in the player's hand, causing most of them to appear misaligned. This pack fixes that — every single item is carefully repositioned to sit exactly where it should.
 
+> This resource pack requires the Respackopts mod to function correctly.
+
+[![Respackopts](https://img.shields.io/badge/Get-Respackopts-blue?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/respackopts)
+
 # 🛠️ Compatibility & Sinergy
 
 This pack includes full compatibility support for the most popular 3D resource packs. When multiple packs are active at the same time, their item positioning adjustments can stack and conflict with each other — by manually enabling the corresponding toggles in the settings, this pack applies the correct corrections for every combination, so everything stays perfectly aligned no matter what you're running.
@@ -15,7 +19,8 @@ This pack includes full compatibility support for the most popular 3D resource p
 | ✅     | **R&V Torches**                  | Incompatible with Pato's Refined Torches                                                 |
 | ✅     | **Pato's Refined Torches**       | Incompatible with R&V Torches; Limited compatibility with W3DI                           |
 | ✅     | **Pato's Refined Buckets**       | ---                                                                                      |
-| ✅     | **Glowing 3D Armors**            | ---                                                                                      |
+| ✅     | **Just 3D Armors**               | Incompatible with Glowing 3D Armors                                                      |
+| ✅     | **Glowing 3D Armors**            | Incompatible with Just 3D Armors                                                         |
 | ✅     | **Glowing 3D Totem**             | ---                                                                                      |
 | ✅     | **Fresh Flowers and Plants**     | Incompatible with A3DS                                                                   |
 | ✅     | **Fresh Foods**                  | ---                                                                                      |
@@ -23,12 +28,9 @@ This pack includes full compatibility support for the most popular 3D resource p
 | ✅     | **Fresh Seeds**                  | ---                                                                                      |
 | ✅     | **Fresh Music Discs**            | ---                                                                                      |
 | ✅     | **Ben's Bundle**                 | ---                                                                                      |
-| ✅     | **NNE Action Swords**            | ---                                                                                      |
 | ✅     | **Gous's Hand Poses**            | Currently incompatible with W3DI; Limited compatibility with A3DS                        |
-
-> To enable compatibility with the packs listed above, you must have the Respackopts mod installed. It adds a settings menu to your resource packs screen where you can toggle support for each pack individually.
-
-[![Respackopts](https://img.shields.io/badge/Get-Respackopts-blue?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/respackopts)
+| ✅     | **NNE Action Swords**            | Incompatible with Beash's Swing Animations                                               |
+| ✅     | **Beash's Swing Animations**     | Incompatible with NNE Action Swords                                                      |
 
 # 📸 Visual Demonstration
 
@@ -55,7 +57,7 @@ To ensure correct positioning, follow this load order:
 3. **Weskerson's 3D Items**
 4. **Weskerson's Nature**
 5. **HMI Item Position Fix**
-6. **[HMI] REANIMATED** (if you are using NNE Action Swords)
+6. **Beash's Swing Animations** or **[HMI] REANIMATED** (if you are using NNE Action Swords)
 
 > For `NNE Action Swords` to work properly, its author requires you to replace the HMI `Example Pack` with their `[HMI] REANIMATED` version, which disables sword battle animations. Make sure to keep `[HMI] REANIMATED` below `HMI Item Position Fix` in the load order.
 
