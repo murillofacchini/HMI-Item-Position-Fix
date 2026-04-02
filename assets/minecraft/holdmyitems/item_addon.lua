@@ -109,25 +109,26 @@ function easeCustomSec(t)
     return 3 * t * (1 - t) * (1 - t) * 0.44 + 3 * t2 * (1 - t) * 0.94 + t3
 end
 
-local function matched(items, match)
+local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
 
-    local function check(item)
-        if match then
-            if itemName:find(item) then
+    local function check(i)
+        if matches then
+            if itemName:match(i) ~= nil then
                 return true
+            elseif i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
+                return false
             end
         end
-        return itemName == item
-            or I:isIn(context.item, Tags:getFabricTag(item))
-            or I:isIn(context.item, Tags:getVanillaTag(item))
+        return itemName == i
+            or I:isIn(context.item, Tags:getFabricTag(i))
+            or I:isIn(context.item, Tags:getVanillaTag(i))
     end
 
     for _, i in ipairs(list) do
-        if check(i) then
-            return true
-        end
+        if check(i) then return true end
     end
+    return false
 end
 
 local function glow(x, y, z, texture)
@@ -214,7 +215,6 @@ yawAngleO = yawAngleO + yawSpeedO * dt
 
 local rvTorches             = ${rvTorches}
 local refinedTorches        = ${refinedTorches}
-local torchesPack           = rvTorches or refinedTorches
 local glowing3Darmors		= ${glowing3Darmors}
 local glowing3Dtotem		= ${glowing3Dtotem}
 local a3ds					= ${a3ds}
@@ -227,6 +227,7 @@ local fyoncle3Dtrims	    = ${fyoncle3Dtrims}
 local gousPoses			    = ${gousPoses}
 local nneSwords			    = ${nneSwords}
 local beashAnimations	    = ${beashAnimations}
+local torchesPack           = rvTorches or refinedTorches
 
 -- == INVERTED AXIS CHECKING ==
 local invertAxisRules = {
@@ -259,7 +260,7 @@ local invertAxisRules = {
         items = {
             "shears", "ender_pearl", "ender_eye", "firework_rocket", "boats", "name_tag", "banner_pattern", "stick",
             "blaze_rod", "breeze_rod", "totem_of_undying", "bone"
-        },
+        }
     }
 }
 
@@ -271,7 +272,7 @@ for _, rule in ipairs(invertAxisRules) do
     end
 end
 
--- == TOOL ANIMATIONS ==
+-- == SWING ANIMATIONS ==
 if isPickaxe then
     context.swingProgress = easeCustom(context.swingProgress)
 else

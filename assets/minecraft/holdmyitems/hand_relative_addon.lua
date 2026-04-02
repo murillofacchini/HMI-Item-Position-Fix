@@ -5,7 +5,8 @@
 -- the old item_model_addon caused a delay in the HMI, leaving the items temporarily misaligned
 -- it is what it is, you gotta make do with what you've got
 
-local l = context.mainHand and 1 or -1
+local l           = context.mainHand and 1 or -1
+local itemName    = I:getName(context.item):gsub("minecraft:", "")
 
 -- === FUNCTION ===
 Positions = {} -- executed by item_pose
@@ -22,32 +23,62 @@ local function addUndoAdj(tables)
     end
 end
 
+local function matched(items, matches)
+    local list = type(items) == "table" and items or {items}
+
+    local function check(i)
+        if matches then
+            if itemName:match(i) ~= nil then
+                return true
+            elseif i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
+                return false
+            end
+        end
+        return itemName == i
+            or I:isIn(context.item, Tags:getFabricTag(i))
+            or I:isIn(context.item, Tags:getVanillaTag(i))
+    end
+
+    for _, i in ipairs(list) do
+        if check(i) then return true end
+    end
+    return false
+end
+
 -- === ITEMS RESOURCE PACKS ===
 PackCompat = {
-    refinedBuckets = { {"bucket"}, matches = true },
-    freshDiscs = { {"music_disc", "disc_fragment_5"}, matches = true },
-    glowing3Dtotem = { {"totem_of_undying"} },
-    glowing3Darmors = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor", "elytra"}, matches = true },
-    just3Darmors = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor", "wolf_armor", "nautilus_armor", "elytra"}, matches = true },
-    freshSeeds = { {"_seeds"}, matches = true },
-    bensBundle = { {"bundles"} },
-    gousPoses = { {"shears"} },
-    better3Dbooks = { {"book", "enchanted_book", "writable_book", "written_book"} },
-    fyoncle3Dtrims = { {"_smithing_template"}, matches = true },
-    rvChests = { {"chest$", "shulker_box", "barrel"}, matches = true },
-    rvTorches = { {
+    refinedBuckets      = { {"bucket"}, matches = true },
+    freshDiscs          = { {"music_disc", "disc_fragment_5"}, matches = true },
+    glowing3Dtotem      = { {"totem_of_undying"} },
+    glowing3Darmors     = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor", "elytra"}, matches = true },
+    just3Darmors        = { {"_helmet", "_chestplate", "_leggings", "_boots", "horse_armor", "wolf_armor", "nautilus_armor", "elytra"}, matches = true },
+    freshSeeds          = { {"_seeds"}, matches = true },
+    bensBundle          = { {"bundles"} },
+    gousPoses           = { {"shears"} },
+    better3Dbooks       = { {"book", "enchanted_book", "writable_book", "written_book"} },
+    fyoncle3Dtrims      = { {"_smithing_template"}, matches = true },
+    rvChests            = { {"chest$", "shulker_box", "^barrel$"}, matches = true },
+    rvTorches           = {
+        {
         "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", "repeater", "comparator",
-        "campfire", "soul_campfire", "candles"} },
-    refinedTorches = { {
+        "campfire", "soul_campfire", "candles"
+        }
+    },
+    refinedTorches = {
+        {
         "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns",
-        "campfire", "soul_campfire"} },
-    freshFoods = { {
+        "campfire", "soul_campfire"
+        }
+    },
+    freshFoods = {
+        {
         "apple", "^chorus_fruit$", "melon_slice", "carrot", "potato", "^beetroot$",
         "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$",
         "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken",
         "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
         "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "cake", "_pressure_plate"
-    }, matches = true },
+        }, matches = true
+    },
     freshOresIngots = { {
         "redstone$", "coal$", "raw", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$",
         "amethyst_shard", "_amethyst_bud", "amethyst_cluster", "nugget", "_ingot",
@@ -155,7 +186,7 @@ ActivePacks = {}
     local refinedBuckets    = ${refinedBuckets}     and (table.insert(ActivePacks, "refinedBuckets") or true)
     local glowing3Dtotem    = ${glowing3Dtotem}     and (table.insert(ActivePacks, "glowing3Dtotem") or true)
     local glowing3Darmors   = ${glowing3Darmors}    and (table.insert(ActivePacks, "glowing3Darmors") or true)
-    local just3Darmors      = ${just3Darmors}        and (table.insert(ActivePacks, "just3Darmors") or true)
+    local just3Darmors      = ${just3Darmors}       and (table.insert(ActivePacks, "just3Darmors") or true)
     local bensBundle        = ${bensBundle}         and (table.insert(ActivePacks, "bensBundle") or true)
     local freshDiscs        = ${freshDiscs}         and (table.insert(ActivePacks, "freshDiscs") or true)
     local freshFoods        = ${freshFoods}         and (table.insert(ActivePacks, "freshFoods") or true)
@@ -163,8 +194,16 @@ ActivePacks = {}
     local freshOres         = ${freshOresIngots}    and (table.insert(ActivePacks, "freshOresIngots") or true)
     local freshFlowers      = ${freshFlowersPlants} and (table.insert(ActivePacks, "freshFlowersPlants") or true)
     local better3Dbooks     = ${better3Dbooks}      and (table.insert(ActivePacks, "better3Dbooks") or true)
-    local fyoncle3Dtrims    = ${fyoncle3Dtrims}      and (table.insert(ActivePacks, "fyoncle3Dtrims") or true)
+    local fyoncle3Dtrims    = ${fyoncle3Dtrims}     and (table.insert(ActivePacks, "fyoncle3Dtrims") or true)
     local gousPoses         = ${gousPoses}          and (table.insert(ActivePacks, "gousPoses") or true)
+
+IsItemCompat = false
+for _, rp in ipairs(ActivePacks) do
+    if PackCompat[rp] and matched(PackCompat[rp][1], PackCompat[rp].matches) then
+        IsItemCompat = true
+        break
+    end
+end
 
 -- === INDIVIDUAL RESOURCE PACK ADJUST ===
 if rvTorches then

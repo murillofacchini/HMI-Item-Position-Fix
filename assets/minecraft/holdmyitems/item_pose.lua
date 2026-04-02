@@ -7,42 +7,26 @@ local AlexModel   = ${AlexSkinModel}
 
 -- === FUNCTIONS AND COMPATIBILITY ===
 -- == Match Item ==
-local function matched(items, match)
+local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
 
-    local function check(item)
-        if match then
-            return itemName:match(item) ~= nil
+    local function check(i)
+        if matches then
+            if itemName:match(i) ~= nil then
+                return true
+            elseif i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
+                return false
+            end
         end
-        return itemName == item
-            or I:isIn(context.item, Tags:getFabricTag(item))
-            or I:isIn(context.item, Tags:getVanillaTag(item))
+        return itemName == i
+            or I:isIn(context.item, Tags:getFabricTag(i))
+            or I:isIn(context.item, Tags:getVanillaTag(i))
     end
 
     for _, i in ipairs(list) do
-        if check(i) then
-            return true
-        end
+        if check(i) then return true end
     end
-end
-
--- == Compatibility ==
-ActivePacks           = ActivePacks or {}
-PackCompat            = PackCompat or {}
-local isItemCompat    = false
-if next(ActivePacks) and next(PackCompat) then
-    for _, rp in ipairs(ActivePacks) do
-        local pack = PackCompat[rp]
-        if pack and pack[1] then
-            for _, i in ipairs(pack[1]) do
-                if matched(i, pack.matches) then
-                    isItemCompat = true
-                    break
-                end
-            end
-        end
-        if isItemCompat then break end
-    end
+    return false
 end
 
 -- == Render Item as Block ==
@@ -51,7 +35,7 @@ local function renderBlock(render, items, force)
         renderAsBlock:put(I:getName(context.item), render)
         return
     end
-    if isItemCompat then return end
+    if IsItemCompat then return end
 
     for _, i in ipairs(items) do
         if matched(i) then
@@ -93,7 +77,7 @@ local function pose(tables, force)
         if (t.condition ~= nil and t.condition[1]) or t.condition == nil then
             for _, i in ipairs(t[1]) do
                 if matched(i, t.matches) then
-                    if not isItemCompat or force then
+                    if not IsItemCompat or force then
                         if t.renderAsBlock ~= nil then
                             renderBlock(t.renderAsBlock, t[1], force)
                         end
@@ -166,8 +150,8 @@ local itemLists = {
 -- === ITEM TYPE CHECKING ===
 local isException   = matched(itemLists.hangingPlants) or matched(itemLists.except, true)
 local is2D          = matched(itemLists.sprites2D, true) or itemName:match("spawn_egg")
-local general3D     = ((not isException and not is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest", "waxed.*chain"}, true)) and not isItemCompat
-local general2D     = not isException and is2D and not isItemCompat
+local general3D     = ((not isException and not is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest", "waxed.*chain"}, true)) and not IsItemCompat
+local general2D     = not isException and is2D and not IsItemCompat
 
 -- === NOT RENDER AS BLOCK ===
 renderBlock(
@@ -360,7 +344,7 @@ pose({
 })
 
 -- === PACK COMPATIBILITY ===
-if isItemCompat then
+if IsItemCompat then
     Positions = Positions or {}
     if Positions and next(Positions) then pose(Positions, true) end
 
