@@ -236,46 +236,51 @@ local nneSwords			    = ${nneSwords}
 local beashAnimations	    = ${beashAnimations}
 local torchesPack           = rvTorches or refinedTorches
 
--- == INVERTED AXIS CHECKING ==
-local invertAxisRules = {
-    {
-        pack = better3Dbooks and w3di,
-        items = {"^book$", "enchanted_book", "writable_book", "written_book"},
-    },
+-- == AXIS RULES ==
+local AxisRules = {
     {
         pack = glowing3Darmors,
-        items = {"_helmet"},
+        invertedItems = {"_helmet"},
     },
     {
         pack = glowing3Dtotem,
-        items = {"totem_of_undying"},
+        invertedItems = {"totem_of_undying"},
     },
     {
         pack = freshFoods,
-        items = {"cake", "pumpkin_pie", "bowl", "_stew", "_soup"},
+        invertedItems = {"cake", "pumpkin_pie", "bowl", "_stew", "_soup"},
     },
     {
         pack = fyoncle3Dtrims,
-        items = {"_smithing_template"},
+        invertedItems = {"_smithing_template"},
     },
     {
         pack = w3di and bensBundle,
-        items = {"bundle"},
+        invertedItems = {"bundle"},
+    },
+    {
+        pack = better3Dbooks and w3di,
+        invertedItems = {"^book$", "enchanted_book", "writable_book", "written_book"},
     },
     {
         pack = w3di and a3ds,
-        items = {
+        invertedItems = {
             "shears", "ender_pearl", "ender_eye", "firework_rocket", "boats", "name_tag", "banner_pattern", "stick",
             "blaze_rod", "breeze_rod", "totem_of_undying", "bone"
-        }
-    }
+        },
+    },
 }
 
 local invertedAxis = false
-for _, rule in ipairs(invertAxisRules) do
-    if rule.pack and matched(rule.items, true) then
-        invertedAxis = true
-        break
+local noSwingAnimation = false
+
+for _, rule in ipairs(AxisRules) do
+    if rule.pack then
+        if matched(rule.invertedItems, true) then
+            invertedAxis = true
+        elseif matched(rule.noSwingItems, true) then
+            noSwingAnimation = true
+        end
     end
 end
 
@@ -329,7 +334,7 @@ if (useAction ~= "block" and useAction ~= "crossbow") or isSword then
     if invertedAxis then
         M:moveX(mat, -0.05 * swing_rot)
         M:moveY(mat, -0.05 * swing_rot)
-    else
+    elseif not noSwingAnimation then
         M:moveZ(mat, -0.05 * swing_rot)
         M:moveY(mat, -0.05 * swing_rot)
         M:rotateX(mat, 10 * swing_rot)
