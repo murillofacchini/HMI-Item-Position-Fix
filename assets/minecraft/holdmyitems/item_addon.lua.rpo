@@ -11,6 +11,7 @@
     better3Dbooks:      "HMIItemPositionFix.ItemsResourcePacksCompatibility.BrayAndCyberBetterFresher3DBooks",
     bensBundle:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.BensBundle",
     fyoncle3Dtrims:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.Fyoncle3DTrims",
+    freshOresIngots:    "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshOresAndIngots",
 
     gousPoses:          "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses",
     nneSwords:          "HMIItemPositionFix.OtherResourcePacksCompatibility.NNEActionSwords",

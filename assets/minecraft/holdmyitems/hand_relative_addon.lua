@@ -48,6 +48,10 @@ local function matched(items, matches)
     return false
 end
 
+local function posInHands(mainHand, offHand)
+    if l ==1 then return mainHand else return offHand end
+end
+
 -- === ITEMS RESOURCE PACKS ===
 PackCompat = {
     refinedBuckets      = { {"bucket"}, matches = true },
@@ -221,7 +225,7 @@ if rvTorches then
     addPos({
         { {"repeater", "comparator"}, m = {-0.045, -0.02, -0.035}, r = {-6, -16, 2.5}, renderAsBlock = false },
         { {"torch", "soul_torch", "redstone_torch", "copper_torch"}, m = {0.01, -0.075, -0.035}, r = {-5, -5.5, nil} },
-        { {"lanterns"}, m = {0.07, -0.545, 0.155}, r = {-25, -5.5, nil} },
+        { {"lanterns"}, m = {0.015, -0.545, 0.155}, r = {-25, 21.5, nil} },
         { {"campfire", "soul_campfire"}, m = {-0.08, 0.185, 0.255}, r = {8, -9.5, -2.5} }
     })
 end
@@ -313,8 +317,9 @@ end
 
 if freshOres then
     addPos({
-        { {"coal$"}, m = {0.065, -0.005, -0.13}, matches = true },
-        { {"raw_"}, m = {nil, -0.07, -0.14}, matches = true },
+        { {"coal$"}, m = {posInHands(0.065, 0.005), posInHands(-0.005, 0.04), posInHands(-0.13, -0.145)}, matches = true },
+        { {"raw_gold"}, m = {posInHands(0, 0.015), -0.1, -0.14} },
+        { {"raw_"}, m = {posInHands(0, 0.015), posInHands(-0.07, -0.03), -0.14}, matches = true },
         { {"_nugget"}, m = {0.07, -0.085, -0.095}, r = {-5.5, -5.5, nil}, matches = true },
         { {"_ingot", "brick$"}, m = {0.025, -0.05, -0.155}, r = {-6.5, 5, nil}, s = {1.2}, matches = true },
         { {"amethyst_bud", "amethyst_cluster"}, m = {0.025, -0.06, -0.055}, r = {-5, -6, nil}, matches = true },
@@ -322,9 +327,9 @@ if freshOres then
         { {"emerald"}, m = {0.025, -0.03, -0.23}, r = {12.5, 13, -2} },
         { {"lapis_lazuli"}, m = {0.005, -0.14, -0.225}, r = {nil, -4.5, nil}, s = {1.1} },
         { {"quartz"}, m = {0.025, -0.07, -0.11}, r = {-6, -5.5, nil}, s = {1.2} },
-        { {"amethyst_shard", "echo_shard"}, m = {-0.055, -0.15, -0.03}, r = {7, -5, nil} },
+        { {"amethyst_shard", "echo_shard"}, m = {posInHands(-0.055, 0), -0.15, -0.03}, r = {7, -5, nil} },
         { {"netherite_scrap"}, m = {0.05, -0.09, -0.17}, r = {-5.5, -1, -16.5}, s = {1.3} },
-        { {"flint"}, m = {0.035, 0.07, -0.115}, r = {15, 12.5, -8}, s = {1.15} },
+        { {"flint"}, m = {posInHands(0.035, -0.035), posInHands(0.07, 0.06), posInHands(-0.115, -0.125)}, r = {15, 12.5, -8}, s = {1.15} },
         { {"resin_clump"}, m = {nil, 0.01, -0.12}, s = {1.2} },
         { {"redstone"}, m = {0.08, -0.135, -0.175}, r = {-17, nil, nil}, s = {1.15} },
         { {"pointed_dripstone"}, m = {0.125, -0.05, -0.075}, r = {-4.5, -4.5, -1.5} }

@@ -231,6 +231,7 @@ local freshFoods			= ${freshFoods}
 local better3Dbooks			= ${better3Dbooks}
 local bensBundle			= ${bensBundle}
 local fyoncle3Dtrims	    = ${fyoncle3Dtrims}
+local freshOres			    = ${freshOresIngots}
 local gousPoses			    = ${gousPoses}
 local nneSwords			    = ${nneSwords}
 local beashAnimations	    = ${beashAnimations}
@@ -255,6 +256,11 @@ local AxisRules = {
         invertedItems = {"_smithing_template"},
     },
     {
+        pack = w3di and freshOres,
+        invertedItems = {"netherite_scrap", "flint"},
+        noSwingItems = {"coal$"},
+    },
+    {
         pack = w3di and bensBundle,
         invertedItems = {"bundle"},
     },
@@ -275,12 +281,14 @@ local invertedAxis = false
 local noSwingAnimation = false
 
 for _, rule in ipairs(AxisRules) do
-    if rule.pack then
-        if matched(rule.invertedItems, true) then
-            invertedAxis = true
-        elseif matched(rule.noSwingItems, true) then
-            noSwingAnimation = true
-        end
+    local isInvertedAxis = rule.pack and matched(rule.invertedItems, true)
+    local isNoSwingAnimation = rule.pack and matched(rule.noSwingItems, true)
+    if isInvertedAxis then
+        invertedAxis = true
+        break
+    elseif isNoSwingAnimation then
+        noSwingAnimation = true
+        break
     end
 end
 
@@ -364,7 +372,7 @@ if (useAction ~= "block" and useAction ~= "crossbow") or isSword then
             M:moveY(mat, 0.05 * swing_hit)
             M:moveY(mat, 0.3 * swingOverall)
 
-        elseif not invertedAxis then
+        elseif not (invertedAxis or noSwingAnimation) then
             M:moveZ(mat, -0.05 * swing_rot)
             M:moveY(mat, -0.05 * swing_rot)
             M:rotateX(mat, -10 * swing_rot)
@@ -531,7 +539,7 @@ local specialCases = {
     },
     -- With Packs
     {
-        check = function() return freshFoods and w3di and matched({"_soup", "_stew"}) end,
+        check = function() return freshFoods and w3di and matched({"_soup", "_stew"}, true) end,
         move = {0.15, -0.05, -0.1}, rotate = {-5, -10, 30}
     },
     {
