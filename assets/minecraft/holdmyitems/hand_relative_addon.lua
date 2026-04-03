@@ -27,15 +27,18 @@ local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
 
     local function check(i)
+        if itemName == i then
+            return true
+        end
         if matches then
-            if itemName:match(i) ~= nil then
+            if itemName:match(i) then
                 return true
-            elseif i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
+            end
+            if i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
                 return false
             end
         end
-        return itemName == i
-            or I:isIn(context.item, Tags:getFabricTag(i))
+        return I:isIn(context.item, Tags:getFabricTag(i))
             or I:isIn(context.item, Tags:getVanillaTag(i))
     end
 
@@ -197,13 +200,26 @@ ActivePacks = {}
     local fyoncle3Dtrims    = ${fyoncle3Dtrims}     and (table.insert(ActivePacks, "fyoncle3Dtrims") or true)
     local gousPoses         = ${gousPoses}          and (table.insert(ActivePacks, "gousPoses") or true)
 
-IsItemCompat = false
-for _, rp in ipairs(ActivePacks) do
-    if PackCompat[rp] and matched(PackCompat[rp][1], PackCompat[rp].matches) then
-        IsItemCompat = true
-        break
+-- === COMPATIBILITY CHECKING ===
+local itemCompatCache = { [0] = {}, [1] = {} }
+local function getItemCompat()
+    if itemCompatCache[0][itemName] then
+        return false
     end
+    if itemCompatCache[1][itemName] then
+        return true
+    end
+    for _, rp in ipairs(ActivePacks) do
+        if PackCompat[rp] and matched(PackCompat[rp][1], PackCompat[rp].matches) then
+            itemCompatCache[1][itemName] = rp
+            return true
+        end
+    end
+    itemCompatCache[0][itemName] = true
+    return false
 end
+
+IsItemCompat = getItemCompat()
 
 -- === INDIVIDUAL RESOURCE PACK ADJUST ===
 if rvTorches then

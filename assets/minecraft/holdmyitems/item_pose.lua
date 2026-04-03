@@ -11,15 +11,18 @@ local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
 
     local function check(i)
+        if itemName == i then
+            return true
+        end
         if matches then
-            if itemName:match(i) ~= nil then
+            if itemName:match(i) then
                 return true
-            elseif i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
+            end
+            if i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
                 return false
             end
         end
-        return itemName == i
-            or I:isIn(context.item, Tags:getFabricTag(i))
+        return I:isIn(context.item, Tags:getFabricTag(i))
             or I:isIn(context.item, Tags:getVanillaTag(i))
     end
 

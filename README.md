@@ -85,4 +85,4 @@ For some reason, the clock model breaks when using `A3DS` together with `W3DI`. 
 
 HMI may cause visual glitches when used together with the Entity Model Features (EMF) mod. To fix this, install Mod Menu, open the Mods menu, and locate EMF. In its options, navigate to the Models section and, under Player Settings, turn on "Prevent first person player animations".
 
-> Found a bug or have a suggestion? Join our [Discord](https://discord.com/channels/1453136992534663319/1453138060538675272)!
+> Found a bug or have a suggestion? Join our [Discord](https://discord.gg/teDctNyajx)!

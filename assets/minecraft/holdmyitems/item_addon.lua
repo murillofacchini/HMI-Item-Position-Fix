@@ -80,6 +80,10 @@ local GRAVITY               = 0.04
 local DAMPING               = 0.85
 local INTENSITY             = 0.15
 local dt                    = context.deltaTime * 30
+local playerSpeed           = P:getSpeed(context.player)
+local playerPitch           = P:getPitch(context.player)
+local playerYaw             = P:getYaw(context.player)
+local playerAge             = P:getAge(context.player)
 local sp                    = I:getUseAction(P:getMainItem(context.player)) == "spear" and 1 or 0
 local spo                   = I:getUseAction(P:getOffhandItem(context.player)) == "spear" and 1 or 0
 local sc                    = context.mainHand and spearCounterM or spearCounterO
@@ -113,15 +117,18 @@ local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
 
     local function check(i)
+        if itemName == i then
+            return true
+        end
         if matches then
-            if itemName:match(i) ~= nil then
+            if itemName:match(i) then
                 return true
-            elseif i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
+            end
+            if i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
                 return false
             end
         end
-        return itemName == i
-            or I:isIn(context.item, Tags:getFabricTag(i))
+        return I:isIn(context.item, Tags:getFabricTag(i))
             or I:isIn(context.item, Tags:getVanillaTag(i))
     end
 
@@ -140,7 +147,7 @@ local function glow(x, y, z, texture)
 		Texture:of("minecraft", texture),
 		"ITEM", context.hand,
 		"SPAWN", "ADDITIVE",
-		0, 200 + (20 * M:sin(P:getAge(context.player) * 0.2))
+		0, 200 + (20 * M:sin(playerAge * 0.2))
 	)
 end
 
@@ -180,7 +187,7 @@ brushSpeedO = brushSpeedO * M:pow(DAMPING, dt)
 brushAngleO = brushAngleO + brushSpeedO * dt
 
 -- Pitch
-pitchSpeed = pitchSpeed + ((P:getSpeed(context.player) * 22 * walkSmoother * -1) - (M:sin(context.mainHandSwingProgress * 3.14)) * 8 + fall * 3 + M:sin(sneak * 3.14) * 0.3 + (P:getPitch(context.player) - prevPitch)) * INTENSITY * dt
+pitchSpeed = pitchSpeed + ((playerSpeed * 22 * walkSmoother * -1) - (M:sin(context.mainHandSwingProgress * 3.14)) * 8 + fall * 3 + M:sin(sneak * 3.14) * 0.3 + (playerPitch - prevPitch)) * INTENSITY * dt
 if useAction == "block" and context.mainHand and not isSword then
     pitchSpeed = pitchSpeed + 10 * M:sin(shieldDisable * 3.14) * INTENSITY * dt
     pitchSpeed = pitchSpeed + 12 * M:sin(shieldM      * 3.14) * INTENSITY * dt
@@ -190,7 +197,7 @@ pitchSpeed = pitchSpeed - GRAVITY * pitchAngle * dt
 pitchSpeed = pitchSpeed * M:pow(DAMPING, dt)
 pitchAngle = pitchAngle + pitchSpeed * dt
 
-pitchSpeedO = pitchSpeedO + ((P:getSpeed(context.player) * 22 * walkSmoother * -1) - (M:sin(context.offHandSwingProgress * 3.14)) * 8 + fall * 3 + M:sin(sneak * 3.14) * 0.3 + (P:getPitch(context.player) - prevPitch)) * INTENSITY * dt
+pitchSpeedO = pitchSpeedO + ((playerSpeed * 22 * walkSmoother * -1) - (M:sin(context.offHandSwingProgress * 3.14)) * 8 + fall * 3 + M:sin(sneak * 3.14) * 0.3 + (playerPitch - prevPitch)) * INTENSITY * dt
 if useAction == "block" and not context.mainHand and not isSword then
     pitchSpeedO = pitchSpeedO + 10 * M:sin(shieldDisable * 3.14) * INTENSITY * dt
     pitchSpeedO = pitchSpeedO + 12 * M:sin(shieldO      * 3.14) * INTENSITY * dt
@@ -201,12 +208,12 @@ pitchSpeedO = pitchSpeedO * M:pow(DAMPING, dt)
 pitchAngleO = pitchAngleO + pitchSpeedO * dt
 
 -- Yaw
-yawSpeed = yawSpeed + (M:sin(walk) * 3 * walkSmoother+ (M:sin(context.mainHandSwingProgress * 3.14)) * 8+ M:sin(swimCounter * swimSmoother) * 3+ M:sin(mainHandSwitch * 6.28) * 3+ P:getYaw(context.player) - prevYaw) * INTENSITY * dt
+yawSpeed = yawSpeed + (M:sin(walk) * 3 * walkSmoother+ (M:sin(context.mainHandSwingProgress * 3.14)) * 8+ M:sin(swimCounter * swimSmoother) * 3+ M:sin(mainHandSwitch * 6.28) * 3+ playerYaw - prevYaw) * INTENSITY * dt
 yawSpeed = yawSpeed - GRAVITY * yawAngle * dt
 yawSpeed = yawSpeed * M:pow(DAMPING, dt)
 yawAngle = yawAngle + yawSpeed * dt
 
-yawSpeedO = yawSpeedO + (M:sin(walk) * 3 * walkSmoother + (M:sin(context.offHandSwingProgress * 3.14)) * 8 + M:sin(swimCounter * swimSmoother) * 3 + M:sin(offHandSwitch * 6.28) * 3 + P:getYaw(context.player) - prevYaw) * INTENSITY * dt
+yawSpeedO = yawSpeedO + (M:sin(walk) * 3 * walkSmoother + (M:sin(context.offHandSwingProgress * 3.14)) * 8 + M:sin(swimCounter * swimSmoother) * 3 + M:sin(offHandSwitch * 6.28) * 3 + playerYaw - prevYaw) * INTENSITY * dt
 yawSpeedO = yawSpeedO - GRAVITY * yawAngleO * dt
 yawSpeedO = yawSpeedO * M:pow(DAMPING, dt)
 yawAngleO = yawAngleO + yawSpeedO * dt
@@ -383,7 +390,7 @@ end
 -- == PHYSICS ==
 if matched({"bell", "end_crystal", "pink_petals", "leaf_litter", "wildflowers"}) or I:isLantern(context.item) or isHangingSign then
 	if matched({"pink_petals", "wildflowers", "leaf_litter"}) then
-		M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
+		M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
 	end
 	if matched({"end_crystal", "bell"}) or I:isLantern(context.item) then
 		if itemName == "end_crystal" then
@@ -399,23 +406,23 @@ if matched({"bell", "end_crystal", "pink_petals", "leaf_litter", "wildflowers"})
 			M:moveY(mat, -0.05)
 			M:moveZ(mat, -0.1)
 			M:scale(mat, 1.2, 1.2, 1.2)
-			M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle, -0.1 * l, 0.4, 0.1)
+			M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, -0.1 * l, 0.4, 0.1)
 			M:rotateZ(mat, ywAngle * -1, -0.1 * l, 0.4, 0.1)
 		else
-			M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle, 0, 0.4, 0)
+			M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, 0, 0.4, 0)
 			M:rotateZ(mat, ywAngle * -1, 0, 0.4, 0)
 		end
 	end
 	if isHangingSign then
-		M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -35, 90) + ptAngle, 0, 0.55, 0)
+		M:rotateX(mat, M:clamp(playerPitch / 2.5, -35, 90) + ptAngle, 0, 0.55, 0)
 		M:rotateZ(mat, ywAngle * -1, 0, 0.55, 0)
 	end
 elseif itemName == "painting" or itemName == "item_frame" or (itemName == "glow_item_frame" and not a3ds) then
 	context.swingProgress = 0
-	M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -25, 90) + ptAngle, 0, 0.45, 0)
+	M:rotateX(mat, M:clamp(playerPitch / 2.5, -25, 90) + ptAngle, 0, 0.45, 0)
 	M:rotateZ(mat, ywAngle * -1, 0, 0.55, 0)
 elseif glowing3Darmors and matched({"chest_armor"}) then
-    M:rotateX(mat, -(P:getPitch(context.player) * 0.09 + ptAngle * 0.6), -0.129, -0.004, 0.495)
+    M:rotateX(mat, -(playerPitch * 0.09 + ptAngle * 0.6), -0.129, -0.004, 0.495)
     M:rotateZ(mat, ywAngle * 0.5, -0.129, -0.004, 0.495)
 else
 	if
@@ -432,14 +439,14 @@ else
 		end
 	end
 	if (isAxe or itemName == "mace") and useAction ~= "crossbow" then
-		M:rotateX(mat, (P:getPitch(context.player) * -0.05) + ptAngle * 0.2, 0, -0.2, 0)
+		M:rotateX(mat, (playerPitch * -0.05) + ptAngle * 0.2, 0, -0.2, 0)
 	elseif useAction ~= "crossbow" then
-		M:rotateX(mat, (P:getPitch(context.player) * -0.025) + ptAngle * 0.1, 0, -0.2, 0)
+		M:rotateX(mat, (playerPitch * -0.025) + ptAngle * 0.1, 0, -0.2, 0)
 	end
 end
 
 if itemName == "elytra" and glowing3Darmors and not w3di then
-    M:rotateX(mat, M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
+    M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
 	M:rotateZ(mat, ywAngle * -0.7, -0.1 * l, 0, 0.1)
 end
 
@@ -684,7 +691,7 @@ swingCountPrev = P:getSwingCount(context.player)
 
 if itemName == "pink_petals" or itemName == "wildflowers" or itemName == "leaf_litter" then
 	local particle_ticker = function(p)
-		p.dx = p.dx + 0.005 * M:sin(P:getAge(context.player) * 0.3) * dt
+		p.dx = p.dx + 0.005 * M:sin(playerAge * 0.3) * dt
 	end
 	local flower = ""
 	if itemName == "wildflowers" then flower = "wild_flowers" else flower = itemName end
@@ -782,7 +789,7 @@ end
 -- === PACKS CORRECTIONS ===
 
 if w3di and a3ds and (itemName:match("_banner_pattern") or itemName == "name_tag") then
-    M:rotateX(mat, -(M:clamp(P:getPitch(context.player) / 2.5, -20, 90) + ptAngle + ywAngle * 0.5), 0, -0.13, 0)
+    M:rotateX(mat, -(M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5), 0, -0.13, 0)
 end
 
 if itemName == "shears" and gousPoses then

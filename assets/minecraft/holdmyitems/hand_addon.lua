@@ -13,15 +13,18 @@ local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
 
     local function check(i)
+        if itemName == i then
+            return true
+        end
         if matches then
-            if itemName:match(i) ~= nil then
+            if itemName:match(i) then
                 return true
-            elseif i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
+            end
+            if i:find("[%^%$%(%)%%%.%[%]%*%+%-%?]") then
                 return false
             end
         end
-        return itemName == i
-            or I:isIn(context.item, Tags:getFabricTag(i))
+        return I:isIn(context.item, Tags:getFabricTag(i))
             or I:isIn(context.item, Tags:getVanillaTag(i))
     end
 
@@ -63,7 +66,7 @@ local function pose(tables, force)
         if (t.condition ~= nil and t.condition[1]) or t.condition == nil then
             for _, i in ipairs(t[1]) do
                 if matched(i, t.matches) then
-                    if not isItemCompat or force then
+                    if not IsItemCompat or force then
                         local opsOrder = t.ops or "mrs"
                         for j = 1, #opsOrder do
                             local op = opsOrder:sub(j, j):lower()
