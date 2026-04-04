@@ -1,22 +1,25 @@
 {
   expansions: {
+    AlexSkinModel:      "HMIItemPositionFix.ItemsResourcePacksCompatibility.AlexSkinModel",
+    w3di:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Weskerson3DItems",
+    a3ds:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Actually3DStuff",
     rvTorches:          "HMIItemPositionFix.ItemsResourcePacksCompatibility.RVTorches",
-    refinedTorches:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedTorches",
-    refinedBuckets:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedBuckets",
+    rvChests:           "HMIItemPositionFix.ItemsResourcePacksCompatibility.RVChestsAndBoxes",
+    just3Darmors:       "HMIItemPositionFix.ItemsResourcePacksCompatibility.Just3DArmors",
     glowing3Darmors:    "HMIItemPositionFix.ItemsResourcePacksCompatibility.Glowing3DArmors",
     glowing3Dtotem:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.Glowing3DTotem",
-    freshFoods:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshFoods",
-    a3ds:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Actually3DStuff",
-    w3di:               "HMIItemPositionFix.ItemsResourcePacksCompatibility.Weskerson3DItems",
-    better3Dbooks:      "HMIItemPositionFix.ItemsResourcePacksCompatibility.BrayAndCyberBetterFresher3DBooks",
     bensBundle:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.BensBundle",
-    fyoncle3Dtrims:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.Fyoncle3DTrims",
+    freshFlowersPlants: "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshFlowersAndPlants",
+    freshFoods:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshFoods",
     freshOresIngots:    "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshOresAndIngots",
+    freshSeeds:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshSeeds",
+    refinedBuckets:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedBuckets",
+    refinedTorches:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.PatoRefinedTorches",
+    freshDiscs:         "HMIItemPositionFix.ItemsResourcePacksCompatibility.FreshMusicDiscs",
+    wNature:            "HMIItemPositionFix.ItemsResourcePacksCompatibility.WeskersonNature",
+    better3Dbooks:      "HMIItemPositionFix.ItemsResourcePacksCompatibility.BrayAndCyberBetterFresher3DBooks",
+    fyoncle3Dtrims:     "HMIItemPositionFix.ItemsResourcePacksCompatibility.Fyoncle3DTrims",
 
-    gousPoses:          "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses",
-    nneSwords:          "HMIItemPositionFix.OtherResourcePacksCompatibility.NNEActionSwords",
-    beashAnimations:    "HMIItemPositionFix.OtherResourcePacksCompatibility.BeashSwingAnimations",
-
-    inspectKeybind:     "HMIItemPositionFix.HMISettings.InspectKeybind"
+    gousPoses:          "HMIItemPositionFix.OtherResourcePacksCompatibility.GoussHandPoses"
   }
 }

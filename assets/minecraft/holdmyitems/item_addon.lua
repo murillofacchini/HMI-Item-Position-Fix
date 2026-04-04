@@ -1,116 +1,21 @@
--- === PHYSICS AND ANIMATIONS ===
--- Extracted from the HMI example_pack (item_pose.lua)
--- Credits: thesapling, KillaMC, OrkaMC, cyber
+-- by omnis._.
 
-global.brushSpeedM          = 0;
-global.brushSpeedO          = 0;
-global.brushAngleM          = 0;
-global.brushAngleO          = 0;
-global.tridentM             = 0;
-global.tridentMO            = 0;
-global.tridentJ             = 0;
-global.tridentJO            = 0;
-global.spearCounterM        = 0;
-global.spearUsageTime       = 0;
-global.canDismountCounter   = 0;
-global.canKnockbackCounter  = 0;
-global.spearCounterO        = 0;
-global.canDismountCounterO  = 0;
-global.canKnockbackCounterO = 0;
-global.hitImpactCounter     = 0;
-global.hitImpactCounterO    = 0;
-global.riptideCounter       = 0;
-global.riptideCounterO      = 0;
-global.swingCountPrev       = 0;
-global.crossBowM            = 0.0;
-global.crossBowSecM         = 0.0;
-global.crossBowO            = 0.0;
-global.crossBowSecO         = 0.0;
-global.walk                 = 0.0;
-global.walkSmoother         = 0.0;
-global.swimSmoother         = 0.0;
-global.swimCounter          = 0.0;
-global.mainHandSwitch       = 0.0;
-global.inspectionCounter    = 0.0;
-global.inspectionSpin       = 0.0;
-global.prevAge              = 0.0;
-global.bowCountO            = 0.0;
-global.bowCountSecO         = 0.0;
-global.bowCount             = 0.0;
-global.bowCountSec          = 0.0;
-global.bowPullSpeed         = 0.0;
-global.bowPullAngle         = 0.0;
-global.bowPullSpeedO        = 0.0;
-global.bowPullAngleO        = 0.0;
-global.mapSmoother          = 0.0;
-global.mapTransition        = 0.0;
-global.mapZoomer            = 0.0;
-global.fall                 = 0.0;
-global.a                    = 0.0;
-global.prevPitch            = 0.0;
-global.pitchSpeed           = 0.0;
-global.pitchAngle           = 0.0;
-global.pitchSpeedO          = 0.0;
-global.pitchAngleO          = 0.0;
-global.yawSpeedO            = 0.0;
-global.yawAngleO            = 0.0;
-global.prevYaw              = 0.0;
-global.yawSpeed             = 0.0;
-global.yawAngle             = 0.0;
-global.offHandSwitch        = 0.0;
-global.foodCount            = 0.0;
-global.foodCountSec         = 0.0;
-global.foodCountSecO        = 0.0;
-global.foodCountO           = 0.0;
-global.brushCounter         = 0.0;
-global.brushCounterO        = 0.0;
-global.shieldDisable        = 0.0;
-global.shieldM              = 0.0;
-global.shieldO              = 0.0;
-global.sneak                = 0.0;
-global.bundleCounter        = 0.0;
-global.swingOHandPrev       = false;
-global.swingMHandPrev       = false;
+local l           = context.mainHand and 1 or -1
+local itemName    = I:getName(context.item):gsub("minecraft:", "")
 
-local swing_rot
-local swing_sword_tilt
-local swing_hit_second
-local l                     = (context.bl and 1) or -1
-local GRAVITY               = 0.04
-local DAMPING               = 0.85
-local INTENSITY             = 0.15
-local dt                    = context.deltaTime * 30
-local playerSpeed           = P:getSpeed(context.player)
-local playerPitch           = P:getPitch(context.player)
-local playerYaw             = P:getYaw(context.player)
-local playerAge             = P:getAge(context.player)
-local sp                    = I:getUseAction(P:getMainItem(context.player)) == "spear" and 1 or 0
-local spo                   = I:getUseAction(P:getOffhandItem(context.player)) == "spear" and 1 or 0
-local sc                    = context.mainHand and spearCounterM or spearCounterO
-local scd                   = context.mainHand and canDismountCounter or canDismountCounterO
-local sck                   = context.mainHand and canKnockbackCounter or canKnockbackCounterO
-local sw                    = context.mainHand and mainHandSwitch or offHandSwitch
-local mat                   = context.matrices
-local hic                   = context.mainHand and Easings:easeInOutSine(hitImpactCounter) or hitImpactCounterO
-local ywAngle               = (context.mainHand and yawAngle) or yawAngleO
-local ptAngle               = (context.mainHand and pitchAngle) or pitchAngleO
-local swing                 = M:sin(context.swingProgress * 3.14)
-local swing_hit             = M:sin(M:clamp(context.swingProgress, 0.16561, 0.49422) * 4.78 * 2 + 4.7)
-local swingOverall          = M:sin(context.swingProgress * 3.14)
-local useAction             = I:getUseAction(context.item)
-local itemName              = I:getName(context.item):gsub("minecraft:", "")
-
--- == FUNCTIONS ==
-function easeCustom(t)
-    local t2 = t * t
-    local t3 = t2 * t
-    return 3 * t * (1 - t) * (1 - t) * 0.44 + 3 * t2 * (1 - t) * 1 + t3
+-- === FUNCTION ===
+Positions = {} -- executed by item_pose
+local function addPos(tables)
+    for _, t in ipairs(tables) do
+        table.insert(Positions, t)
+    end
 end
 
-function easeCustomSec(t)
-    local t2 = t * t
-    local t3 = t2 * t
-    return 3 * t * (1 - t) * (1 - t) * 0.44 + 3 * t2 * (1 - t) * 0.94 + t3
+ItemsUndoAdjusts = {} -- executed by item_pose
+local function addUndoAdj(tables)
+    for _, t in ipairs(tables) do
+        table.insert(ItemsUndoAdjusts, t)
+    end
 end
 
 local function matched(items, matches)
@@ -138,685 +43,661 @@ local function matched(items, matches)
     return false
 end
 
-local function glow(x, y, z, texture)
-	particleManager:addParticle(
-		context.particles,
-		false,
-		x, y, z,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 1.3,
-		Texture:of("minecraft", texture),
-		"ITEM", context.hand,
-		"SPAWN", "ADDITIVE",
-		0, 200 + (20 * M:sin(playerAge * 0.2))
-	)
+local function posInHands(mainHand, offHand)
+    if l ==1 then return mainHand else return offHand end
 end
 
-local function particle(x, y, z, texture, size, tick)
-	particleManager:addParticle(
-		context.particles, true,
-		x, y, z,
-		(math.random() * 0.12 - 0.06) * l, math.random() * 0.12,
-		0, 0, 0, 0, 0, 0, 0, size or 0.4,
-		Texture:of("minecraft", texture),
-		"SCREEN", context.hand,
-		"OPACITY", "TRANSLUCENT_L",
-		1, 255, tick
-	)
-end
-
--- == CALC ==
-local isSword        = matched({"swords"})
-local isShovel       = matched({"shovels"})
-local isAxe          = matched({"axes"})
-local isHangingSign  = matched({"hanging_signs"})
-local isPickaxe      = matched({"pickaxes"})
-local isNugget       = matched({"nuggets"})
-local isMusicDisc    = matched({"music_discs"})
-local isSpearTag     = matched({"spears"})
-local isSkull        = matched({"skulls"})
-
--- Brush
-brushSpeedM = brushSpeedM + (M:sin(foodCountSec * 4.14) * brushCounter) * dt
-brushSpeedM = brushSpeedM - GRAVITY * brushAngleM * dt
-brushSpeedM = brushSpeedM * M:pow(DAMPING, dt)
-brushAngleM = brushAngleM + brushSpeedM * dt
-
-brushSpeedO = brushSpeedO + (M:sin(foodCountSecO * 4.14) * brushCounterO) * dt
-brushSpeedO = brushSpeedO - GRAVITY * brushAngleO * dt
-brushSpeedO = brushSpeedO * M:pow(DAMPING, dt)
-brushAngleO = brushAngleO + brushSpeedO * dt
-
--- Pitch
-pitchSpeed = pitchSpeed + ((playerSpeed * 22 * walkSmoother * -1) - (M:sin(context.mainHandSwingProgress * 3.14)) * 8 + fall * 3 + M:sin(sneak * 3.14) * 0.3 + (playerPitch - prevPitch)) * INTENSITY * dt
-if useAction == "block" and context.mainHand and not isSword then
-    pitchSpeed = pitchSpeed + 10 * M:sin(shieldDisable * 3.14) * INTENSITY * dt
-    pitchSpeed = pitchSpeed + 12 * M:sin(shieldM      * 3.14) * INTENSITY * dt
-end
-pitchSpeed = pitchSpeed + ((-20 * M:sin(canDismountCounter   * 3.14) * spearCounterM) + (20 * M:sin(canKnockbackCounter * 3.14) * spearCounterM) + (12 * M:sin(inspectionCounter * 3.14)) + (15 * M:sin(spearCounterM       * 3.14)) + (-10 * M:clamp(M:sin(Easings:easeInBack(hitImpactCounter) * 6.28), 0, 1)) + ( 40 * M:clamp(M:sin(M:clamp(mainHandSwitch * 1.5 * sp, 0, 1) * 6.28), 0, 1))) * INTENSITY * dt
-pitchSpeed = pitchSpeed - GRAVITY * pitchAngle * dt
-pitchSpeed = pitchSpeed * M:pow(DAMPING, dt)
-pitchAngle = pitchAngle + pitchSpeed * dt
-
-pitchSpeedO = pitchSpeedO + ((playerSpeed * 22 * walkSmoother * -1) - (M:sin(context.offHandSwingProgress * 3.14)) * 8 + fall * 3 + M:sin(sneak * 3.14) * 0.3 + (playerPitch - prevPitch)) * INTENSITY * dt
-if useAction == "block" and not context.mainHand and not isSword then
-    pitchSpeedO = pitchSpeedO + 10 * M:sin(shieldDisable * 3.14) * INTENSITY * dt
-    pitchSpeedO = pitchSpeedO + 12 * M:sin(shieldO      * 3.14) * INTENSITY * dt
-end
-pitchSpeedO = pitchSpeedO + ((-20 * M:sin(canDismountCounterO   * 3.14) * spearCounterO) + (20 * M:sin(canKnockbackCounterO * 3.14) * spearCounterO) + (15 * M:sin(spearCounterO * 3.14)) + ( 40 * M:clamp(M:sin(M:clamp(offHandSwitch * 1.5 * spo, 0, 1) * 6.28), 0, 1))) * INTENSITY * dt
-pitchSpeedO = pitchSpeedO - GRAVITY * pitchAngleO * dt
-pitchSpeedO = pitchSpeedO * M:pow(DAMPING, dt)
-pitchAngleO = pitchAngleO + pitchSpeedO * dt
-
--- Yaw
-yawSpeed = yawSpeed + (M:sin(walk) * 3 * walkSmoother+ (M:sin(context.mainHandSwingProgress * 3.14)) * 8+ M:sin(swimCounter * swimSmoother) * 3+ M:sin(mainHandSwitch * 6.28) * 3+ playerYaw - prevYaw) * INTENSITY * dt
-yawSpeed = yawSpeed - GRAVITY * yawAngle * dt
-yawSpeed = yawSpeed * M:pow(DAMPING, dt)
-yawAngle = yawAngle + yawSpeed * dt
-
-yawSpeedO = yawSpeedO + (M:sin(walk) * 3 * walkSmoother + (M:sin(context.offHandSwingProgress * 3.14)) * 8 + M:sin(swimCounter * swimSmoother) * 3 + M:sin(offHandSwitch * 6.28) * 3 + playerYaw - prevYaw) * INTENSITY * dt
-yawSpeedO = yawSpeedO - GRAVITY * yawAngleO * dt
-yawSpeedO = yawSpeedO * M:pow(DAMPING, dt)
-yawAngleO = yawAngleO + yawSpeedO * dt
-
--- == RESOURCE PACKS ==
-
-local rvTorches             = ${rvTorches}
-local refinedTorches        = ${refinedTorches}
-local glowing3Darmors		= ${glowing3Darmors}
-local glowing3Dtotem		= ${glowing3Dtotem}
-local a3ds					= ${a3ds}
-local w3di					= ${w3di}
-local refinedBuckets		= ${refinedBuckets}
-local freshFoods			= ${freshFoods}
-local better3Dbooks			= ${better3Dbooks}
-local bensBundle			= ${bensBundle}
-local fyoncle3Dtrims	    = ${fyoncle3Dtrims}
-local freshOres			    = ${freshOresIngots}
-local gousPoses			    = ${gousPoses}
-local nneSwords			    = ${nneSwords}
-local beashAnimations	    = ${beashAnimations}
-local torchesPack           = rvTorches or refinedTorches
-
--- == AXIS RULES ==
-local AxisRules = {
-    {
-        pack = glowing3Darmors,
-        invertedItems = {"_helmet"},
+-- === ITEMS RESOURCE PACKS ===
+PackCompat = {
+    refinedBuckets      = { {"bucket"}, matches = true },
+    freshDiscs          = { {"music_disc", "disc_fragment_5"}, matches = true },
+    glowing3Dtotem      = { {"totem_of_undying"} },
+    glowing3Darmors     = { {"head_armor", "chest_armor", "leg_armor", "foot_armor", "horse_armor", "elytra"}, matches = true },
+    just3Darmors        = { {"head_armor", "chest_armor", "leg_armor", "foot_armor", "horse_armor", "wolf_armor", "nautilus_armor", "elytra"}, matches = true },
+    freshSeeds          = { {"_seeds"}, matches = true },
+    bensBundle          = { {"bundles"} },
+    gousPoses           = { {"shears"} },
+    better3Dbooks       = { {"book", "enchanted_book", "writable_book", "written_book"} },
+    fyoncle3Dtrims      = { {"_smithing_template"}, matches = true },
+    rvChests            = { {"chest$", "shulker_box", "^barrel$"}, matches = true },
+    rvTorches           = {
+        {
+        "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns", "repeater", "comparator",
+        "campfire", "soul_campfire", "candles"
+        }
     },
-    {
-        pack = glowing3Dtotem,
-        invertedItems = {"totem_of_undying"},
+    refinedTorches = {
+        {
+        "torch", "soul_torch", "copper_torch", "redstone_torch", "lanterns",
+        "campfire", "soul_campfire"
+        }
     },
-    {
-        pack = freshFoods,
-        invertedItems = {"cake", "pumpkin_pie", "bowl", "_stew", "_soup"},
+    freshFoods = {
+        {
+        "apple", "^chorus_fruit$", "melon_slice", "carrot", "potato", "^beetroot$",
+        "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$",
+        "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken",
+        "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
+        "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "cake", "_pressure_plate"
+        }, matches = true
     },
-    {
-        pack = fyoncle3Dtrims,
-        invertedItems = {"_smithing_template"},
+    freshOresIngots = { {
+        "redstone$", "coal$", "raw", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$",
+        "amethyst_shard", "_amethyst_bud", "amethyst_cluster", "nugget", "_ingot",
+        "netherite_scrap", "^flint$", "resin_clump", "echo_shard", "brick$", "pointed_dripstone"
+    }, matches = true },
+    freshFlowersPlants = {
+        {
+        "pale_hanging_moss", "_mushroom$", "_fungus$", "small_flowers", "cacutus_flower", "pink_petals", "wildflowers",
+        "leaf_litter", "spore_blossom", "bamboo", "sugar_cane", "^vine$", "sunflower", "lilac", "peony", "pitcher_plant",
+        "_dripleaf", "rose_bush", "sculk_vein", "glow_lichen", "lily_pad", "seagrass", "sea_pickle", "^kelp$",
+        "_coral$", "_coral_fan", "weeping_vines", "twisting_vines", "saplings", "fern", "_grass$", "bush", "crimson_roots", 
+        "warped_roots", "hanging_roots", "nether_sprouts"
+        }, matches = true,
+        withBlocks =
+        {
+            "saplings", "short_grass", "fern", "short_dry_grass", "bush", "dead_bush", "firefly_bush",
+            "crimson_roots", "warped_roots", "nether_sprouts", "tall_grass", "large_fern", "tall_dry_grass",
+        }
     },
-    {
-        pack = w3di and freshOres,
-        invertedItems = {"netherite_scrap", "flint"},
-        noSwingItems = {"coal$"},
+    a3ds = {
+        {
+        -- Natural Blocks
+        "pale_hanging_moss", "saplings", "_mushroom$", "_fungus$", "_grass$", "fern", "small_flowers", "cactus_flower",
+        "bush", "pink_petals", "wildflowers", "leaf_litter", "^bamboo$", "sugar_cane", "crimson_roots", "warped_roots",
+        "nether_sprouts", "sunflower", "lilac", "rose_bush", "pitcher_plant", "glow_lichen", "hanging_roots", "frogspawn",
+        "lily_pad", "^azalea$", "^flowering_azalea$", "weeping_vines", "twisting_vines", "^vine$", "peony", 
+        -- Functional Blocks
+        "^bell$", "armor_stand", "item_frame", "painting", "ender_eye",
+        -- Redstone Blocks
+        "^redstone$", "string", "minecart", "_raft", "_boat",
+        -- Tools
+        "fishing_rod", "flint_and_steel", "fire_charge", "bone_meal", "shears", "brush", "name_tag", "lead", "bundle",
+        "^compass$", "^map$", "writable_book", "ender_pearl", "firework_rocket", "saddle", "_harness", "on_a_stick",
+        "goat_horn",
+        -- Combat
+        "totem_of_undying", "snowball", "^egg$", "brown_egg", "blue_egg",
+        -- Ingredients
+        "coal$", "raw_", "^emerald$", "^lapis_lazuli$", "^diamond$", "^quartz$", "_shard", "_nugget", "_ingot",
+        "netherite_scrap", "^stick$", "flint", "^bone$", "^leather$", "rabbit_hide", "^honeycomb$", "resin_clump",
+        "ink_sac", "slime_ball", "clay_ball", "prismarine_crystals", "nautilus_shell", "heart_of_the_sea", "blaze_rod",
+        "breeze_rod", "nether_star", "_dye", "brick$", "paper", "^book$", "firework_star", "glowstone_dust", "gunpowder",
+        "blaze_powder", "^sugar$", "rabbit_foot", "magma_cream", "ghast_tear", "banner_pattern", "_smithing_template",
+        "_key", "enchanted_book"
+        }, matches = true,
+        naturalWithBlocks =
+        {
+            "saplings", "short_grass", "fern", "short_dry_grass", "bush", "dead_bush", "small_flowers",
+            "firefly_bush", "crimson_roots", "warped_roots", "nether_sprouts", "tall_grass", 'large_fern',
+            "tall_dry_grass", "sunflower", "lilac", "rose_bush", "peony", "pitcher_plant"
+        }
     },
-    {
-        pack = w3di and bensBundle,
-        invertedItems = {"bundle"},
+    wNature = {
+        {
+            "oak_sapling", "^azalea$", "^flowering_azalea$", "_mushroom$", "_fungus$", "^fern$", "dead_bush",
+            "dandelion", "poppy", "blue_orchid", "allium", "azure_bluet", "_tulip", "oxeye_daisy", "cornflower",
+            "lily_of_the_valley"
+        }, matches = true
     },
-    {
-        pack = better3Dbooks and w3di,
-        invertedItems = {"^book$", "enchanted_book", "writable_book", "written_book"},
-    },
-    {
-        pack = w3di and a3ds,
-        invertedItems = {
-            "shears", "ender_pearl", "ender_eye", "firework_rocket", "boats", "name_tag", "banner_pattern", "stick",
-            "blaze_rod", "breeze_rod", "totem_of_undying", "bone"
-        },
-    },
+    w3di = {
+        {
+            -- Natural Blocks
+            "turtle_egg",
+            -- Functional Blocks
+            "^torch$", "soul_torch", "copper_torch", "^lantern$", "soul_lantern", "copper_lantern", "campfire", 
+            "end_crystal", "flower_pot", "armor_stand", "_sign", "ender_eye",
+            -- Redstone Blocks
+            "redstone$", "repeater", "comparator", "lever",
+            -- Tools
+            "bucket", "fishing_rod", "flint_and_steel", "fire_charge", "bone_meal", "shears", "name_tag",
+            "lead", "bundle", "compass", "clock", "map", "book", "wind_charge", "ender_pearl", "elytra",
+            "firework_rocket", "_on_a_stick", "goat_horn", "music_disc", "boats",
+            -- Combat
+            "mace", "nautilus_armor", "totem_of_undying", "snowball", "^egg$", "brown_egg", "blue_egg",
+            -- Foods & Potions
+            "apple", "^chorus_fruit$", "melon_slice", "^carrot$", "potato", "^beetroot$",
+            "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$",
+            "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken",
+            "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
+            "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "potion", "cake",
+            -- Ingredients
+            "coal$", "raw", "^emerald$", "^lapis_lazuli$", "diamond$", "quartz$", "amethyst_shard",
+            "nugget", "ingot", "netherite_scrap", "stick$", "flint$", "bone$", "feather",
+            "honeycomb", "scute", "slime_ball", "clay_ball", "prismarine_crystals",
+            "nautilus_shell", "heart_of_the_sea", "blaze_rod", "breeze_rod", "shulker_shell",
+            "disc_fragment_5", "bowl", "brick$", "bottle", "glowstone_dust", "gunpowder",
+            "dragon_breath", "blaze_powder", "sugar$", "_banner_pattern",
+            -- Spawn Eggs
+            "spawn_egg"
+        }, matches = true
+    }
 }
 
-local invertedAxis = false
-local noSwingAnimation = false
+ActivePacks = {}
+    local a3ds              = ${a3ds}               and (table.insert(ActivePacks, "a3ds") or true)
+    local w3di              = ${w3di}               and (table.insert(ActivePacks, "w3di") or true)
+    local wNature           = ${wNature}            and (table.insert(ActivePacks, "wNature") or true)
+    local rvChests          = ${rvChests}           and (table.insert(ActivePacks, "rvChests") or true)
+    local rvTorches         = ${rvTorches}          and (table.insert(ActivePacks, "rvTorches") or true)
+    local refinedTorches    = ${refinedTorches}     and (table.insert(ActivePacks, "refinedTorches") or true)
+    local refinedBuckets    = ${refinedBuckets}     and (table.insert(ActivePacks, "refinedBuckets") or true)
+    local glowing3Dtotem    = ${glowing3Dtotem}     and (table.insert(ActivePacks, "glowing3Dtotem") or true)
+    local glowing3Darmors   = ${glowing3Darmors}    and (table.insert(ActivePacks, "glowing3Darmors") or true)
+    local just3Darmors      = ${just3Darmors}       and (table.insert(ActivePacks, "just3Darmors") or true)
+    local bensBundle        = ${bensBundle}         and (table.insert(ActivePacks, "bensBundle") or true)
+    local freshDiscs        = ${freshDiscs}         and (table.insert(ActivePacks, "freshDiscs") or true)
+    local freshFoods        = ${freshFoods}         and (table.insert(ActivePacks, "freshFoods") or true)
+    local freshSeeds        = ${freshSeeds}         and (table.insert(ActivePacks, "freshSeeds") or true)
+    local freshOres         = ${freshOresIngots}    and (table.insert(ActivePacks, "freshOresIngots") or true)
+    local freshFlowers      = ${freshFlowersPlants} and (table.insert(ActivePacks, "freshFlowersPlants") or true)
+    local better3Dbooks     = ${better3Dbooks}      and (table.insert(ActivePacks, "better3Dbooks") or true)
+    local fyoncle3Dtrims    = ${fyoncle3Dtrims}     and (table.insert(ActivePacks, "fyoncle3Dtrims") or true)
+    local gousPoses         = ${gousPoses}          and (table.insert(ActivePacks, "gousPoses") or true)
 
-for _, rule in ipairs(AxisRules) do
-    local isInvertedAxis = rule.pack and matched(rule.invertedItems, true)
-    local isNoSwingAnimation = rule.pack and matched(rule.noSwingItems, true)
-    if isInvertedAxis then
-        invertedAxis = true
-        break
-    elseif isNoSwingAnimation then
-        noSwingAnimation = true
-        break
+-- === COMPATIBILITY CHECKING ===
+local itemCompatCache = { [0] = {}, [1] = {} }
+local function getItemCompat()
+    if itemCompatCache[0][itemName] then
+        return false
     end
-end
-
--- == SWING ANIMATIONS ==
-if isPickaxe then
-    context.swingProgress = easeCustom(context.swingProgress)
-else
-    context.swingProgress = easeCustomSec(context.swingProgress)
-end
-
-if context.swingProgress < 0.70016 then
-    swing_rot = M:sin(M:clamp(context.swingProgress, 0, 0.308) * 5.1)
-else
-    swing_rot = M:sin(M:clamp(context.swingProgress, 0.70016, 1) * 5.1 - 2)
-end
-
-if context.swingProgress < 0.65245 then
-    swing_sword_tilt = M:sin(M:clamp(context.swingProgress, 0, 0.16675) * 3.14 * 3)
-else
-    swing_sword_tilt = M:sin(M:clamp(context.swingProgress, 0.65245, 1) * 4.4 - 1.3)
-end
-
-swing_rot = swing_rot * swing_rot * swing_rot
-
-if context.swingProgress < 0.65594 then
-    swing_hit_second = M:sin(M:clamp(context.swingProgress, 0.16561, 0.32991) * 4.78 * 2 + 4.7)
-else
-    swing_hit_second = M:sin(M:clamp(context.swingProgress, 0.65594, 0.82025) * 4.78 * 2 - 4.7)
-end
-
-if useAction == "spear" then
-    M:rotateZ(mat, 180 * l)
-
-    M:rotateZ(mat, -180 * Easings:easeInOutBack(M:clamp(sw * 2, 0, 1)) * l)
-    M:moveZ(mat, -0.2 * Easings:easeInOutSine(Easings:easeInOutBack(sc * 0.8)))
-
-    M:moveY(mat, -0.05 * Easings:easeInOutBack(scd))
-
-    M:rotateX(mat, -70 * Easings:easeInOutBack(sc * 0.8))
-    M:rotateX(mat, -8 * Easings:easeInOutBack(scd))
-    M:rotateY(mat, 60 * Easings:easeInOutBack(sc * 0.8) * l)
-    M:rotateY(mat, -30 * Easings:easeInOutBack(scd) * l)
-
-    M:rotateY(mat, -60 * Easings:easeOutBack(sck) * sck * l)
-
-    M:moveY(mat, -0.25 * M:clamp(M:sin(Easings:easeInOutSine(hic) * 6.28), 0, 1))
-end
-
-if (useAction ~= "block" and useAction ~= "crossbow") or isSword then
-
-    if invertedAxis then
-        M:moveX(mat, -0.05 * swing_rot)
-        M:moveY(mat, -0.05 * swing_rot)
-    elseif not noSwingAnimation then
-        M:moveZ(mat, -0.05 * swing_rot)
-        M:moveY(mat, -0.05 * swing_rot)
-        M:rotateX(mat, 10 * swing_rot)
-        M:rotateX(mat, -30 * swing_rot)
-        M:rotateX(mat, -10 * swing_hit)
+    if itemCompatCache[1][itemName] then
+        return true
     end
-
-    if not isSword then
-        if useAction == "trident" or useAction == "spear" then
-            M:moveZ(mat, -0.1 * swing_rot)
-            M:moveY(mat, -0.05 * swing_rot)
-
-            if useAction == "spear" then
-                M:moveY(mat, -0.15 * swing_hit)
-                M:rotateX(mat, -5 * swing_hit)
-            end
-
-            M:rotateX(mat, -10 * swing_rot)
-            M:rotateX(mat, -15 * swing_hit)
-
-            if useAction == "trident" then
-                M:rotateX(mat, -45 * swingOverall)
-            else
-                M:rotateX(mat, -45 * swing_sword_tilt)
-            end
-
-            M:moveY(mat, 0.05 * swing_hit)
-            M:moveY(mat, 0.3 * swingOverall)
-
-        elseif not (invertedAxis or noSwingAnimation) then
-            M:moveZ(mat, -0.05 * swing_rot)
-            M:moveY(mat, -0.05 * swing_rot)
-            M:rotateX(mat, -10 * swing_rot)
-            M:rotateX(mat, -25 * swing_hit)
+    for _, rp in ipairs(ActivePacks) do
+        if PackCompat[rp] and matched(PackCompat[rp][1], PackCompat[rp].matches) then
+            itemCompatCache[1][itemName] = rp
+            return true
         end
     end
-
-    if isShovel then
-        M:moveY(mat, 0.12 * swing_sword_tilt)
-        M:moveZ(mat, 0.05 * swing_sword_tilt)
-        M:rotateX(mat, 10 * swing_sword_tilt)
-        M:rotateX(mat, -30 * swingOverall)
-        M:rotateX(mat, 20 * swing_rot)
-        M:rotateX(mat, 10 * swing_hit_second)
-    end
-
-    if isSword and not (beashAnimations or nneSwords) then
-        swing = M:sin(context.swingProgress * 3.14)
-        M:moveY(mat, -0.1 * Easings:easeInOutBack(swing))
-        M:rotateX(mat, -60 * Easings:easeInOutBack(swing))
-    end
-
-    if useAction == "bow" then
-        M:moveX(mat, -0.065 * l)
-    end
+    itemCompatCache[0][itemName] = true
+    return false
 end
 
--- == PHYSICS ==
-if matched({"bell", "end_crystal", "pink_petals", "leaf_litter", "wildflowers"}) or I:isLantern(context.item) or isHangingSign then
-	if matched({"pink_petals", "wildflowers", "leaf_litter"}) then
-		M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
-	end
-	if matched({"end_crystal", "bell"}) or I:isLantern(context.item) then
-		if itemName == "end_crystal" then
-			M:scale(mat, 1 + 0.01 * M:sin(a * 15), 1 + 0.01 * M:sin(a * 15), 1 + 0.01 * M:sin(a * 8))
-			M:moveY(mat, 0.03 * M:sin(a * 2))
-			M:moveY(mat, 0.25)
-			M:moveY(mat, ptAngle / 150)
-			M:moveX(mat, ywAngle / 150 * l * -1)
-			M:rotateZ(mat, 5 * M:sin(a))
-			M:scale(mat, 0.7, 0.7, 0.7)
-		elseif itemName == "bell" then
-			M:moveX(mat, 0.15 * l)
-			M:moveY(mat, -0.05)
-			M:moveZ(mat, -0.1)
-			M:scale(mat, 1.2, 1.2, 1.2)
-			M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, -0.1 * l, 0.4, 0.1)
-			M:rotateZ(mat, ywAngle * -1, -0.1 * l, 0.4, 0.1)
-		else
-			M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, 0, 0.4, 0)
-			M:rotateZ(mat, ywAngle * -1, 0, 0.4, 0)
-		end
-	end
-	if isHangingSign then
-		M:rotateX(mat, M:clamp(playerPitch / 2.5, -35, 90) + ptAngle, 0, 0.55, 0)
-		M:rotateZ(mat, ywAngle * -1, 0, 0.55, 0)
-	end
-elseif itemName == "painting" or itemName == "item_frame" or (itemName == "glow_item_frame" and not a3ds) then
-	context.swingProgress = 0
-	M:rotateX(mat, M:clamp(playerPitch / 2.5, -25, 90) + ptAngle, 0, 0.45, 0)
-	M:rotateZ(mat, ywAngle * -1, 0, 0.55, 0)
-elseif glowing3Darmors and matched({"chest_armor"}) then
-    M:rotateX(mat, -(playerPitch * 0.09 + ptAngle * 0.6), -0.129, -0.004, 0.495)
-    M:rotateZ(mat, ywAngle * 0.5, -0.129, -0.004, 0.495)
-else
-	if
-		not I:isBlock(context.item)
-		and not I:isEmpty(context.item)
-		and useAction == "none"
-		and useAction ~= "crossbow"
-	then
-		if isAxe or itemName == "mace" then
-			local ptAngleMultiplier = (itemName == "mace" and 0.2) or 0.15
-			M:rotateX(mat, -20 * M:sin(context.equipProgress * context.equipProgress * context.equipProgress) + (ptAngle * ptAngleMultiplier), 0.3 * l, -0.3, 0)
-		else
-			M:rotateX(mat, -20 * M:sin(context.equipProgress * context.equipProgress * context.equipProgress) + (ptAngle * 0.05), 0.3 * l, -0.4, 0)
-		end
-	end
-	if (isAxe or itemName == "mace") and useAction ~= "crossbow" then
-		M:rotateX(mat, (playerPitch * -0.05) + ptAngle * 0.2, 0, -0.2, 0)
-	elseif useAction ~= "crossbow" then
-		M:rotateX(mat, (playerPitch * -0.025) + ptAngle * 0.1, 0, -0.2, 0)
-	end
+IsItemCompat = getItemCompat()
+
+-- === INDIVIDUAL RESOURCE PACK ADJUST ===
+if rvTorches then
+    addPos({
+        { {"repeater", "comparator"}, m = {-0.045, -0.02, -0.035}, r = {-6, -16, 2.5}, renderAsBlock = false },
+        { {"torch", "soul_torch", "redstone_torch", "copper_torch"}, m = {0.01, -0.075, -0.035}, r = {-5, -5.5, nil} },
+        { {"lanterns"}, m = {0.015, -0.545, 0.155}, r = {-25, 21.5, nil} },
+        { {"campfire", "soul_campfire"}, m = {-0.08, 0.185, 0.255}, r = {8, -9.5, -2.5} }
+    })
 end
 
-if itemName == "elytra" and glowing3Darmors and not w3di then
-    M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
-	M:rotateZ(mat, ywAngle * -0.7, -0.1 * l, 0, 0.1)
+if refinedTorches then
+    addPos({
+        { {"torch", "soul_torch", "redstone_torch", "copper_torch"}, m = {0.035, nil, -0.04}, r = {-5, -4.5, nil} },
+        { {"lanterns"}, m = {-0.04, -0.48, 0.3}, r = {-38, 9, nil} },
+    })
 end
 
--- == EAT & DRINK ANIMATION ==
--- Animations Helpers
-local move = {
-    x = function(v) M:moveX(mat, v * l) end,
-    y = function(v) M:moveY(mat, v) end,
-    z = function(v) M:moveZ(mat, v) end
-}
-local rotate = {
-    x = function(v) M:rotateX(mat, v) end,
-    y = function(v) M:rotateY(mat, v * l) end,
-    z = function(v) M:rotateZ(mat, v * l) end
-}
-
-local function applyTransform(op, progress, exp, x, y, z)
-    local t = M:pow(progress, exp)
-
-    if x then op.x(x * t) end
-    if y then op.y(y * t) end
-    if z then op.z(z * t) end
+if glowing3Dtotem then
+    addPos({
+        { {"totem_of_undying"}, m = {-0.015, 0.115, -0.14}, r = {-3, 50, -8.5}, s = {0.85} }
+    })
 end
 
--- Animation
-local function eatDrinkAnimation(use, progress, movePos, rotatePos)
-    local function m(default, override)
-        if override ~= nil then return override else return default end
-    end
+if just3Darmors then
+    addPos({
+        { {"horse_armor"}, m = {-0.035, -0.03, -0.045}, r = {-8, 3.5, -5.5}, matches = true },
+        { {"nautilus_armor"}, m = {0.03, 0.015, -0.105}, r = {-4.5, 20, nil}, matches = true },
+        { {"turtle_helmet"}, m = {0.02, 0.01, 0.035}, r = {2.5, -4.5, -4} },
+        { {"head_armor"}, m = {0.005, nil, nil}, r = {8, nil, -1.5} },
+        { {"leg_armor"}, m = {0.04, nil, nil} },
+        { {"wolf_armor"}, m = {0.055, -0.125, -0.14}, r = {6.5, -15.5, 2} }
+    })
+end
 
-    local moveVals = {
-        x = movePos and m(nil, movePos[1]) or nil,
-        y = movePos and m(nil, movePos[2]) or nil,
-        z = movePos and m(-0.05, movePos[3]) or -0.05
+if glowing3Darmors then
+    addPos({
+        { {"horse_armor"}, m = {-0.075, -0.025, -0.015}, r = {-6.5, 84.5, -1}, matches = true },
+        { {"head_armor"}, m = {-0.125, -0.12, -0.04}, r = {-4, 84.5, nil} },
+        { {"chest_armor"}, m = {nil, -0.26, 0.085}, r = {58, 180, -15} },
+        { {"leg_armor"}, m = {-0.04, -0.385, -0.205}, r = {-2, nil, 7.5} },
+        { {"foot_armor"}, m = {-0.095, -0.01, -0.02}, r = {nil, 82, nil} },
+        { {"elytra"}, m = {-0.005, -0.22, nil}, r = {-80, -9.5, 4.5} }
+    })
+end
+
+if bensBundle then
+    addPos({
+        { {"bundles"}, m = {-0.04, 0.095, -0.035}, r = {-0.5, 23, -4} }
+    })
+end
+
+if freshDiscs then
+    addPos({
+        { {"music_disc"}, m = {0.015, -0.015, -0.08}, r = {-5.5, -5.5, -0.5}, matches = true },
+        { {"disc_fragment_5"}, m = {-0.015, nil, -0.055} }
+    })
+end
+
+if freshFoods then
+    addPos({
+        { {"_pressure_plate"}, m = {0.125, -0.02, 0.345}, r = {-119.5, -4.5, -7.5}, matches = true }, -- fresh foods changes the position of all items whose ID contains "plate", so this correction is necessary
+        { {"_soup", "_stew", "bowl"}, m = {0.07, -0.025, -0.03}, r = {1.5, -4.5, -1}, matches = true },
+        { {"beef", "porkchop"}, m = {0.06, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
+        { {"mutton"}, m = {0.025, 0.005, -0.13}, r = {-1.5, -5.5, -1}, s = {1.15}, matches = true },
+        { {"apple"}, m = {0.075, 0.015, -0.07}, r = {2, -0.5, nil}, matches = true },
+        { {"melon_slice"}, m = {0.03, nil, -0.055}, r = {2, -0.5, nil}, matches = true },
+        { {"potato"}, m = {0.025, -0.01, -0.105}, r = {-5, -5, nil}, s = {1.15}, matches = true },
+        { {"spider_eye"}, m = {-0.01, -0.13, -0.19}, r = {-5.5, 1.5, 34.5} },
+        { {"carrot", "golden_carrot"}, m = {-0.04, -0.035, -0.05}, r = {nil, -5, 3} },
+        { {"sweet_berries"}, m = {-0.035, nil, -0.055}, r = {nil, -4, nil} },
+        { {"glow_berries"}, m = {0.015, -0.055, -0.095} },
+        { {"chorus_fruit"}, m = {0.1, -0.055, -0.085}, r = {nil, -5.5, nil} },
+        { {"beetroot"}, m = {-0.01, -0.12, -0.165}, r = {1.5, -5.5, nil} },
+        { {"dried_kelp"}, m = {0.035, -0.025, -0.09}, r = {nil, 7.5, -1.5} },
+        { {"chicken", "cooked_chicken"}, m = {0.065, -0.04, -0.15} },
+        { {"rabbit"}, m = {0.1, -0.045, -0.095}, r = {nil, -6, nil} },
+        { {"cooked_rabbit"}, m = {-0.025, -0.11, -0.055}, r = {-0.5, -7.5, nil} },
+        { {"cod", "cooked_cod", "tropical_fish"}, m = {0.065, -0.04, -0.09}, r = {1.5, -5, -1.5} },
+        { {"salmon"}, m = {-0.005, -0.04, -0.13}, r = {1.5, -5, -1.5} },
+        { {"cooked_salmon"}, m = {-0.005, -0.04, -0.13}, r = {1.5, -5, -1.5} },
+        { {"pufferfish"}, m = {0.075, 0.005, -0.065}, r = {15, 7.5, 9} },
+        { {"bread"}, m = {0.07, -0.04, -0.085}, r = {1, nil, nil} },
+        { {"cookie"}, m = {0.07, 0.005, -0.075} },
+        { {"cake"}, m = {0.115, -0.04, nil}, r = {-6, -5, nil} },
+        { {"pumpkin_pie"}, m = {0.06, 0.02, -0.175}, r = {4.5, 3, 5.5} },
+        { {"rotten_flesh"}, m = {0.085, -0.19, -0.035}, r = {-40.5, nil, 3.5}, s = {1.15} },
+    })
+end
+
+if freshSeeds then
+    addPos({
+        { {"_seeds"}, m = {0.045, -0.115, -0.055}, r = {-8.5, 25, 5}, s = {1.05}, matches = true }
+    })
+end
+
+if freshOres then
+    addPos({
+        { {"coal$"}, m = {posInHands(0.065, 0.005), posInHands(-0.005, 0.04), posInHands(-0.13, -0.145)}, matches = true },
+        { {"raw_gold"}, m = {posInHands(0, 0.015), -0.1, -0.14} },
+        { {"raw_"}, m = {posInHands(0, 0.015), posInHands(-0.07, -0.03), -0.14}, matches = true },
+        { {"_nugget"}, m = {0.07, -0.085, -0.095}, r = {-5.5, -5.5, nil}, matches = true },
+        { {"_ingot", "brick$"}, m = {0.025, -0.05, -0.155}, r = {-6.5, 5, nil}, s = {1.2}, matches = true },
+        { {"amethyst_bud", "amethyst_cluster"}, m = {0.025, -0.06, -0.055}, r = {-5, -6, nil}, matches = true },
+        { {"diamond"}, m = {0.03, 0.01, -0.165}, r = {11.5, 13, -3} },
+        { {"emerald"}, m = {0.025, -0.03, -0.23}, r = {12.5, 13, -2} },
+        { {"lapis_lazuli"}, m = {0.005, -0.14, -0.225}, r = {nil, -4.5, nil}, s = {1.1} },
+        { {"quartz"}, m = {0.025, -0.07, -0.11}, r = {-6, -5.5, nil}, s = {1.2} },
+        { {"amethyst_shard", "echo_shard"}, m = {posInHands(-0.055, 0), -0.15, -0.03}, r = {7, -5, nil} },
+        { {"netherite_scrap"}, m = {0.05, -0.09, -0.17}, r = {-5.5, -1, -16.5}, s = {1.3} },
+        { {"flint"}, m = {posInHands(0.035, -0.035), posInHands(0.07, 0.06), posInHands(-0.115, -0.125)}, r = {15, 12.5, -8}, s = {1.15} },
+        { {"resin_clump"}, m = {nil, 0.01, -0.12}, s = {1.2} },
+        { {"redstone"}, m = {0.08, -0.135, -0.175}, r = {-17, nil, nil}, s = {1.15} },
+        { {"pointed_dripstone"}, m = {0.125, -0.05, -0.075}, r = {-4.5, -4.5, -1.5} }
+    })
+end
+
+if freshFlowers then
+    addPos({
+        { PackCompat.freshFlowersPlants.withBlocks, m = {0.055, -0.075, -0.09}, r = {10.5, -6, -2.5} },
+        { {"^dead.*fan$"}, m = {nil, -0.06, -0.165}, r = {16, 36.5, -17}, matches = true },
+        { {"^dead.*coral$"}, m = {0.055, -0.075, -0.09}, r = {10.5, -6, -2.5}, matches = true },
+        { {"_coral$", "_coral_fan"}, m = {0.155, -0.06, -0.055}, r = {-6, -5, nil}, matches = true },
+        { {"_mushroom$", "_fungus$"}, m = {0.02, -0.03, -0.035}, r = {-5.5, -5.5, -2}, matches = true },
+        { {"small_flowers"}, m = {-0.005, -0.015, -0.015}, r = {-9.5, nil, nil} },
+        { {"wildflowers", "leaf_litter", "pink_petals"}, m = {nil, -0.19, -0.05}, r = {-72.5, 0.5, -1} },
+        { {"bamboo"}, m = {0.02, 0.02, -0.025}, r = {-6, -5.5, -2} },
+        { {"sugar_cane"}, m = {-0.005, 0.02, -0.025}, r = {-6, -5.5, -2} },
+        { {"twisting_vines"}, m = {0.035, nil, 0.035} },
+        { {"vine", "sculk_vein", "glow_lichen"}, m = {-0.14, nil, 0.115}, r = {-9, -12, nil} },
+        { {"rose_bush", "peony", "lilac", "pitcher_plant"}, m = {nil, nil, -0.03}, r = {-7, nil, nil} },
+        { {"big_dripleaf"}, m = {-0.02, nil, -0.015} },
+        { {"small_dripleaf"}, m = {nil, nil, -0.03} },
+        { {"lily_pad"}, m = {0.14, -0.1, -0.075}, r = {-5.5, -6.5, nil} },
+        { {"sea_pickle"}, m = {0.025, -0.025, -0.04}, r = {-5, -7, nil} },
+        { {"seagrass"}, m = {0.225, -0.17, -0.18}, r = {-11, -11.5, nil} },
+        { {"kelp"}, m = {-0.045, -0.01, -0.06}, r = {14.5, -14, -9.5} }
+    })
+end
+
+if better3Dbooks then
+    addPos({
+        { {"book", "enchanted_book", "writable_book", "written_book"}, r = {-12.5, -15.5, nil} }
+    })
+end
+
+if wNature then
+    addPos({
+        { {"_mushroom$", "_fungus$"}, m = {0.245, -0.11, -0.135}, r = {-4, -5, nil}, s = {1.45}, matches = true },
+        { {"_tulip"}, m = {0.15, -0.065, -0.08}, matches = true },
+        { {"oak_sapling"}, m = {0.115, -0.075, -0.08}, r = {-3.5, nil, nil} },
+        { {"azalea", "flowering_azalea"}, m = {0.165, -0.075, -0.075}, r = {-5, -3.5, nil} },
+        { {"dead_bush"}, m = {0.22, -0.09, -0.11}, r = {-4, -6, nil}, s = {1.35} },
+        { {"fern"}, m = {0.21, -0.09, -0.11}, r = {-4, -6, nil}, s = {1.35} },
+        { {"dandelion"}, m = {0.16, -0.06, -0.11} },
+        { {"poppy"}, m = {0.06, nil, nil} },
+        { {"blue_orchid"}, m = {0.135, -0.06, -0.095} },
+        { {"allium"}, m = {-0.075, -0.055, -0.095}, r = {nil, 75.5, nil}, s = {0.9} },
+        { {"azure_bluet"}, m = {0.095, -0.06, -0.135}, r = {nil, 35.5, nil} },
+        { {"oxeye_daisy"}, m = {0.205, -0.075, -0.07}, r = {nil, -20.5, nil}, s = {1.25} },
+        { {"cornflower"}, m = {0.21, -0.055, -0.125}, s = {1.25} },
+        { {"lily_of_the_valley"}, m = {0.07, -0.09, -0.115}, r = {nil, 20, nil} }
+    })
+end
+
+if fyoncle3Dtrims then
+    addPos({
+        { {"smithing_template"}, m = {0.025, 0.095, -0.04}, r = {32.5, 77, -36.5}, matches = true }
+    })
+end
+
+if a3ds then
+    addPos({
+        -- Natural Blocks
+        { {"vine", "weeping_vines", "twisting_vines"}, renderAsBlock = false },
+        { {"frogspawn"}, m = {-0.06, 0.04, -0.025}, r = {-4, -5.5, -2}, renderAsBlock = false },
+        { {"bamboo"}, m = {0.005, nil, -0.03}, r = {-5.5, -5, -1}, s = {0.8}, renderAsBlock = false },
+        { {"_mushroom$", "_fungus$"}, m = {0.01, -0.03, -0.075}, r = {-5, -4, -1}, matches = true },
+        { {"azalea", "flowering_azalea"}, m = {0.065, -0.095, -0.17}, r = {-6, 29, nil} },
+        { {"cactus_flower"}, m = {0.03, 0.07, -0.09}, r = {-4.5, -4.5, nil} },
+        { {"sugar_cane"}, m = {0.015, nil, -0.105}, r = {nil, -5.5, nil}, s = {0.9} },
+        { {"glow_lichen"}, m = {nil, -0.21, nil} },
+        { {"lily_pad"}, m = {nil, -0.215, 0.02}, r = {-109, nil, nil}, s = {1, 0.4, 1} },
+        { {"pink_petals", "wildflowers", "leaf_litter"}, m = {-0.035, -0.22, -0.085}, r = {-73.5, nil, nil} },
+        { PackCompat.a3ds.naturalWithBlocks, m = {nil, -0.04, -0.08}, renderAsBlock = false },
+        -- Functional Blocks
+        { {"bell"}, m = {-0.165, -0.495, 0.17}, r = {-15.5, -4.5, -2.5} },
+        { {"armor_stand"}, m = {nil, 0.03, nil} },
+        { {"item_frame", "painting"}, m = {-0.03, -0.62, 0.2}, r = {-39, -6, nil} },
+        -- Tools & Utilities
+        { {"bundles"}, m = {0.015, 0.03, -0.055}, r = {-4, -5.5, nil} },
+        { {"writable_book"}, m = {nil, nil, -0.09} },
+        { {"minecart"}, m = {nil, 0.045, nil}, matches = true },
+        { {"ender_eye"}, m = {0.03, -0.01, -0.08}, r = {-4.5, -6, nil} },
+        { {"ender_pearl"}, m = {0.01, -0.005, -0.08}, r = {-4.5, -6, nil} },
+        { {"flint_and_steel"}, m = {0.015, 0.005, -0.095}, r = {10, 2.5, -2.5}, s = {0.9} },
+        { {"bone_meal"}, m = {0.01, 0.07, -0.125}, r = {-5.5, -4, nil} },
+        { {"shears"}, r = {-7, nil, 38.5} },
+        { {"brush"}, m = {0.025, 0.05, -0.035}, r = {-4.5, -5.5, -1} },
+        { {"lead"}, m = {0.125, -0.13, -0.215}, r = {-5.5, -4, -1}, s = {0.9} },
+        { {"compass"}, m = {0.015, 0.06, -0.03}, r = {-6.5, -5, -2} },
+        { {"map", "paper"}, m = {0.025, -0.02, -0.055}, r = {-6.5, -5, nil} },
+        { {"firework_rocket"}, m = {0.035, -0.01, -0.07}, r = {-6, -5.5, -1.5}, s = {0.9} },
+        { {"saddle"}, m = {-0.025, nil, nil} },
+        { {"boats"}, r = {nil, -37.5, nil} },
+        { {"goat_horn"}, m = {0.015, 0.09, nil}, r = {nil, -4, -1.5} },
+        -- Combat
+        { {"totem_of_undying"}, m = {0.025, -0.02, -0.055} },
+        { {"egg", "brown_egg", "blue_egg"}, m = {0.03, nil, -0.085}, r = {-6, -6, nil}, s = {1.2} },
+        { {"snowball"}, m = {0.015, -0.01, -0.085}, r = {-6, -6, nil} },
+        -- Ingredients
+        { {"resin_clump"}, m = {-0.005, -0.055, -0.095}, r = {-7, -4.5, nil}, renderAsBlock = false },
+        { {"coal$"}, m = {nil, nil, -0.025}, r = {-8, nil, nil}, s = {0.9}, matches = true },
+        { {"raw_"}, m = {-0.005, -0.055, -0.095}, r = {-7, -4.5, nil}, matches = true },
+        { {"nugget"}, m = {0.02, 0.03, -0.045}, r = {-6, -5, nil}, matches = true },
+        { {"ingot", "brick$"}, m = {-0.01, 0.005, -0.07}, r = {-6, -5.5, -1.5}, s = {0.9}, matches = true },
+        { {"string"}, m = {0.05, -0.005, -0.075}, r = {-4.5, -4.5, nil}, renderAsBlock = false },
+        { {"smithing_template"}, m = {-0.095, -0.11, -0.14}, r = {-5.5, -5, nil}, matches = true },
+        { {"_key"}, m = {0.015, nil, -0.085}, r = {-6, -5.5, nil}, matches = true },
+        { {"emerald"}, m = {0.015, -0.035, -0.085}, r = {-6.5, -3.5, nil} },
+        { {"lapis_lazuli"}, m = {nil, -0.06, -0.105}, r = {-6, -5.5, nil} },
+        { {"diamond"}, m = {0.015, -0.055, -0.09}, r = {-7.5, -3.5, nil} },
+        { {"quartz"}, m = {0.005, 0.07, -0.035}, r = {-6, -7, nil}, s = {0.7} },
+        { {"amethyst_shard", "echo_shard"}, m = {0.025, -0.01, -0.055}, r = {-4.5, -5.5, nil} },
+        { {"netherite_scrap"}, m = {-0.045, -0.035, -0.13}, r = {-6, -5, -1} },
+        { {"redstone"}, m = {-0.01, -0.02, -0.095}, r = {-8.5, nil, nil} },
+        { {"flint"}, m = {0.03, 0.06, -0.08}, r = {14.5, 12.5, -8} },
+        { {"book", "enchanted_book"}, m = {-0.135, nil, 0.085}, r = {-5, -6, -2} },
+        { {"stick", "blaze_rod", "breeze_rod"}, m = {0.02, -0.19, -0.015}, r = {-4.5, -7, -0.5} },
+        { {"flint"}, m = {0.01, -0.1, -0.085}, r = {-6, -4.5, -0.5} },
+        { {"bone"}, m = {0.025, -0.04, -0.035}, r = {-5, -5.5, nil} },
+        { {"leather", "rabbit_hide"}, m = {-0.01, -0.03, -0.08}, r = {-5.5, -4, -1} },
+        { {"honeycomb"}, m = {0.01, 0.04, -0.05}, r = {-5, -5, nil} },
+        { {"ink_sac", "glow_ink_sac"}, m = {0.015, 0.015, -0.085}, r = {-4, -4.5, -1} },
+        { {"clay_ball"}, m = {l == 1 and 0 or 0.06, nil, nil} },
+        { {"fire_charge", "heart_of_the_sea"}, m = {0.005, 0.04, 0.005}, r = {-6, -5, nil} },
+        { {"slime_ball"}, m = {0.02, 0.005, -0.09}, r = {-4, -3.5, nil} },
+        { {"prismarine_shard"}, m = {0.02, nil, -0.09}, r = {-6.5, -6, -1.5} },
+        { {"prismarine_crystals"}, m = {0.025, 0.01, -0.14}, r = {-7.5, -6.5, nil}, s = {1.15} },
+        { {"nautilus_shell"}, m = {0.025, -0.015, -0.04}, r = {-5.5, -5, nil} },
+        { {"nether_star"}, m = {0.01, -0.135, -0.035}, r = {-6, -5.5, -2} },
+        { {"dyes"}, m = {0.02, nil, -0.105}, r = {-4, -5.5, nil} },
+        { {"firework_star", "magma_cream"}, m = {0.03, 0.01, -0.01}, r = {-4.5, -5, -1.5} },
+        { {"glowstone_dust", "gunpowder", "sugar", "blaze_powder"}, m = {-0.01, -0.02, -0.095}, r = {-8.5, nil, nil} },
+        { {"rabbit_foot"}, m = {-0.01, -0.005, -0.08}, r = {-5, -4.5, nil} },
+        { {"ghast_tear"}, m = {0.02, -0.02, -0.05}, r = {-5, -5, -2}, s = {1.3} },
+        { {"loom_patterns"}, m = {nil, nil, -0.175} },
+    })
+end
+
+if w3di then
+    addPos({
+        -- Natural Blocks
+        { {"turtle_egg"}, m = {0.255, -0.18, -0.2}, r = {-5.5, -5.5, 4}, s = {1.7} },
+        -- Functional Blocks
+        { {"copper_torch"}, m = {0.07, -0.15, -0.07}, r = {-4.5, -5, -1.5}, s = {1.35} },
+        { {"torch", "redstone_torch", "soul_torch"}, m = {0.005, -0.07, -0.08}, r = {-5, nil, -1.5} },
+        { {"lanterns"}, m = {0.015, -0.515, 0.14}, r = {-17, -5.5, nil}, s = {0.7} },
+        { {"end_crystal"}, m = {-0.08, -0.225, -0.04} },
+        { {"flower_pot"}, m = {0.025, -0.015, -0.04}, r = {4, -5.5, 3.5} },
+        { {"armor_stand"}, m = {-0.055, -0.015, -0.08}, r = {-4, -9.5, 6} },
+        { {"signs"}, m = {-0.035, 0.02, -0.065}, r = {-4.5, -5, 6.5} },
+        -- Redstone Blocks
+        { {"repeater", "comparator"}, r = {-6.5, nil, nil} },
+        { {"lever"}, r = {8.5, nil, nil} },
+        { {"boats"}, r = {3.5, -8, -4.5} },
+        -- Tools & Utilities
+        { {"elytra"}, m = {nil, -0.32, nil}, r = {-131.5, nil, nil}, condition = {not just3Darmors} },
+        { {"bucket"}, m = {0.02, 0.05, -0.09}, r = {-94.5, -21, 180}, matches = true },
+        { {"bundles"}, m = {-0.05, -0.015, -0.015}, r = {-6, -11, 2.5}, s = {0.9} },
+        { {"music_discs"}, m = {-0.05, nil, -0.06}, r = {-5.5, -10.5, 2.5} },
+        { {"disc_fragment_5"}, m = {-0.065, -0.045, -0.005}, r = {-5.5, -9.5, 5.5} },
+        { {"shears"}, m = {nil, -0.085, -0.085}, r = {-40.5, 10, 24} },
+        { {"writable_book", "written_book"}, m = {0.07, 0.065, -0.09}, r = {10, -26, 13} },
+        { {"flint_and_steel"}, m = {0.05, -0.015, -0.145}, r = {3.5, -6, 4.5} },
+        { {"lead"}, m = {0.075, -0.03, -0.08}, r = {nil, -26, 10} },
+        { {"compasses", "clock"}, m = {-0.005, -0.03, -0.16}, r = {5.5, -9.5, 7.5} },
+        { {"map"}, m = {-0.045, 0.035, -0.035}, r = {-5, -9.5, 5} },
+        { {"wind_charge"}, m = {-0.02, -0.03, -0.06}, r = {-3.5, -11, 3} },
+        { {"ender_eye", "ender_pearl"}, m = {-0.015, -0.01, -0.005}, r = {-4, -10, 3} },
+        { {"goat_horn"}, m = {-0.015, nil, -0.15}, r = {14, -9, 5.5} },
+        { {"firework_rocket"}, m = {-0.03, nil, -0.03}, r = {-6, -13.5, 4.5} },
+        -- Combat
+        { {"nautilus_armor"}, m = {-0.055, 0.04, 0.01}, r = {-4.5, -9.5, 6}, matches = true },
+        { {"nautilus_shell"}, m = {-0.055, 0.04, 0.01}, r = {-4.5, -9.5, 6} },
+        { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {0.01, -0.015, -0.05}, r = {-6, -5.5, 3} },
+        { {"totem_of_undying"}, m = {-0.06, nil, -0.045}, r = {-7.5, nil, nil} },
+        -- Foods & Drinks
+        { {"apple", "^chorus_fruit$"}, m = {-0.05, -0.01, -0.035}, r = {-5.5, -5.5, 3}, matches = true },
+        { {"melon_slice"}, m = {-0.045, -0.03, -0.105}, r = {-5, -6, nil}, matches = true },
+        { {"beef", "porkchop","mutton", "rotten_flesh"}, m = {-0.05, -0.005, -0.025}, r = {-5, -6, 3.5}, matches = true },
+        { {"potato", "bread"}, m = {-0.05, -0.005, -0.035}, r = {-6, -5.5, 3.5}, matches = true },
+        { {"_stew", "_soup", "bowl"}, m = {0.01, -0.015, -0.105}, r = {-7, -6.5, -1}, matches = true },
+        { {"bottle", "potion", "dragon_breath"}, m = {-0.055, nil, -0.035}, r = {-4.5, -7, 4}, matches = true },
+        { {"carrot", "golden_carrot"}, m = {-0.045, -0.085, -0.08}, r = {-9.5, -9.5, 6} },
+        { {"spider_eye"}, m = {-0.07, -0.14, -0.115}, r = {-6, -6.5, 3} },
+        { {"sweet_berries"}, m = {0.025, 0.085, -0.12}, r = {-5.5, -4.5, 7.5} },
+        { {"glow_berries"}, m = {-0.06, -0.01, -0.07} },
+        { {"dried_kelp"}, m = {-0.095, 0.02, -0.005}, r = {nil, -4, nil} },
+        { {"beetroot"}, m = {-0.045, -0.01, -0.08}, r = {-5.5, -10, 6.5} },
+        { {"chicken", "cooked_chicken"}, m = {-0.06, -0.005, -0.025}, r = {-5.5, -5.5, 3.5} },
+        { {"rabbit", "cooked_rabbit"}, m = {-0.055, 0.01, 0.065}, r = {-5.5, -5.5, 4.5} },
+        { {"cod", "cooked_cod"}, m = {-0.115, -0.005, -0.065}, r = {-5, -7, 5} },
+        { {"salmon", "cooked_salmon"}, m = {-0.09, -0.005, -0.085}, r = {-5, -7, 5} },
+        { {"tropical_fish"}, m = {-0.065, -0.005, -0.075}, r = {-3, -5, 4} },
+        { {"pufferfish"}, m = {-0.075, nil, nil}, r = {-4.5, -5.5, 2.5} },
+        { {"cookie"}, m = {-0.06, -0.005, -0.02}, r = {-5, -5.5, 3.5} },
+        { {"cake"}, m = {-0.03, 0.125, -0.085}, r = {3.5, -22.5, 3}, s = {0.9} },
+        { {"pumpkin_pie"}, m = {-0.125, nil, 0.01}, r = {-7, -6, 3} },
+        -- Ingredients
+        { {"coal$"}, m = {-0.045, nil, nil}, r = {-4.5, -11, 4}, matches = true },
+        { {"raw_"}, m = {-0.045, nil, -0.035}, r = {-6, -6.5, 4.5}, matches = true },
+        { {"nugget"}, m = {-0.06, 0.055, -0.035}, r = {-7.5, -10, 6.5}, matches = true },
+        {  {"_ingot", "brick$"}, m = {-0.03, -0.005, -0.03}, r = {-8, -21.5, 4}, matches = true },
+        { {"emerald"}, m = {-0.05, 0.01, -0.035}, r = {-6, -4.5, 5.5}, s = {0.85} },
+        { {"lapis_lazuli"}, m = {-0.105, 0.08, 0.06}, r = {-5, -5.5, 5.5} },
+        { {"diamond"}, m = {-0.045, 0.015, -0.035}, r = {-5.5, -5.5, 5.5}, s = {0.8} },
+        { {"quartz"}, m = {-0.035, -0.005, 0.07}, r = {1, 79.5, 2} },
+        { {"amethyst_shard"}, m = {-0.05, 0.02, -0.06}, r = {-7, -9.5, 3.5} },
+        { {"netherite_scrap"}, m = {-0.05, nil, -0.08}, r = {-3, nil, nil} },
+        { {"flint"}, m = {-0.05, -0.145, -0.12}, r = {4.5, -5.5, 4.5} },
+        { {"redstone"}, m = {-0.1, 0.015, 0.035}, r = {-3, -11, nil} },
+        { {"book", "enchanted_book"}, m = {-0.1, nil, -0.01}, r = {nil, -8.5, nil} },
+        { {"bone_meal", "gunpowder", "glowstone_dust", "sugar"}, m = {-0.1, 0.015, 0.035}, r = {-3, -11, nil} },
+        { {"stick"}, m = {0.01, 0.01, -0.02}, r = {-2, -2, -1.5} },
+        { {"blaze_rod", "breeze_rod"}, m = {-0.005, 0.01, -0.02}, r = {-2, -2, -1.5} },
+        { {"bone"}, m = {-0.025, -0.105, -0.025}, r = {-0.5, -0.5, -1} },
+        { {"honeycomb"}, m = {-0.07, -0.005, -0.065}, r = {-4.5, -9.5, 5.5} },
+        { {"turtle_scute", "armadillo_scute"}, m = {-0.045, -0.005, -0.035}, r = {-7, -6, 4} },
+        { {"fire_charge"}, m = {0.015, -0.035, -0.07}, r = {-5.5, -6.5, 3.5} },
+        { {"slime_ball"}, m = {-0.05, -0.005, -0.015}, r = {-5.5, -6, 4.5} },
+        { {"clay_ball"}, m = {-0.055, -0.01, -0.055}, r = {-6, -11, 3.5} },
+        { {"prismarine_crystals"}, m = {-0.17, 0.04, 0.105}, r = {nil, 90.5, nil}, s = {1.3} },
+        { {"heart_of_the_sea"}, m = {-0.045, 0.02, -0.02}, r = {-3.5, -6, 4}, s = {0.9} },
+        { {"shulker_shell"}, m = {-0.035, -0.055, -0.085}, r = {-5, -10, 6} },
+        { {"fermented_spider_eye"}, m = {-0.025, -0.085, -0.045}, r = {0.5, nil, 4} },
+        { {"blaze_powder"}, m = {-0.01, -0.03, -0.045}, r = {-13, -47, nil} },
+        { {"feather"}, m = {-0.055, -0.02, -0.03}, r = {nil, -10, 6} },
+        -- Spawn Eggs
+        { {"spawn_egg"}, m = {-0.02, -0.015, -0.03}, r = {-6.5, -10.5, 3}, matches = true }
+    })
+end
+
+-- === UNDO ADJUSTS ===
+ItemsUndoAdjusts = {
+    a3ds = {
+        totem = {
+            { {"totem_of_undying"}, r = {10, 190, 110, "yzx"} }
+        },
+        shears = {
+            { {"shears"}, m = {nil, -0.025, -0.065}, r = {-14.5, 2.5, -35.5} }
+        },
+        books = {
+            { {"writable_book"}, m = {nil, -0.1, nil}, r = {-25, nil, nil} }
+        },
+    },
+    w3di = {
+        totem = {
+            { {"totem_of_undying"}, s = {1/1.2}, m = {0.01, 0.01, 0, "yzx"}, r = {-55, 4, 9, "yxz"}, ops = "smr" }
+        },
+        musicDiscs = {
+            { {"music_disc"}, s = {1/1.35}, r = {-50, -95, 50, "zyx"}, m = {0.13, 0.205, 0.08, "zyx"}, ops = "srm", matches = true }
+        },
+        bucket = {
+            { {"milk_bucket"}, m = {-0.175, -0.1, -0.125}, r = {-5.5, 180, -12}, s = {1/1.05} },
+            { {"bucket"}, m = {0.06, -0.03, -0.035}, r = {14, 6.5, 18.5}, s = {1/1.05}, matches = true }
+        },
+        bundles = {
+            { {"bundles"}, s = {1/1.3}, m = {0.05, 0.05, 0.01, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr" }
+        },
+        shears = {
+            { {"shears"}, s = {1/1.3, 1/1.4, 1/1.3}, m = {0.1, -0.05, nil, "zxy"}, r = {25, 30, 45, "yxz"}, ops = "smr" },
+        },
+        elytra = {
+            { {"elytra"}, m = {0.025, 0.095, 0.16}, r = {58.5, -1.5, -1} }
+        },
+        books = {
+            { {"writable_book"}, s = {1/1.1}, m = {0.02, -0.055, -0.055}, r = {1.5, nil, 6}, condition = {a3ds} },
+            { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm", condition = {not a3ds} },
+            { {"written_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm" },
+            { {"book", "enchanted_book"}, s = {1/1.1, 1/1.2, 1/1.1}, r = {-40, 20, 30, "yxz"}, m = {-0.2, -0.07, -0.1, "yzx"}, ops = "srm" }
+        },
+        torches = {
+            { {"torch", "soul_torch", "redstone_torch"}, s = {1/1.35}, r = {0, 5, nil, "zyx"}, m = {-0.07, 0.085, nil}, ops = "srm" },
+            { {"lanterns"}, m = {0.045, 0.015, -0.07}, r = {6, -13, nil}, s = {0.6}, condition = {refinedTorches} },
+            { {"lanterns"}, m = {-0.065, 0.08, 0.18}, r = {-11, nil, nil}, s = {0.6}, condition = {rvTorches} },
+            { {"campfire", "soul_campfire"}, s = {1/1.35, 1/1.35, 1/1.5}, r = {-7, -15, 75, "yzx"}, m = {-0.1, -0.15, -0.1, "xzy"}, ops = "srm" },
+            { {"repeater", "comparator"}, s = {1/1.35}, r = {-7, -35, 85, "yzx"}, m = {-0.15, -0.15, 0.1, "xzy"}, ops = "srm", condition = {rvTorches} }
+        },
+        foods = {
+            { {"apple", "^chorus_fruit$", "^pufferfish$"}, s = {1/1.05}, m = {0.05, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr", matches = true },
+            { {"melon_slice"}, s = {1/1.2}, m = {0, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr", matches = true },
+            { {"beef", "porkchop", "mutton", "rotten_flesh"}, s = {1/1.2, 1/1.4, 1/1.2}, m = {0.1, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr", matches = true },
+            { {"_soup", "_stew", "bowl"}, s = {1/1.2}, r = {180, -180, -115, "zyx"}, m = {-0.2, -0.13, 0, "zyx"}, ops = "srm", matches = true },
+            { {"glow_berries"}, s = {1/1.1}, m = {-0.05, -0.02, -0.07, "yzx"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"carrot"}, s = {1/1.05}, m = {-0.03, -0.07, nil, "zxy"}, r = {-4, -4, 8, "yxz"}, ops = "smr" },
+            { {"golden_carrot"}, s = {1/1.04}, m = {-0.01, -0.07, nil, "zxy"}, r = {-4, -4, 8, "yxz"}, ops = "smr" },
+            { {"potato"}, m = {0.02, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"} },
+            { {"baked_potato", "poisonous_potato"}, m = {0.05, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"} },
+            { {"beetroot"}, s = {1/1.04}, m = {0.02, -0.07, nil, "zxy"}, r = {-4, 0, 8, "yxz"}, ops = "smr" },
+            { {"dried_kelp"}, s = {1/1.05}, m = {0.02, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"chicken", "cooked_chicken", "rabbit", "cooked_rabbit"}, s = {1/1.15}, m = {0.1, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"cod", "cooked_cod", "salmon", "cooked_salmon", "tropical_fish"}, s = {1/1.3, 1/1.4, 1/1.3}, m = {-0.05, 0.1, -0.07, "zzx"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"bread"}, s = {1/1.15, 1/1.25, 1/1.15}, m = {-0.05, 0.15, -0.07, "zzx"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"cookie"}, s = {1/1.15, 1/1.25, 1/1.15}, m = {-0.05, 0.07, -0.07, "zzx"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"cake"}, s = {1/1.35, 1/1.35, 1/1.5}, r = {-7, -15, 75, "yzx"}, m = {-0.1, -0.15, -0.1, "xzy"}, ops = "srm" },
+            { {"pumpkin_pie"}, s = {1/1.15}, m = {0, 0, -0.07, "yzx"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"spider_eye"}, s = {1/1.1}, m = {0.04, -0.05, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr" }
+        },
+        ores = {
+            { {"coal$"}, s = {1, 1/1.2, 1}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr", matches = true },
+            { {"raw_"}, s = {1/1.3, 1, 1/1.3}, r = {0, 0, 5, "yxz"}, m = {0.05, -0.05, nil, "zxy"}, ops = "srm", matches = true },
+            { {"^quartz$", "_nugget", "amethyst_shard", "^redstone$"}, s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05,-0.07, "yzx"}, matches = true },
+            { {"_ingot", "brick$"}, s = {1/1.15}, r = {-15, 0.3, 5, "yxz"}, m = {0, 0.1, 0, "yzx"}, ops = "srm", matches = true },
+            { {"emerald", "diamond", "lapis_lazuli"}, s = {1/1.1, 1/1.25, 1/1.1}, r = {0, 0.3, 7, "yxz"}, m = {0.05, 0.1, -0.07, "yzx"} },
+            { {"netherite_scrap"}, s = {1/1.15}, r = {-15, 0.3, 5, "yxz"}, ops = "srm" },
+            { {"flint"}, s = {1/1.3}, r = {5, 10, nil, "zxy"}, ops = "srm" }
+        },
+        nautilusArmor = {
+            { {"nautilus_armor"}, s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm", matches = true }
+        },
+        a3dsCompat = {
+            { {"writable_book"}, s = {1/1.1}, r = {-4, 30, 7, "yxz"}, m = {0.05, -0.05, 0.03, "yzx"}, ops = "srm", condition = {not better3Dbooks} },
+            { {"bone_meal", "map", "honeycomb", "nautilus_shell", "gunpowder", "glowstone_dust", "blaze_powder", "sugar"},
+            s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm" },
+            { {"armor_stand"}, s = {1/1.1}, r = {-4, 0.3, 7, "yxz"}, m = {0, 0.05, -0.07, "yzx"}, ops = "srm" },
+            { {"boats"}, s = {1/1.35}, r = {-4, -180, 120, "yzx"}, m = {nil, -0.15, nil}, ops = "srm" },
+            { {"name_tag", "_banner_pattern"}, s = {1/1.4}, r = {180, 130, nil, "zxy"}, m = {-0.1, 0.15, nil, "zyx"}, ops = "srm", matches = true },
+            { {"ender_eye", "ender_pearl"}, s = {1/1.05}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr" },
+            { {"fishing_rod"}, s = {1/1.2}, m = {0.1, 0.1, nil}, r = {1, 10, 70, "yzx"}, ops = "smr" },
+            { {"flint_and_steel"}, s = {1/1.1}, r = {5, 10, nil, "zxy"}, ops = "srm" },
+            { {"fire_charge"}, s = {1/1.25}, r = {nil, nil, 5}, ops = "srm" },
+            { {"lead"}, s = {1/1.2, 1, 1}, r = {nil, -24.5, 10}, m = {-0.025, 0.2, nil, "xzy"}, ops = "srm" },
+            { {"compass"}, s = {1/1.2}, r = {-4, 10, 7, "yxz"}, m = {0, -0.01, -0.03, "yzx"}, ops = "srm" },
+            { {"firework_rocket"}, s = {1/1.2}, m = {0.03, 0, nil, "zxy"}, ops = "smr", prox = true },
+            { {"firework_rocket"}, s = {1/1.05}, m = {0.05, 0.05, nil, "zxy"}, r = {-95, 0, 5, "yxz"}, ops = "smr" },
+            { {"carrot_on_a_stick"}, s = {1/1.2}, m = {0.1, 0.1, nil}, r = {1, 60, nil, "yxz"}, ops = "smr" },
+            { {"goat_horn"}, s = {1/1.3}, m = {0.05, -0.05, nil, "zxy"}, r = {nil, nil, 5}, ops = "smr" },
+            { {"egg", "blue_egg", "brown_egg", "snowball"}, r = {nil, nil, 5} },
+            { {"stick", "bone", "blaze_rod", "breeze_rod"}, m = {0.05, 0.07, 0.05, "yzx"}, r = {4, nil, -85, "zxy"} },
+            { {"slime_ball"}, s = {1/1.05}, m = {0.05, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"}, ops = "smr" },
+            { {"clay_ball"}, m = {-0.055, 0.015, nil}, r = {-3, 0, 6} },
+            { {"heart_of_the_sea"}, s = {1/1.35}, m = {0.05, -0.07, nil, "zxy"}, r = {0, 5, nil, "xzy"} },
+            { {"totem_of_undying"}, s = {1/1.2}, m = {-0.015, -0.005, -0.02}, r = {51, 140, 30.5}, ops = "smr", condition = {glowing3Dtotem} },
+            { {"shears"}, m = {nil, -0.155, -0.15}, r = {-7, 10, -32.5}, s = {0.9}, condition = {gousPoses} }
+        }
     }
-    local rotateVals = {
-        x = rotatePos and m(nil, rotatePos[1]) or nil,
-        y = rotatePos and m(-50, rotatePos[2]) or -50,
-        z = rotatePos and m(nil, rotatePos[3]) or nil
-    }
-
-    applyTransform(move, progress, 1, 0.02, moveVals.y, moveVals.z)
-    applyTransform(move, progress, 1, moveVals.x, nil, nil)
-
-    if use == "eat" or use == "toot_horn" then
-        local ex = rotatePos and m(-23, rotatePos[1]) or -23
-        local ez = rotatePos and m(-12, rotatePos[3]) or -12
-        applyTransform(rotate, progress, 2,  ex,  nil,  ez)
-    end
-
-    applyTransform(rotate, progress, 2,  rotateVals.x,  rotateVals.y,  rotateVals.z)
-
-    if use == "drink" then
-        local dx = rotatePos and m(15, rotatePos[1]) or 15
-        applyTransform(rotate, progress, 2,  dx,  nil,  nil)
-    end
-end
-local progress = context.mainHand and foodCount or foodCountO
-
-local specialCases = {
-    -- Without Packs
-    {
-        check = function() return not (w3di or a3ds) and matched("goat_horn") end,
-        move = {nil, nil, nil}, rotate = {nil, -12, nil}
-    },
-    {
-        check = function() return not (freshFoods or w3di) and matched("sweet_berries") end,
-        move = {nil, nil, 0.05}, rotate = {nil, 10, nil}
-    },
-    {
-        check = function() return not (w3di or refinedBuckets) and matched("milk_bucket") end,
-        move = {0.15, 0.14, -0.18}, rotate = {nil, -60, 5}
-    },
-    {
-        check = function() return not (w3di or freshFoods) and itemName ~= "milk_bucket" end,
-        move = {-0.05, -0.07, 0.05}
-    },
-    -- With Packs
-    {
-        check = function() return freshFoods and w3di and matched({"_soup", "_stew"}, true) end,
-        move = {0.15, -0.05, -0.1}, rotate = {-5, -10, 30}
-    },
-    {
-        check = function() return freshFoods and w3di and matched("spider_eye") end,
-        move = {0.1, 0.05, 0.05}, rotate = {nil, nil, nil}
-    },
-	{
-		check = function() return w3di and refinedBuckets and matched("milk_bucket") end,
-		move = {-0.3, 0.2, 0.15}, rotate = {-20, -60, -10}
-	},
-	{
-		check = function() return not w3di and refinedBuckets and matched("milk_bucket") end,
-		move = {0.02, 0.06, -0.1}, rotate = {nil, -60, nil}
-	},
-    {
-		check = function() return w3di and matched("milk_bucket") end,
-		move = {nil, -0.05, -0.1}, rotate = {-10, -30, -55}
-	},
-    {
-		check = function() return w3di and not freshFoods and matched("sweet_berries") end,
-		move = {nil, nil, 0.05}
-	}
 }
 
-local caseMatched = false
-for _, case in ipairs(specialCases) do
-    if case.check() then
-        eatDrinkAnimation(useAction, progress, case.move, case.rotate)
-        caseMatched = true
-		break
+if w3di then
+    if a3ds then
+        addUndoAdj(ItemsUndoAdjusts.w3di.a3dsCompat)
     end
-end
 
-if not caseMatched and (useAction == "eat" or useAction == "drink" or useAction == "toot_horn") then
-    eatDrinkAnimation(useAction, progress)
-end
+    local w3diConds = {
+        { refinedBuckets,                    ItemsUndoAdjusts.w3di.bucket        },
+        { freshOres,                         ItemsUndoAdjusts.w3di.ores          },
+        { freshFoods,                        ItemsUndoAdjusts.w3di.foods         },
+        { freshDiscs,                        ItemsUndoAdjusts.w3di.musicDiscs    },
+        { bensBundle,                        ItemsUndoAdjusts.w3di.bundles       },
+        { glowing3Dtotem,                    ItemsUndoAdjusts.w3di.totem         },
+        { better3Dbooks,                     ItemsUndoAdjusts.w3di.books         },
+        { just3Darmors,                      ItemsUndoAdjusts.w3di.nautilusArmor },
+        { glowing3Darmors or just3Darmors,   ItemsUndoAdjusts.w3di.elytra        },
+        { rvTorches or refinedTorches,       ItemsUndoAdjusts.w3di.torches       },
+        -- Apply only when A3DS is also active.
+        { a3ds and not bensBundle,           ItemsUndoAdjusts.w3di.bundles       },
+        { a3ds and not freshOres,            ItemsUndoAdjusts.w3di.ores          },
+        { a3ds and not glowing3Dtotem,       ItemsUndoAdjusts.w3di.totem         },
+        { a3ds and not gousPoses,            ItemsUndoAdjusts.w3di.shears        },
+    }
 
-global.foodCount          = 0.0;
-global.foodCountO         = 0.0;
-local easedFoodCounter    = Easings:easeInQuart(context.mainHand and foodCount or foodCountO)
-
--- == BRUSH ANIMATION ==
-if useAction == "brush" then
-	if context.mainHand then
-		M:moveZ(mat, -0.03 	* Easings:easeInOutBack(brushCounter))
-		M:rotateX(mat, -30 	* Easings:easeInOutBack(brushCounter))
-		M:rotateZ(mat, 15 	* l * M:sin((foodCountSec - 0.5) * 4.14) * Easings:easeInOutBack(brushCounter))
-		M:rotateZ(mat, l 	* brushAngleM)
-	else
-		M:moveZ(mat, -0.03 	* Easings:easeInOutBack(brushCounterO))
-		M:rotateX(mat, -30 	* Easings:easeInOutBack(brushCounterO))
-		M:rotateZ(mat, 15 	* l * M:sin((foodCountSecO - 0.5) * 4.14) * Easings:easeInOutBack(brushCounterO))
-		M:rotateZ(mat, l 	* brushAngleO)
-	end
-end
-
--- == FALL ANIMATION ==
-if itemName == "slime_ball" or itemName == "slime_block" or itemName == "honey_block" then
-    if itemName == "slime_ball" then
-        local scaleY = (fall < 0 and fall * 0.06) or fall * 0.12
-        M:moveY(mat, -0.1)
-        M:scale(mat, 1, 1 + scaleY, 1)
-        M:moveY(mat,  0.1)
-    else
-        local scaleX_Z = (fall < 0 and fall * 0.05) or fall * 0.1
-        local scaleY   = (fall < 0 and fall * 0.1)  or fall * 0.3
-        M:scale(mat, 1 - scaleX_Z, 1 + scaleY, 1 - scaleX_Z)
-        M:shear(mat, 0, -ywAngle * 0.006 * l, 0)
+    for _, entry in ipairs(w3diConds) do
+        if entry[1] then addUndoAdj(entry[2]) end
     end
-end
 
-prevPitch   = P:getPitch(context.player)
-prevYaw     = P:getYaw(context.player)
+elseif a3ds then
+    local a3dsConds = {
+        { glowing3Dtotem,   ItemsUndoAdjusts.a3ds.totem   },
+        { gousPoses,        ItemsUndoAdjusts.a3ds.shears  },
+        { better3Dbooks,    ItemsUndoAdjusts.a3ds.books   },
+    }
 
-if itemName == "magma_cream" then
-    M:scale(mat, 1 - (fall / 5), 1 + (fall / 5), 1)
-end
-
--- == SWITCH ANIMATION ==
-local activeSwitch              = context.mainHand and mainHandSwitch or offHandSwitch
-local switchEvent               = context.mainHand and mainHandSwitchEvent or offHandSwitchEvent
-local switchAnimationVariable   = Easings:easeInBack(M:sin(M:clamp(activeSwitch, 0.09723, 0.60632) * 5.346 - 0.1))
-
-if
-	(
-		matched({"bundles", "skulls", "music_discs", "nuggets", "ender_pearl", "ender_eye"})
-        or (glowing3Darmors and matched({"head_armor"}))
-		or I:isThrowable(context.item)
-	) and useAction ~= "trident"
-then
-    M:rotateX(mat, -10 * switchAnimationVariable)
-    M:moveY(mat,  0.62 * switchAnimationVariable)
-    M:moveY(mat,  M:clamp(0.1 * fall, 0, 255))
-
-    local eased = Easings:easeInOutBack(M:clamp(activeSwitch * 1.65, 0, 1))
-
-    if isNugget then
-        if switchEvent then S:playSound("entity.experience_orb.pickup", 0.3) end
-        M:moveY(mat, -0.07)
-        M:rotateX(mat, 360 * Easings:easeInOutBack((context.mainHand and M:clamp(mainHandSwitch * 1.65, 0, 1)) or M:clamp(offHandSwitch * 1.65, 0, 1)), 0, 0.1, 0)
-    elseif isMusicDisc then
-        if switchEvent then S:playSound("entity.context.player.attack.weak", 0.3) end
-        M:rotateZ(mat, 360 * eased, -0.1 * l, 0.25, 0)
-
-    else
-        if switchEvent then S:playSound("entity.context.player.attack.weak", 0.3) end
-        local clampedSwitch = M:clamp(activeSwitch * 1.2, 0, 1)
-        M:rotateZ(mat, -7 * l * M:sin(M:clamp(clampedSwitch, 0.0943, 0.66791) * 10.605 - 0.8))
+    for _, entry in ipairs(a3dsConds) do
+        if entry[1] then addUndoAdj(entry[2]) end
     end
-end
-
-if (context.mainHand and mainHandSwitchEvent) or offHandSwitchEvent then
-    S:playSound("context.item.armor.equip_leather", 0.2)
-end
-
--- == MAP ANIMATION ==
-local easedMapSmoother   = Easings:easeInOutBack(mapSmoother)
-local easedMapZoomer     = Easings:easeInOutBack(mapZoomer)
-
-if I:isOf(context.item, Items:get("minecraft:filled_map")) then
-    M:rotateZ(mat, 5 * l * easedMapSmoother)
-    M:rotateY(mat, (-40 - (20 * easedMapZoomer)) * l * easedMapSmoother)
-    M:rotateZ(mat, 15 * l * easedMapSmoother)
-    M:rotateX(mat, -10 * easedMapZoomer * easedMapSmoother)
-
-    local smoother = 1 - easedMapSmoother
-    M:moveZ(mat, -0.05 * smoother)
-    M:moveY(mat, -0.05 * smoother)
-    M:rotateX(mat, -40 * smoother)
-    M:rotateY(mat, -10 * l * smoother)
-    M:rotateZ(mat, 5 * l * smoother)
-end
-
--- == GLOW AND PARTICLES ==
-if not (refinedBuckets or torchesPack or w3di) then
-
-    if itemName == "torch" 		            then glow(0.5 * l, 0.6, 0.5, "textures/particle/orange_glow.png")       end
-    if itemName == "copper_torch" 	        then glow(0.5 * l, 0.6, 0.5, "textures/particle/copper_glow.png")       end
-    if itemName == "soul_torch" 			then glow(0.5 * l, 0.6, 0.5, "textures/particle/blue_glow.png")         end
-    if itemName == "redstone_torch" 		then glow(0.5 * l, 0.6, 0.5, "textures/particle/red_glow.png")          end
-    if itemName == "lantern" 				then glow(0.45 * l, 0.15, 0.5, "textures/particle/orange_glow.png")     end
-    if itemName == "soul_lantern" 			then glow(0.45 * l, 0.15, 0.5, "textures/particle/blue_glow.png")       end
-    if itemName:match("copper_lantern") 	then glow(0.45 * l, 0.15, 0.5, "textures/particle/copper_glow.png")     end
-    if itemName == "lava_bucket" 			then glow(-0.05 * l, 0, 0, "textures/particle/orange_glow.png")         end
-
-elseif w3di and not (torchesPack or refinedBuckets) then
-
-    if itemName == "torch" 		            then glow(0.5 * l, 0.6, 0.5, "textures/particle/orange_glow.png")       end
-    if itemName == "copper_torch" 	        then glow(0.5 * l, 0.6, 0.5, "textures/particle/copper_glow.png")       end
-    if itemName == "soul_torch" 			then glow(0.5 * l, 0.6, 0.5, "textures/particle/blue_glow.png")         end
-    if itemName == "redstone_torch" 		then glow(0.5 * l, 0.6, 0.5, "textures/particle/red_glow.png")          end
-	if itemName == "lantern" 			    then glow(0.05 * l, -0.2, -0.2, "textures/particle/orange_glow.png")    end
-	if itemName == "soul_lantern" 		    then glow(0.05 * l, -0.2, -0.2, "textures/particle/b_glow.png")         end
-	if itemName:match("copper_lantern")     then glow(0.05 * l, -0.2, -0.2, "textures/particle/copper_glow.png")    end
-
-end
-
-if swingCountPrev ~= P:getSwingCount(context.player) and context.mainHand and itemName == "bell" then
-	S:playSound("block.bell.use", 0.3)
-end
-swingCountPrev = P:getSwingCount(context.player)
-
-if itemName == "pink_petals" or itemName == "wildflowers" or itemName == "leaf_litter" then
-	local particle_ticker = function(p)
-		p.dx = p.dx + 0.005 * M:sin(playerAge * 0.3) * dt
-	end
-	local flower = ""
-	if itemName == "wildflowers" then flower = "wild_flowers" else flower = itemName end
-
-	if swingMHandPrev ~= context.swingMHand and context.mainHand then
-		S:playSound("block.leaf_litter.place", 0.7)
-        particle(0.75 * l, -0.2,  -0.9, "textures/particle/firefly.png", 0.4, particle_ticker)
-        particle(0.75 * l, -0.2,  -0.9, "textures/particle/firefly.png", 0.4, particle_ticker)
-        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_1.png", 0.3, particle_ticker)
-        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_1.png", 0.3, particle_ticker)
-        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_2.png", 0.3, particle_ticker)
-        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_2.png", 0.3, particle_ticker)
-        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_4.png", 0.2, particle_ticker)
-        particle(0.65 * l, -0.25, -0.9, "textures/particle/" .. flower .. "_4.png", 0.2, particle_ticker)
-    end
-end
-if context.mainHand then swingMHandPrev = context.swingMHand else swingOHandPrev = context.swingOHand end
-
--- == SWING SPEED ==
-if isSpearTag then itemSwingSpeed:put(context.item, 15) end
-if isShovel then itemSwingSpeed:put(context.item, 14) end
-if itemName == "trident" or itemName == "mace" then itemSwingSpeed:put(context.item, 12) end
-
--- == TRIDENT AND SPEAR POSE ==
-if useAction == "trident" then
-    M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    M:moveZ(mat, -0.08 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    M:rotateY(mat,  40 * l)
-    M:rotateX(mat, -90 * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
-    M:rotateZ(mat, -45 * l * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
-end
-
-if useAction == "spear" then
-    M:moveZ(mat, -0.1)
-    M:rotateY(mat, 10 * l)
-end
-
--- == BOW STATE ==
-local easedBowSec  = Easings:easeOutBack(bowCountSec)
-local easedBowSecO = Easings:easeOutBack(bowCountSecO)
-local bc           = context.mainHand and easedBowSec or easedBowSecO
-
-usingItem:put("minecraft:bow",    bc >= 0.1)
-useDuration:put("minecraft:bow",  Easings:cubicEase(bc) * 20)
-
--- == INSPECT ANIMATION ==
-if KeyBindManager:isKeyPressed(${inspectKeybind} ~= 0 and ${inspectKeybind} or 67) then
-    inspectionSpin = inspectionSpin + 0.025 * dt
-else
-    inspectionSpin = 0
-end
-inspectionSpin = M:clamp(inspectionSpin, 0, 1)
-
-if isSword or isPickaxe or isAxe or useAction == "trident" and context.mainHand then
-    M:moveX(mat, -0.2 * l * inspectionCounter)
-    M:rotateX(mat, -360 * Easings:easeInOutBack(inspectionSpin), 0, 0, 0.15)
-end
-prevAge = P:getAge(context.player)
-
--- == SOME POSITIONS ==
-if itemName == "dragon_head" then
-	M:moveY(mat, 0.25)
-    M:rotateZ(mat, 6 * l)
-    M:rotateY(mat, 160 * l)
-elseif isSkull then
-	M:moveX(mat, -0.1 * l)
-    M:moveY(mat, 0.11)
-    M:rotateZ(mat, 15 * l)
-    M:rotateY(mat, -85 * l)
-    M:rotateX(mat, -55)
-end
-
-if isShovel then
-	M:moveX(mat, -0.09 * l)
-	M:rotateY(mat, 80 * l)
-end
-
-if itemName:match("bucket") and not (refinedBuckets and w3di) then
-	M:moveY(mat, 0.025)
-	M:moveX(mat, -0 * l)
-	M:moveZ(mat, -0.1)
-	M:rotateY(mat, 180)
-	M:rotateX(mat, -82.5)
-	M:rotateZ(mat, -20 * l)
-	if itemName == "milk_bucket" then
-		M:rotateX(mat, -0 * easedFoodCounter)
-		M:rotateZ(mat, 30 * l * easedFoodCounter)
-		M:rotateY(mat, 0 * l * easedFoodCounter)
-		M:moveX(mat, 0 * l * easedFoodCounter)
-		M:moveY(mat, 0.1 * easedFoodCounter)
-		M:moveZ(mat, 0.02 * easedFoodCounter)
-	end
-end
-
--- === PACKS CORRECTIONS ===
-
-if w3di and a3ds and (itemName:match("_banner_pattern") or itemName == "name_tag") then
-    M:rotateX(mat, -(M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5), 0, -0.13, 0)
-end
-
-if itemName == "shears" and gousPoses then
-    if not context.bl then
-        M:moveZ(mat, 0.1)
-        M:rotateY(mat, 180)
-    end
-    M:rotateZ(mat, 45)
-end
-
-if rvTorches and matched("candle", true) then
-    renderAsBlock:put(I:getName(context.item), false)
-    M:moveX(mat, -0.05 * l)
-    M:rotateX(mat, -8)
-    M:rotateY(mat, -10 * l)
-    M:rotateZ(mat, 6 * l)
 end
