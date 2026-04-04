@@ -220,7 +220,7 @@ if rvTorches then
     addPos({
         { {"repeater", "comparator"}, m = {-0.045, -0.02, -0.035}, r = {-6, -16, 2.5}, renderAsBlock = false },
         { {"torch", "soul_torch", "redstone_torch", "copper_torch"}, m = {0.01, -0.075, -0.035}, r = {-5, -5.5, nil} },
-        { {"lanterns"}, m = {0.015, -0.545, 0.155}, r = {-25, 21.5, nil} },
+        { {"lanterns"}, m = {0.015, -0.545, 0.1}, r = {-25, 21.5, nil} },
         { {"campfire", "soul_campfire"}, m = {-0.08, 0.185, 0.255}, r = {8, -9.5, -2.5} }
     })
 end
