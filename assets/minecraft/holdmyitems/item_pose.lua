@@ -462,6 +462,7 @@ local swing                 = M:sin(context.swingProgress * 3.14)
 local swing_hit             = M:sin(M:clamp(context.swingProgress, 0.16561, 0.49422) * 4.78 * 2 + 4.7)
 local swingOverall          = M:sin(context.swingProgress * 3.14)
 local useAction             = I:getUseAction(context.item)
+local isUsingItem           = P:isUsingItem(context.player)
 
 -- == FUNCTIONS ==
 function easeCustom(t)
@@ -857,12 +858,26 @@ local specialCases = {
         pack = function() return refinedBuckets and w3di end,
         items = {"milk_bucket"},
         move = {0.01, 0.17, -0.1}, scale = {0.8, 0.8, 0.8}
+    },
+    {
+        pack = function() return w3di and not refinedBuckets end,
+        items = {"milk_bucket"},
+        move = {-0.1, 0.05, -0.08}, rotate = {-10, -90, 5}, scale = {0.8, 0.8, 0.8}
+    },
+    {
+        pack = function() return not (w3di or refinedBuckets) end,
+        items = {"milk_bucket"},
+        move = {0.08, 0.15, -0.12}, rotate = {0, -60, 15}, scale = {0.75, 0.75, 0.75}
+    },
+    {
+        pack = function() return not (w3di or freshFoods) end,
+        move = {nil, -0.05, 0.1}
     }
 }
 
 local caseMatched = false
 for _, case in ipairs(specialCases) do
-    if case.pack() and matched(case.items) then
+    if case.pack() and ((case.items ~= nil and matched(case.items)) or case.items == nil) then
         eatDrinkAnimation(useAction, progress, case.move, case.rotate, case.scale)
         caseMatched = true
         break
@@ -877,29 +892,6 @@ global.foodCount    = 0.0;
 global.foodCountO   = 0.0;
 
 local easedFoodCounter = Easings:easeInQuart(context.mainHand and foodCount or foodCountO)
-
-if matched("bucket", true) then
-    if itemName == "milk_bucket" then
-        M:moveX(mat, -0.05 * l)
-        M:rotateX(mat, -8)
-        M:rotateY(mat, -10 * l)
-        M:rotateZ(mat, 6 * l)
-    end
-    M:moveY(mat, 0.025)
-    M:moveX(mat, -0 * l)
-    M:moveZ(mat, -0.1)
-    M:rotateY(mat, 180)
-    M:rotateX(mat, -82.5)
-    M:rotateZ(mat, -20 * l)
-    if itemName == "milk_bucket" then
-        M:rotateX(mat, -0 * easedFoodCounter)
-        M:rotateZ(mat, 30 * l * easedFoodCounter)
-        M:rotateY(mat, 0 * l * easedFoodCounter)
-        M:moveX(mat, 0 * l * easedFoodCounter)
-        M:moveY(mat, 0.1 * easedFoodCounter)
-        M:moveZ(mat, 0.02 * easedFoodCounter)
-    end
-end
 
 -- == BRUSH ANIMATION ==
 if useAction == "brush" then
@@ -1085,6 +1077,35 @@ end
 prevAge = P:getAge(context.player)
 
 -- == SOME POSITIONS ==
+if
+    isUsingItem and useAction == "eat"
+    and (itemName == "milk_bucket"
+        or matched(PackCompat.freshFoods[1], true)
+        or matched(PackCompat.w3di.foods, true))
+then
+    M:moveX(mat, -0.05 * l)
+    M:rotateX(mat, -8)
+    M:rotateY(mat, -10 * l)
+    M:rotateZ(mat, 6 * l)
+end
+
+if matched("bucket", true) then
+    M:moveY(mat, 0.025)
+    M:moveX(mat, -0 * l)
+    M:moveZ(mat, -0.1)
+    M:rotateY(mat, 180)
+    M:rotateX(mat, -82.5)
+    M:rotateZ(mat, -20 * l)
+    if itemName == "milk_bucket" then
+        M:rotateX(mat, -0 * easedFoodCounter)
+        M:rotateZ(mat, 30 * l * easedFoodCounter)
+        M:rotateY(mat, 0 * l * easedFoodCounter)
+        M:moveX(mat, 0 * l * easedFoodCounter)
+        M:moveY(mat, 0.1 * easedFoodCounter)
+        M:moveZ(mat, 0.02 * easedFoodCounter)
+    end
+end
+
 if itemName == "dragon_head" then
 	M:moveY(mat, 0.25)
     M:rotateZ(mat, 6 * l)
@@ -1102,8 +1123,16 @@ if isShovel then
 	M:rotateY(mat, 80 * l)
 end
 
--- === PACKS CORRECTIONS ===
+-- === PACK COMPATIBILITY ===
+if IsItemCompat then
+    Positions = Positions or {}
+    if Positions and next(Positions) then pose(Positions, true) end
 
+    ItemsUndoAdjusts = ItemsUndoAdjusts or {}
+    if ItemsUndoAdjusts and next(ItemsUndoAdjusts) then pose(ItemsUndoAdjusts, true) end
+end
+
+-- === PACKS CORRECTIONS ===
 if w3di and a3ds and (itemName:match("_banner_pattern") or itemName == "name_tag") then
     M:rotateX(mat, -(M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5), 0, -0.13, 0)
 end
@@ -1116,19 +1145,10 @@ if itemName == "shears" and gousPoses then
     M:rotateZ(mat, 45)
 end
 
-if rvTorches and matched("candle", true) then
+if rvTorches and matched("candle", true) then -- verificar
     renderAsBlock:put(I:getName(context.item), false)
     M:moveX(mat, -0.05 * l)
     M:rotateX(mat, -8)
     M:rotateY(mat, -10 * l)
     M:rotateZ(mat, 6 * l)
-end
-
--- === PACK COMPATIBILITY ===
-if IsItemCompat then
-    Positions = Positions or {}
-    if Positions and next(Positions) then pose(Positions, true) end
-
-    ItemsUndoAdjusts = ItemsUndoAdjusts or {}
-    if ItemsUndoAdjusts and next(ItemsUndoAdjusts) then pose(ItemsUndoAdjusts, true) end
 end

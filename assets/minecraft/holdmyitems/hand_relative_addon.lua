@@ -172,7 +172,14 @@ PackCompat = {
             "dragon_breath", "blaze_powder", "sugar$", "_banner_pattern",
             -- Spawn Eggs
             "spawn_egg"
-        }, matches = true
+        }, matches = true,
+        foods = {
+            "apple", "^chorus_fruit$", "melon_slice", "^carrot$", "potato", "^beetroot$",
+            "bread", "cookie", "pumpkin_pie", "beef", "porkchop", "^chicken$", "mutton", "^rabbit$",
+            "^cod$", "^salmon$", "^tropical_fish$", "^pufferfish$", "cooked_chicken",
+            "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
+            "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "potion", "cake",
+        }
     }
 }
 
@@ -278,7 +285,8 @@ end
 
 if freshFoods then
     addPos({
-        { {"_pressure_plate"}, m = {0.125, -0.02, 0.345}, r = {-119.5, -4.5, -7.5}, matches = true }, -- fresh foods changes the position of all items whose ID contains "plate", so this correction is necessary
+        -- fresh foods changes the position of all items whose ID contains "plate", so this correction is necessary
+        { {"_pressure_plate"}, m = {0.125, -0.02, 0.345}, r = {-119.5, -4.5, -7.5}, matches = true },
     })
     if not (isUsingItem and useAction == "eat") then
         addPos({
@@ -508,28 +516,6 @@ if w3di then
         { {"nautilus_shell"}, m = {-0.055, 0.04, 0.01}, r = {-4.5, -9.5, 6} },
         { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {0.01, -0.015, -0.05}, r = {-6, -5.5, 3} },
         { {"totem_of_undying"}, m = {-0.06, nil, -0.045}, r = {-7.5, nil, nil} },
-        -- Foods & Drinks
-        { {"apple", "^chorus_fruit$"}, m = {-0.05, -0.01, -0.035}, r = {-5.5, -5.5, 3}, matches = true },
-        { {"melon_slice"}, m = {-0.045, -0.03, -0.105}, r = {-5, -6, nil}, matches = true },
-        { {"beef", "porkchop","mutton", "rotten_flesh"}, m = {-0.05, -0.005, -0.025}, r = {-5, -6, 3.5}, matches = true },
-        { {"potato", "bread"}, m = {-0.05, -0.005, -0.035}, r = {-6, -5.5, 3.5}, matches = true },
-        { {"_stew", "_soup", "bowl"}, m = {0.01, -0.015, -0.105}, r = {-7, -6.5, -1}, matches = true },
-        { {"bottle", "potion", "dragon_breath"}, m = {-0.055, nil, -0.035}, r = {-4.5, -7, 4}, matches = true },
-        { {"carrot", "golden_carrot"}, m = {-0.045, -0.085, -0.08}, r = {-9.5, -9.5, 6} },
-        { {"spider_eye"}, m = {-0.07, -0.14, -0.115}, r = {-6, -6.5, 3} },
-        { {"sweet_berries"}, m = {0.025, 0.085, -0.12}, r = {-5.5, -4.5, 7.5} },
-        { {"glow_berries"}, m = {-0.06, -0.01, -0.07} },
-        { {"dried_kelp"}, m = {-0.095, 0.02, -0.005}, r = {nil, -4, nil} },
-        { {"beetroot"}, m = {-0.045, -0.01, -0.08}, r = {-5.5, -10, 6.5} },
-        { {"chicken", "cooked_chicken"}, m = {-0.06, -0.005, -0.025}, r = {-5.5, -5.5, 3.5} },
-        { {"rabbit", "cooked_rabbit"}, m = {-0.055, 0.01, 0.065}, r = {-5.5, -5.5, 4.5} },
-        { {"cod", "cooked_cod"}, m = {-0.115, -0.005, -0.065}, r = {-5, -7, 5} },
-        { {"salmon", "cooked_salmon"}, m = {-0.09, -0.005, -0.085}, r = {-5, -7, 5} },
-        { {"tropical_fish"}, m = {-0.065, -0.005, -0.075}, r = {-3, -5, 4} },
-        { {"pufferfish"}, m = {-0.075, nil, nil}, r = {-4.5, -5.5, 2.5} },
-        { {"cookie"}, m = {-0.06, -0.005, -0.02}, r = {-5, -5.5, 3.5} },
-        { {"cake"}, m = {-0.03, 0.125, -0.085}, r = {3.5, -22.5, 3}, s = {0.9} },
-        { {"pumpkin_pie"}, m = {-0.125, nil, 0.01}, r = {-7, -6, 3} },
         -- Ingredients
         { {"coal$"}, m = {-0.045, nil, nil}, r = {-4.5, -11, 4}, matches = true },
         { {"raw_"}, m = {-0.045, nil, -0.035}, r = {-6, -6.5, 4.5}, matches = true },
@@ -562,6 +548,32 @@ if w3di then
         -- Spawn Eggs
         { {"spawn_egg"}, m = {-0.02, -0.015, -0.03}, r = {-6.5, -10.5, 3}, matches = true }
     })
+    if not (isUsingItem and useAction == "eat") then
+        addPos({
+            -- Foods & Drinks
+            { {"apple", "^chorus_fruit$"}, m = {-0.05, -0.01, -0.035}, r = {-5.5, -5.5, 3}, matches = true },
+            { {"melon_slice"}, m = {-0.045, -0.03, -0.105}, r = {-5, -6, nil}, matches = true },
+            { {"beef", "porkchop","mutton", "rotten_flesh"}, m = {-0.05, -0.005, -0.025}, r = {-5, -6, 3.5}, matches = true },
+            { {"potato", "bread"}, m = {-0.05, -0.005, -0.035}, r = {-6, -5.5, 3.5}, matches = true },
+            { {"_stew", "_soup", "bowl"}, m = {0.01, -0.015, -0.105}, r = {-7, -6.5, -1}, matches = true },
+            { {"bottle", "potion", "dragon_breath"}, m = {-0.055, nil, -0.035}, r = {-4.5, -7, 4}, matches = true },
+            { {"carrot", "golden_carrot"}, m = {-0.045, -0.085, -0.08}, r = {-9.5, -9.5, 6} },
+            { {"spider_eye"}, m = {-0.07, -0.14, -0.115}, r = {-6, -6.5, 3} },
+            { {"sweet_berries"}, m = {0.025, 0.085, -0.12}, r = {-5.5, -4.5, 7.5} },
+            { {"glow_berries"}, m = {-0.06, -0.01, -0.07} },
+            { {"dried_kelp"}, m = {-0.095, 0.02, -0.005}, r = {nil, -4, nil} },
+            { {"beetroot"}, m = {-0.045, -0.01, -0.08}, r = {-5.5, -10, 6.5} },
+            { {"chicken", "cooked_chicken"}, m = {-0.06, -0.005, -0.025}, r = {-5.5, -5.5, 3.5} },
+            { {"rabbit", "cooked_rabbit"}, m = {-0.055, 0.01, 0.065}, r = {-5.5, -5.5, 4.5} },
+            { {"cod", "cooked_cod"}, m = {-0.115, -0.005, -0.065}, r = {-5, -7, 5} },
+            { {"salmon", "cooked_salmon"}, m = {-0.09, -0.005, -0.085}, r = {-5, -7, 5} },
+            { {"tropical_fish"}, m = {-0.065, -0.005, -0.075}, r = {-3, -5, 4} },
+            { {"pufferfish"}, m = {-0.075, nil, nil}, r = {-4.5, -5.5, 2.5} },
+            { {"cookie"}, m = {-0.06, -0.005, -0.02}, r = {-5, -5.5, 3.5} },
+            { {"cake"}, m = {-0.03, 0.125, -0.085}, r = {3.5, -22.5, 3}, s = {0.9} },
+            { {"pumpkin_pie"}, m = {-0.125, nil, 0.01}, r = {-7, -6, 3} },
+        })
+    end
 end
 
 -- === UNDO ADJUSTS ===
