@@ -739,11 +739,11 @@ if (useAction ~= "block" and useAction ~= "crossbow") or isSword then
 end
 
 -- == PHYSICS ==
-if matched({"bell", "end_crystal", "pink_petals", "leaf_litter", "wildflowers"}) or I:isLantern(context.item) or isHangingSign then
+if matched({"bell", "end_crystal", "pink_petals", "leaf_litter", "wildflowers", "lanterns", "hanging_signs"}) then
 	if matched({"pink_petals", "wildflowers", "leaf_litter"}) then
 		M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
 	end
-	if matched({"end_crystal", "bell"}) or I:isLantern(context.item) then
+	if matched({"end_crystal", "bell", "lanterns"}) then
 		if itemName == "end_crystal" then
 			M:scale(mat, 1 + 0.01 * M:sin(a * 15), 1 + 0.01 * M:sin(a * 15), 1 + 0.01 * M:sin(a * 8))
 			M:moveY(mat, 0.03 * M:sin(a * 2))
@@ -759,7 +759,7 @@ if matched({"bell", "end_crystal", "pink_petals", "leaf_litter", "wildflowers"})
 			M:scale(mat, 1.2, 1.2, 1.2)
 			M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, -0.1 * l, 0.4, 0.1)
 			M:rotateZ(mat, ywAngle * -1, -0.1 * l, 0.4, 0.1)
-		else
+        elseif not (torchesPack or w3di) then
 			M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, 0, 0.4, 0)
 			M:rotateZ(mat, ywAngle * -1, 0, 0.4, 0)
 		end
@@ -867,7 +867,7 @@ local specialCases = {
     {
         pack = function() return not (w3di or refinedBuckets) end,
         items = {"milk_bucket"},
-        move = {0.08, 0.15, -0.12}, rotate = {0, -60, 15}, scale = {0.75, 0.75, 0.75}
+        move = {0.08, 0.15, -0.1}, rotate = {5, -45, 10}, scale = {0.75, 0.75, 0.75}
     },
     {
         pack = function() return not (w3di or freshFoods) end,
@@ -877,10 +877,12 @@ local specialCases = {
 
 local caseMatched = false
 for _, case in ipairs(specialCases) do
-    if case.pack() and ((case.items ~= nil and matched(case.items)) or case.items == nil) then
-        eatDrinkAnimation(useAction, progress, case.move, case.rotate, case.scale)
-        caseMatched = true
-        break
+    if case.pack() then
+        if (case.items ~= nil and matched(case.items)) or case.items == nil then
+            eatDrinkAnimation(useAction, progress, case.move, case.rotate, case.scale)
+            caseMatched = true
+            break
+        end
     end
 end
 
@@ -1077,11 +1079,10 @@ end
 prevAge = P:getAge(context.player)
 
 -- == SOME POSITIONS ==
+local foodPack = matched(PackCompat.freshFoods[1], true) or matched(PackCompat.w3di.foods, true)
 if
-    isUsingItem and useAction == "eat"
-    and (itemName == "milk_bucket"
-        or matched(PackCompat.freshFoods[1], true)
-        or matched(PackCompat.w3di.foods, true))
+    itemName == "milk_bucket"
+    or (isUsingItem and useAction == "eat" and foodPack)
 then
     M:moveX(mat, -0.05 * l)
     M:rotateX(mat, -8)
@@ -1151,4 +1152,9 @@ if rvTorches and matched("candle", true) then -- verificar
     M:rotateX(mat, -8)
     M:rotateY(mat, -10 * l)
     M:rotateZ(mat, 6 * l)
+end
+
+if (torchesPack or w3di) and matched("lanterns") then
+    M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, 0, 0.4, 0)
+    M:rotateZ(mat, ywAngle * -1, 0, 0.4, 0)
 end
