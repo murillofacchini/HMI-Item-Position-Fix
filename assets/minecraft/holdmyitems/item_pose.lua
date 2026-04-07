@@ -773,9 +773,6 @@ elseif itemName == "painting" or itemName == "item_frame" or (itemName == "glow_
 	context.swingProgress = 0
 	M:rotateX(mat, M:clamp(playerPitch / 2.5, -25, 90) + ptAngle, 0, 0.45, 0)
 	M:rotateZ(mat, ywAngle * -1, 0, 0.55, 0)
-elseif glowing3Darmors and matched({"chest_armor"}) then
-    M:rotateX(mat, -(playerPitch * 0.09 + ptAngle * 0.6), -0.129, -0.004, 0.495)
-    M:rotateZ(mat, ywAngle * 0.5, -0.129, -0.004, 0.495)
 else
 	if
 		not I:isBlock(context.item)
@@ -795,11 +792,6 @@ else
 	elseif useAction ~= "crossbow" then
 		M:rotateX(mat, (playerPitch * -0.025) + ptAngle * 0.1, 0, -0.2, 0)
 	end
-end
-
-if itemName == "elytra" and glowing3Darmors and not w3di then
-    M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
-	M:rotateZ(mat, ywAngle * -0.7, -0.1 * l, 0, 0.1)
 end
 
 -- == EAT & DRINK ANIMATION ==
@@ -1174,4 +1166,16 @@ end
 if (torchesPack or w3di) and matched("lanterns") then
     M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle, 0, 0.4, 0)
     M:rotateZ(mat, ywAngle * -1, 0, 0.4, 0)
+end
+
+if glowing3Darmors then
+    if matched("chest_armor") then
+        M:rotateX(mat, -(M:clamp(playerPitch / 2.5, -15, 80) + ptAngle + ywAngle * 0.3), 0, 0.1, 0.1)
+        M:rotateZ(mat, ywAngle * 0.5, -0.129, -0.004, 0.495)
+    elseif matched("leg_armor") then
+        M:rotateZ(mat, M:clamp(playerPitch / 2.5, -15, 80) + ptAngle + ywAngle * 0.3, 0, 0.44, 0.3)
+    elseif itemName == "elytra" and not w3di then
+        M:rotateX(mat, M:clamp(playerPitch / 2.5, -20, 90) + ptAngle + ywAngle * 0.5, 0, -0.13, 0)
+	    M:rotateZ(mat, ywAngle * -0.7, -0.1 * l, 0, 0.1)
+    end
 end

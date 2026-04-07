@@ -194,7 +194,7 @@ end
 if glowing3Darmors then
     pose({
         { {"elytra"}, m = {nil, 0.415, nil}, condition = {not w3di} },
-        { {"chest_armor"}, m = {nil, 0.415, nil} }
+        { {"chest_armor", "leg_armor"}, m = {nil, 0.415, nil} }
     }, true)
     if matched("head_armor") then
         M:rotateX(context.matrices, 10 * switchAnimationVariable)
