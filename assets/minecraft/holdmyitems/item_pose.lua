@@ -5,7 +5,7 @@ local l           = context.mainHand and 1 or -1
 local itemName    = I:getName(context.item):gsub("minecraft:", "")
 local AlexModel   = ${AlexSkinModel}
 
--- === FUNCTIONS AND COMPATIBILITY ===
+-- === FUNCTIONS ===
 -- == Match Item ==
 local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
@@ -130,12 +130,12 @@ local itemLists = {
         "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
         "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "bottle", "potion",
         -- Ingredients
-        "coal$", "raw_", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$", "_shard", "netherite_scrap", "flint",
+        "coal$", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$", "_shard", "netherite_scrap", "flint",
         "wheat", "feather", "^leather$", "rabbit_hide", "resin_clump", "ink_sac", "_scute", "slime_ball", "clay_ball",
         "prismarine_crystals", "nautilus_shell", "heart_of_the_sea", "phantom_membrane", "_key", "ghast_tear",
-        "nether_star", "shulker_shell", "popped_chorus_fruit", "disc_fragment_5", "brick$", 
-        "paper", "firework_star", "glowstone_dust", "book$", "gunpowder", "fermented_spider_eye", "blaze_powder",
-        "^sugar$", "glistering_melon_slice", "magma_cream", "_nugget", "_ingot", "^stick$", "bone", "_dye",
+        "nether_star", "shulker_shell", "popped_chorus_fruit", "disc_fragment_5", "brick$", "^raw_iron$", "^raw_gold$",
+        "^raw_copper$", "paper", "firework_star", "glowstone_dust", "book$", "gunpowder", "fermented_spider_eye",
+        "^sugar$", "glistering_melon_slice", "magma_cream", "_nugget", "_ingot", "^stick$", "bone", "_dye", "blaze_powder",
         "dragon_breath", "rabbit_foot", "banner_pattern", "pottery_sherd", "smithing_template"
     },
     spawnEggsAdjust = {
@@ -146,7 +146,7 @@ local itemLists = {
     except = {
         "pink_petals", "wildflowers", "leaf_litter", "bucket", "fishing_rod", "shears", "rail", "fence", "wall",
         "bed_", "_banner$", "candle", "glow_lichen", "sniffer_egg", "sculk_vein", "^torch$", "_torch",
-        "hanging_sign", "golem_statue", "comparator", "conduit", "_head", "campfire", "anvil", "brewing_stand",
+        "hanging_sign", "golem_statue", "comparator", "conduit", "campfire", "anvil", "brewing_stand",
         "repeater", "button", "^hopper$", "pickaxe", "axe", "shovel", "hoe", "sword", "_on_a_stick",
         "boat", "raft", "trident", "mace", "cake", "blaze_rod", "breeze_rod", "heavy_core", "item_frame", "painting",
         "^lantern$", "soul_lantern", "copper_lantern", "_head", "_skull", "pressure_plate", "trapdoor", "carpet",
@@ -156,7 +156,7 @@ local itemLists = {
 
 -- === ITEM TYPE CHECKING ===
 local isException   = matched(itemLists.hangingPlants) or matched(itemLists.except, true) or IsItemCompat
-local is2D          = matched(itemLists.sprites2D, true) or itemName:match("spawn_egg")
+local is2D          = matched(itemLists.sprites2D, true) or matched("spawn_egg", true)
 local general2D     = not isException and is2D
 local general3D     = not (isException or is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest", "waxed.*chain"}, true)
 
@@ -329,9 +329,9 @@ pose({
     { {"ominous_bottle"}, m = {0.015, nil, nil} },
 
     -- Ingredients
-    { {"raw"}, m = {nil, -0.035, -0.01}, matches = true },
     { {"_ingot", "brick$"}, m = {-0.065, -0.075, nil}, matches = true },
     { {"_key"}, m = {-0.025, 0.005, 0.01}, s = {0.8}, matches = true },
+    { {"raw_iron", "raw_gold", "raw_copper"}, m = {nil, -0.035, -0.01} },
     { {"emerald", "lapis_lazuli"}, m = {nil, -0.035, nil} },
     { {"amethyst_shard"}, m = {nil, -0.05, nil} },
     { {"nuggets"}, m = {0.02, -0.07, -0.01} },
@@ -857,18 +857,24 @@ local specialCases = {
         items = {"milk_bucket"},
         move = {-0.07, 0.05, -0.11}, rotate = {-5, -85, 5}, scale = {0.6, 0.6, 0.6}
     },
+    -- Without packs
     {
         pack = function() return not (w3di or refinedBuckets) end,
         items = {"milk_bucket"},
         move = {-0.03, 0.15, -0.09}, rotate = {5, -40, 10}, scale = {0.55, 0.55, 0.55}
     },
     {
-        pack = function() return not (w3di or freshFoods) and useAction == "eat" end,
-        move = {nil, -0.05, 0.1}
-    },
-    {
         pack = function() return not (w3di or refinedBuckets) and useAction == "drink" end,
         move = {-0.04, -0.015, nil}
+    },
+    {
+        pack = function() return not (w3di or freshFoods) end,
+        items = {"sweet_berries"},
+        move = {nil, nil, 0.05}, rotate = {nil, 10, nil}
+    },
+    {
+        pack = function() return not (w3di or freshFoods) and useAction == "eat" end,
+        move = {nil, -0.05, 0.1}
     }
 }
 

@@ -85,8 +85,8 @@ PackCompat = {
         }, matches = true
     },
     freshOresIngots = { {
-        "redstone$", "coal$", "raw", "^emerald$", "^lapis_lazuli$", "^diamond$", "quartz$",
-        "amethyst_shard", "_amethyst_bud", "amethyst_cluster", "nugget", "_ingot",
+        "redstone$", "coal$", "^raw_iron$", "^raw_gold$", "^raw_copper$", "^emerald$", "^lapis_lazuli$",
+        "amethyst_shard", "_amethyst_bud", "amethyst_cluster", "nugget", "_ingot", "^diamond$", "quartz$",
         "netherite_scrap", "^flint$", "resin_clump", "echo_shard", "brick$", "pointed_dripstone"
     }, matches = true },
     freshFlowersPlants = {
@@ -121,12 +121,12 @@ PackCompat = {
         -- Combat
         "totem_of_undying", "snowball", "^egg$", "brown_egg", "blue_egg",
         -- Ingredients
-        "coal$", "raw_", "^emerald$", "^lapis_lazuli$", "^diamond$", "^quartz$", "_shard", "_nugget", "_ingot",
+        "coal$", "^raw_iron$", "^raw_gold$", "^raw_copper$", "^emerald$", "^lapis_lazuli$", "^diamond$", "^quartz$",
         "netherite_scrap", "^stick$", "flint", "^bone$", "^leather$", "rabbit_hide", "^honeycomb$", "resin_clump",
         "ink_sac", "slime_ball", "clay_ball", "prismarine_crystals", "nautilus_shell", "heart_of_the_sea", "blaze_rod",
         "breeze_rod", "nether_star", "_dye", "brick$", "paper", "^book$", "firework_star", "glowstone_dust", "gunpowder",
         "blaze_powder", "^sugar$", "rabbit_foot", "magma_cream", "ghast_tear", "banner_pattern", "_smithing_template",
-        "_key", "enchanted_book"
+        "_key", "enchanted_book", "_shard", "_nugget", "_ingot",
         }, matches = true,
         naturalWithBlocks =
         {
@@ -164,12 +164,11 @@ PackCompat = {
             "cooked_rabbit", "cooked_cod", "cooked_salmon", "_stew", "_soup", "rotten_flesh", "^spider_eye$",
             "^dried_kelp$", "^honeycomb$", "_berries", "bowl", "potion", "cake",
             -- Ingredients
-            "coal$", "raw", "^emerald$", "^lapis_lazuli$", "diamond$", "quartz$", "amethyst_shard",
-            "nugget", "ingot", "netherite_scrap", "stick$", "flint$", "bone$", "feather",
-            "honeycomb", "scute", "slime_ball", "clay_ball", "prismarine_crystals",
-            "nautilus_shell", "heart_of_the_sea", "blaze_rod", "breeze_rod", "shulker_shell",
-            "disc_fragment_5", "bowl", "brick$", "bottle", "glowstone_dust", "gunpowder",
-            "dragon_breath", "blaze_powder", "sugar$", "_banner_pattern",
+            "coal$", "^raw_iron$", "^raw_gold$", "^raw_copper$", "^emerald$", "^lapis_lazuli$", "diamond$",
+            "nugget", "ingot", "netherite_scrap", "stick$", "flint$", "bone$", "feather", "quartz$", "amethyst_shard",
+            "honeycomb", "scute", "slime_ball", "clay_ball", "prismarine_crystals", "sugar$", "_banner_pattern",
+            "nautilus_shell", "heart_of_the_sea", "blaze_rod", "breeze_rod", "shulker_shell", "blaze_powder",
+            "disc_fragment_5", "bowl", "brick$", "bottle", "glowstone_dust", "gunpowder", "dragon_breath", "blaze_powder",
             -- Spawn Eggs
             "spawn_egg"
         }, matches = true,
