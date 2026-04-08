@@ -1,5 +1,6 @@
 {
   expansions: {
-    glowEnchantment: "HMIItemPositionFix.ExtraOptions.GlowEnchantment"
+    glowEnchantment:  "HMIItemPositionFix.ExtraOptions.GlowEnchantment",
+    glowTotem:        "HMIItemPositionFix.ExtraOptions.GlowTotem"
   }
 }

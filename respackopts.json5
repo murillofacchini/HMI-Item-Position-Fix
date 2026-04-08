@@ -31,7 +31,8 @@
       BeashSwingAnimations:             false
     },
     ExtraOptions: {
-      GlowEnchantment:                  true
+      GlowEnchantment:                  true,
+      GlowTotem:                        true
     },
     HMISettings: {
       InspectKeybind: {
