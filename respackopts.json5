@@ -30,6 +30,9 @@
       NNEActionSwords:                  false,
       BeashSwingAnimations:             false
     },
+    ExtraOptions: {
+      GlowEnchantment:                  true
+    },
     HMISettings: {
       InspectKeybind: {
         type: "integer",
