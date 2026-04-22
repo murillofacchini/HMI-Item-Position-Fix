@@ -1,7 +1,5 @@
 {
     "rpo.HMIItemPositionFix": "HMI Item Position Fix",
     "rpo.HMIItemPositionFix.ExtraOptions.SkinModel.true": "Alex",
-    "rpo.HMIItemPositionFix.ExtraOptions.SkinModel.false": "Steve",
-    "rpo.HMIItemPositionFix.ExtraOptions.TridentThrowingPose.true": "HMI 5.0",
-    "rpo.HMIItemPositionFix.ExtraOptions.TridentThrowingPose.false": "HMI 5.1"
+    "rpo.HMIItemPositionFix.ExtraOptions.SkinModel.false": "Steve"
 }

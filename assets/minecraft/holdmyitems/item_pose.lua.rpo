@@ -19,7 +19,6 @@
     beashAnimations:    "HMIItemPositionFix.ResourcePacksCompatibility.BeashSwingAnimations",
 
     skinModel:          "HMIItemPositionFix.ExtraOptions.SkinModel",
-    tridentPose:        "HMIItemPositionFix.ExtraOptions.TridentThrowingPose",
 
     inspectKeybind:     "HMIItemPositionFix.HMISettings.InspectKeybind"
   }

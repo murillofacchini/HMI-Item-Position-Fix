@@ -31,8 +31,7 @@
       BeashSwingAnimations: false
     },
     ExtraOptions: {
-      SkinModel: false,
-      TridentThrowingPose: false
+      SkinModel: false
     },
     HMISettings: {
       InspectKeybind: {

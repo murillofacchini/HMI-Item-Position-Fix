@@ -4,7 +4,7 @@
 local l           = context.mainHand and 1 or -1
 local itemName    = I:getName(context.item):gsub("minecraft:", "")
 local AlexModel   = ${skinModel}
-
+debugger:out(Teste)
 -- === FUNCTIONS ===
 -- == Match Item ==
 local function matched(items, matches)
@@ -313,6 +313,7 @@ pose({
     { {"potato"}, m = {nil, -0.04, 0.015}, matches = true },
     { {"bowl", "_stew", "_soup"}, m = {nil, -0.075, -0.015}, matches = true },
     { {"potion", "bottle", "dragon_breath"}, m = {-0.025, nil, nil}, matches = true },
+    { {"mutton"}, m = {l == 1 and 0 or -0.07, nil, nil}, matches = true },
     { {"sweet_berries"}, m = {0.19, 0.08, nil}, r = {nil, nil, 51} },
     { {"chorus_fruit"}, m = {-0.04, nil, nil} },
     { {"carrot"}, m = {nil, -0.085, nil} },
@@ -1003,24 +1004,13 @@ if isShovel                                     then itemSwingSpeed:put(I:getNam
 if itemName == "trident" or itemName == "mace"  then itemSwingSpeed:put(I:getName(context.item), 12) end
 
 -- == TRIDENT AND SPEAR POSE ==
-local tridentPose = ${tridentPose} and "5.0" or "5.1"
-debugger:out(tridentPose)
-
 if useAction == "trident" then
-    if tridentPose == "5.1" then
-        M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-        M:moveZ(mat, -0.08 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-        M:rotateY(mat,  40 * l)
-        M:rotateX(mat, -90 * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
-        M:rotateZ(mat, -45 * l * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
-    else
-        M:rotateY(mat, 40 * l)
-        M:rotateY(mat, -75 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-        M:rotateX(mat, 180 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-        M:moveZ(mat, -0.05 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-        M:moveX(mat, 0.05 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-        M:moveY(mat, 0.15 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    end
+    M:rotateY(mat, 40 * l)
+    M:rotateY(mat, -75 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+    M:rotateX(mat, 180 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+    M:moveZ(mat, -0.05 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+    M:moveX(mat, 0.05 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+    M:moveY(mat, 0.15 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
 end
 
 if useAction == "spear" then

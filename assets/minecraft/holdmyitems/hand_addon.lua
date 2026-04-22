@@ -1,12 +1,8 @@
 -- by omnis._.
 
-global.mainHandSwitch           = 0.0;
-global.offHandSwitch            = 0.0;
-
 local l                         = context.mainHand and 1 or -1
+local mat                       = context.matrices
 local itemName                  = I:getName(context.item):gsub("minecraft:", "")
-local switch_val                = (context.mainHand and mainHandSwitch) or offHandSwitch
-local switchAnimationVariable   = Easings:easeInBack(M:sin(M:clamp(switch_val, 0.09723, 0.60632) * 3.24 * 1.65 - 0.1))
 
 -- === FUNCTIONS AND COMPATIBILITY ===
 local function matched(items, matches)
@@ -34,14 +30,14 @@ end
 
 -- == Position Processing ==
 local move = {
-    x = function(v) M:moveX(context.matrices, v * l) end,
-    y = function(v) M:moveY(context.matrices, v) end,
-    z = function(v) M:moveZ(context.matrices, v) end
+    x = function(v) M:moveX(mat, v * l) end,
+    y = function(v) M:moveY(mat, v) end,
+    z = function(v) M:moveZ(mat, v) end
 }
 local rotate = {
-    x = function(v) M:rotateX(context.matrices, v) end,
-    y = function(v) M:rotateY(context.matrices, v * l) end,
-    z = function(v) M:rotateZ(context.matrices, v * l) end
+    x = function(v) M:rotateX(mat, v) end,
+    y = function(v) M:rotateY(mat, v * l) end,
+    z = function(v) M:rotateZ(mat, v * l) end
 }
 
 local function process(ops, dataORx, default_y, default_z)
@@ -72,9 +68,9 @@ local function pose(tables, force)
                             if op == "r" and t.r then process(rotate, t.r) end
                             if op == "s" and t.s then
                                 if t.s[2] == nil and t.s[3] == nil then
-                                    M:scale(context.matrices, t.s[1], t.s[1], t.s[1])
+                                    M:scale(mat, t.s[1], t.s[1], t.s[1])
                                 else
-                                    M:scale(context.matrices, t.s[1], t.s[2], t.s[3])
+                                    M:scale(mat, t.s[1], t.s[2], t.s[3])
                                 end
                             end
                         end
@@ -201,10 +197,6 @@ if glowing3Darmors then
         { {"elytra"}, m = {nil, 0.415, nil}, condition = {not w3di} },
         { {"chest_armor", "leg_armor"}, m = {nil, 0.415, nil} }
     }, true)
-    if matched("head_armor") then
-        M:rotateX(context.matrices, 10 * switchAnimationVariable)
-        M:rotateZ(context.matrices, 6 * switchAnimationVariable)
-    end
 end
 
 -- === INDIVIDUAL ADJUSTS ===
@@ -213,3 +205,16 @@ pose({
     { {"glow_item_frame"}, m = {0.14, nil, nil}, r = {25, nil, nil} },
     { {"bucket"}, r = {10, -5, nil, "zyx"}, m = {0.1, nil, nil, "zyx"}, ops = "rms", condition = {not (w3di or refinedBuckets)}, matches = true }
 })
+
+-- === ANIMATIONS ===
+global.mainHandSwitch           = 0.0;
+global.offHandSwitch            = 0.0;
+
+local switch_val                = (context.mainHand and mainHandSwitch) or offHandSwitch
+local switchAnimationVariable   = Easings:easeInBack(M:sin(M:clamp(switch_val, 0.09723, 0.60632) * 3.24 * 1.65 - 0.1))
+
+-- Switch Animation Head Armors Glowing3Darmors
+if glowing3Darmors and matched("head_armor") then
+    M:rotateX(mat, 10 * switchAnimationVariable)
+    M:rotateZ(mat, 6 * switchAnimationVariable)
+end
