@@ -3,7 +3,7 @@
 -- === CONTEXTS ===
 local l           = context.mainHand and 1 or -1
 local itemName    = I:getName(context.item):gsub("minecraft:", "")
-local AlexModel   = ${AlexSkinModel}
+local AlexModel   = ${skinModel}
 
 -- === FUNCTIONS ===
 -- == Match Item ==
@@ -241,7 +241,7 @@ pose({
     { {"end_rod"}, m = {0.195, -0.025, 0.03}, r = {nil, -24, nil}, s = {1.5} },
     { {"grindstone"}, m = {0.215, 0.365, -0.08}, r = {90, nil, 22.5}, s = {1.35} },
     { {"furnace", "blast_furnace", "smoker", "lectern", "barrel"}, m = {-0.305, nil, 0.27}, r = {-180, nil, 180} },
-    { {"anvil", "brewing_stand"}, m = {-0.105, -0.09, -0.13}, r = {-6, 84.5, -1} },
+    { {"anvil", "brewing_stand"}, m = {-0.11, -0.08, -0.13}, r = {10, 84.5, -16} },
     { {"end_crystal"}, m = {-0.125, -0.065, 0.23}, r = {nil, -29.5, nil} },
     { {"conduit"}, m = {0.22, -0.22, -0.1}, r = {-5.5, -6, -1}, s = {1.3} },
     { {"scaffolding"}, m = {0.13, -0.265, 0.025}, r = {nil, -23, nil} },
@@ -272,19 +272,20 @@ pose({
 
     -- Tools & Utilities
     { {"bucket"}, m = {0.01, -0.15, -0.15}, r = {nil, -7, nil}, s = {1.5}, matches = true },
-    { {"fishing_rod", "_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil}, matches = true },
+    { {"fishing_rod", "carrot_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil} },
+    { {"warped_fungus_on_a_stick"}, m = {0.02, 0.075, -0.07}, r = {nil, -5.5, nil} },
     { {"pickaxes", "axes", "hoes"}, m = {0.025, -0.115, -0.04}, r = {nil, -8.5, nil} },
     { {"shovels"}, m = {0.005, -0.185, 0.035}, r = {-4, 5.5, -7} },
-    { {"flint_and_steel"}, m = {-0.055, 0.035, nil} },
+    { {"flint_and_steel"}, m = {-0.105, nil, nil} },
     { {"fire_charge"}, m = {-0.025, -0.035, 0.03} },
     { {"shears"}, m = {0.03, -0.075, -0.065}, r = {-55, -4, 50} },
-    { {"brush"}, m = {nil, nil, 0.055}, s = {0.8} },
+    { {"brush"}, m = {nil, nil, 0.1}, s = {0.7} },
     { {"bundles"}, m = {-0.05, nil, 0.02} },
     { {"recovery_compass"}, m = {-0.01, nil, nil} },
     { {"compass"}, m = {-0.005, -0.04, -0.005} },
     { {"spyglass"}, m = {-0.12, nil, 0.015}, r = {nil, -24.5, nil} },
     { {"map", "paper"}, m = {nil, -0.035, nil} },
-    { {"bookshelf_books"}, m = {-0.065, nil, nil} },
+    { {"bookshelf_books"}, m = {-0.065, -0.035, nil} },
     { {"music_disc_11"}, m = {-0.01, -0.07, -0.005} },
     { {"wind_charge", "music_discs"}, m = {-0.01, -0.07, 0.02} },
     { {"elytra"}, m = {nil, -0.07, nil} },
@@ -296,17 +297,17 @@ pose({
     -- Combat
     { {"horse_armor"}, m = {0.02, -0.04, nil}, matches = true },
     { {"nautilus_armor"}, m = {-0.04, -0.075, -0.005}, matches = true },
-    { {"swords"}, m = {0.025, nil, -0.05}, r = {nil, -5, nil} },
-    { {"mace"}, m = {0.025, -0.06, -0.05}, r = {nil, -5, nil} },
+    { {"swords"}, m = {0.025, nil, -0.025}, r = {nil, -5, nil} },
+    { {"mace"}, m = {0.025, -0.06, -0.025}, r = {nil, -5, nil} },
     { {"trident"}, m = {-0.03, nil, nil} },
     { {"shield"}, m = {-0.035, 0.06, 0.005}, r = {-1.5, -22.5, nil}, s = {0.8, 1, 1} },
     { {"head_armor", "foot_armor"}, m = {nil, -0.11, -0.005} },
     { {"leg_armor"}, m = {nil, -0.035, -0.005} },
     { {"wolf_armor"}, m = {-0.005, -0.285, -0.015} },
-    { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {-0.015, -0.045, 0.015} },
+    { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {nil, -0.06, nil} },
     { {"arrows"}, m = {nil, nil, 0.02} },
     { {"bow"}, m = {-0.03, nil, 0.07}, r = {nil, -25.5, -10.5} },
-    { {"crossbow"}, m = {-0.12, 0.08, 0.065}, r = {nil, -11, nil} },
+    { {"crossbow"}, m = {-0.12, 0.085, 0.065}, r = {nil, -11, nil} },
 
     -- Foods & Drinks
     { {"potato"}, m = {nil, -0.04, 0.015}, matches = true },
@@ -361,7 +362,7 @@ pose({
 
 -- === PHYSICS AND ANIMATIONS ===
 -- Extracted from the HMI example_pack (item_pose.lua)
--- Credits: thesapling, KillaMC, OrkaMC, cyber
+-- Credits: thesapling, KillaMC, OrkaMC, cyber, Axolotl
 
 global.brushSpeedM          = 0;
 global.brushSpeedO          = 0;
@@ -1002,12 +1003,24 @@ if isShovel                                     then itemSwingSpeed:put(I:getNam
 if itemName == "trident" or itemName == "mace"  then itemSwingSpeed:put(I:getName(context.item), 12) end
 
 -- == TRIDENT AND SPEAR POSE ==
+local tridentPose = ${tridentPose} and "5.0" or "5.1"
+debugger:out(tridentPose)
+
 if useAction == "trident" then
-    M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    M:moveZ(mat, -0.08 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
-    M:rotateY(mat,  40 * l)
-    M:rotateX(mat, -90 * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
-    M:rotateZ(mat, -45 * l * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
+    if tridentPose == "5.1" then
+        M:rotateZ(mat, 170 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+        M:moveZ(mat, -0.08 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+        M:rotateY(mat,  40 * l)
+        M:rotateX(mat, -90 * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
+        M:rotateZ(mat, -45 * l * Easings:easeOutBack(M:sin(context.mainHand and riptideCounter or riptideCounterO * 3.14)))
+    else
+        M:rotateY(mat, 40 * l)
+        M:rotateY(mat, -75 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+        M:rotateX(mat, 180 * l * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+        M:moveZ(mat, -0.05 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+        M:moveX(mat, 0.05 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+        M:moveY(mat, 0.15 * Easings:easeOutBack(M:clamp(context.mainHand and tridentM or tridentMO * 1.5, 0, 1)))
+    end
 end
 
 if useAction == "spear" then

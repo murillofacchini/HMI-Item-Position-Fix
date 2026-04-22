@@ -1,38 +1,38 @@
 {
   id: "HMIItemPositionFix",
-  version: 9,
-  capabilities: ["FileFilter", "DirFilter"],
+  version: 14,
+  capabilities: [
+    "FileFilter",
+    "DirFilter"
+  ],
   conf: {
-    ItemsResourcePacksCompatibility: {
-      AlexSkinModel:                    false,
-      WeskersonNature:                  false,
-      Weskerson3DFoods:                 false,
-      Weskerson3DItems:                 false,
-      Actually3DStuff:                  false,
-      RVChestsAndBoxes:                 false,
-      RVTorches:                        false,
-      PatoRefinedTorches:               false,
-      PatoRefinedBuckets:               false,
-      Just3DArmors:                     false,
-      Glowing3DArmors:                  false,
-      Glowing3DTotem:                   false,
-      BensBundle:                       false,
-      FreshFlowersAndPlants:            false,
-      FreshFoods:                       false,
-      FreshOresAndIngots:               false,
-      FreshSeeds:                       false,
-      FreshMusicDiscs:                  false,
+    ResourcePacksCompatibility: {
+      WeskersonNature: false,
+      Weskerson3DFoods: false,
+      Weskerson3DItems: false,
+      Actually3DStuff: false,
+      RVChestsAndBoxes: false,
+      RVTorches: false,
+      PatoRefinedTorches: false,
+      PatoRefinedBuckets: false,
+      Just3DArmors: false,
+      Glowing3DArmors: false,
+      Glowing3DTotem: false,
+      BensBundle: false,
+      FreshFlowersAndPlants: false,
+      FreshFoods: false,
+      FreshOresAndIngots: false,
+      FreshSeeds: false,
+      FreshMusicDiscs: false,
       BrayAndCyberBetterFresher3DBooks: false,
-      Fyoncle3DTrims:                   false
-    },
-    OtherResourcePacksCompatibility: {
-      GoussHandPoses:                   false,
-      NNEActionSwords:                  false,
-      BeashSwingAnimations:             false
+      Fyoncle3DTrims: false,
+      GoussHandPoses: false,
+      NNEActionSwords: false,
+      BeashSwingAnimations: false
     },
     ExtraOptions: {
-      GlowEnchantment:                  true,
-      GlowTotem:                        true
+      SkinModel: false,
+      TridentThrowingPose: false
     },
     HMISettings: {
       InspectKeybind: {
