@@ -4,7 +4,7 @@
 local l           = context.mainHand and 1 or -1
 local itemName    = I:getName(context.item):gsub("minecraft:", "")
 local AlexModel   = ${skinModel}
-debugger:out(Teste)
+
 -- === FUNCTIONS ===
 -- == Match Item ==
 local function matched(items, matches)
@@ -275,7 +275,7 @@ pose({
     { {"fishing_rod", "carrot_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil} },
     { {"warped_fungus_on_a_stick"}, m = {0.02, 0.075, -0.07}, r = {nil, -5.5, nil} },
     { {"pickaxes", "axes", "hoes"}, m = {0.025, -0.115, -0.04}, r = {nil, -8.5, nil} },
-    { {"shovels"}, m = {0.005, -0.185, 0.035}, r = {-4, 5.5, -7} },
+    { {"shovels"}, m = {0.05, -0.173, 0.035}, r = {-4, 5.5, -4.5} },
     { {"flint_and_steel"}, m = {-0.105, nil, nil} },
     { {"fire_charge"}, m = {-0.025, -0.035, 0.03} },
     { {"shears"}, m = {0.03, -0.075, -0.065}, r = {-55, -4, 50} },

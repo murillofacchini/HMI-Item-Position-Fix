@@ -45,7 +45,7 @@ local function matched(items, matches)
 end
 
 local function posInHands(mainHand, offHand)
-    if l ==1 then return mainHand else return offHand end
+    if l == 1 then return mainHand else return offHand end
 end
 
 -- === ITEMS RESOURCE PACKS ===
@@ -60,6 +60,7 @@ PackCompat = {
     gousPoses           = { {"shears"} },
     better3Dbooks       = { {"book", "enchanted_book", "writable_book", "written_book"} },
     fyoncle3Dtrims      = { {"_smithing_template"}, matches = true },
+    classicToolsFusion  = { {"swords", "spears", "axes", "shovels", "pickaxes", "hoes"} },
     rvChests            = { {"chest$", "shulker_box", "^barrel$"}, matches = true },
     rvTorches           = {
         {
@@ -182,26 +183,27 @@ PackCompat = {
 }
 
 ActivePacks = {}
-    local a3ds              = ${a3ds}               and (table.insert(ActivePacks, "a3ds") or true)
-    local w3di              = ${w3di}               and (table.insert(ActivePacks, "w3di") or true)
-    local w3Dfoods          = ${w3Dfoods}           and (table.insert(ActivePacks, "w3Dfoods") or true)
-    local wNature           = ${wNature}            and (table.insert(ActivePacks, "wNature") or true)
-    local rvChests          = ${rvChests}           and (table.insert(ActivePacks, "rvChests") or true)
-    local rvTorches         = ${rvTorches}          and (table.insert(ActivePacks, "rvTorches") or true)
-    local refinedTorches    = ${refinedTorches}     and (table.insert(ActivePacks, "refinedTorches") or true)
-    local refinedBuckets    = ${refinedBuckets}     and (table.insert(ActivePacks, "refinedBuckets") or true)
-    local glowing3Dtotem    = ${glowing3Dtotem}     and (table.insert(ActivePacks, "glowing3Dtotem") or true)
-    local glowing3Darmors   = ${glowing3Darmors}    and (table.insert(ActivePacks, "glowing3Darmors") or true)
-    local just3Darmors      = ${just3Darmors}       and (table.insert(ActivePacks, "just3Darmors") or true)
-    local bensBundle        = ${bensBundle}         and (table.insert(ActivePacks, "bensBundle") or true)
-    local freshDiscs        = ${freshDiscs}         and (table.insert(ActivePacks, "freshDiscs") or true)
-    local freshFoods        = ${freshFoods}         and (table.insert(ActivePacks, "freshFoods") or true)
-    local freshSeeds        = ${freshSeeds}         and (table.insert(ActivePacks, "freshSeeds") or true)
-    local freshOres         = ${freshOresIngots}    and (table.insert(ActivePacks, "freshOresIngots") or true)
-    local freshFlowers      = ${freshFlowersPlants} and (table.insert(ActivePacks, "freshFlowersPlants") or true)
-    local better3Dbooks     = ${better3Dbooks}      and (table.insert(ActivePacks, "better3Dbooks") or true)
-    local fyoncle3Dtrims    = ${fyoncle3Dtrims}     and (table.insert(ActivePacks, "fyoncle3Dtrims") or true)
-    local gousPoses         = ${gousPoses}          and (table.insert(ActivePacks, "gousPoses") or true)
+    local a3ds               = ${a3ds}                and (table.insert(ActivePacks, "a3ds") or true)
+    local w3di               = ${w3di}                and (table.insert(ActivePacks, "w3di") or true)
+    local w3Dfoods           = ${w3Dfoods}            and (table.insert(ActivePacks, "w3Dfoods") or true)
+    local wNature            = ${wNature}             and (table.insert(ActivePacks, "wNature") or true)
+    local rvChests           = ${rvChests}            and (table.insert(ActivePacks, "rvChests") or true)
+    local rvTorches          = ${rvTorches}           and (table.insert(ActivePacks, "rvTorches") or true)
+    local refinedTorches     = ${refinedTorches}      and (table.insert(ActivePacks, "refinedTorches") or true)
+    local refinedBuckets     = ${refinedBuckets}      and (table.insert(ActivePacks, "refinedBuckets") or true)
+    local glowing3Dtotem     = ${glowing3Dtotem}      and (table.insert(ActivePacks, "glowing3Dtotem") or true)
+    local glowing3Darmors    = ${glowing3Darmors}     and (table.insert(ActivePacks, "glowing3Darmors") or true)
+    local just3Darmors       = ${just3Darmors}        and (table.insert(ActivePacks, "just3Darmors") or true)
+    local bensBundle         = ${bensBundle}          and (table.insert(ActivePacks, "bensBundle") or true)
+    local freshDiscs         = ${freshDiscs}          and (table.insert(ActivePacks, "freshDiscs") or true)
+    local freshFoods         = ${freshFoods}          and (table.insert(ActivePacks, "freshFoods") or true)
+    local freshSeeds         = ${freshSeeds}          and (table.insert(ActivePacks, "freshSeeds") or true)
+    local freshOres          = ${freshOresIngots}     and (table.insert(ActivePacks, "freshOresIngots") or true)
+    local freshFlowers       = ${freshFlowersPlants}  and (table.insert(ActivePacks, "freshFlowersPlants") or true)
+    local better3Dbooks      = ${better3Dbooks}       and (table.insert(ActivePacks, "better3Dbooks") or true)
+    local fyoncle3Dtrims     = ${fyoncle3Dtrims}      and (table.insert(ActivePacks, "fyoncle3Dtrims") or true)
+    local gousPoses          = ${gousPoses}           and (table.insert(ActivePacks, "gousPoses") or true)
+    local classicToolsFusion = ${classicToolsFusion}  and (table.insert(ActivePacks, "classicToolsFusion") or true)
 
 -- === COMPATIBILITY CHECKING ===
 local itemCompatCache = { [0] = {}, [1] = {} }
@@ -221,10 +223,34 @@ local function getItemCompat()
     itemCompatCache[0][itemName] = true
     return false
 end
-
 IsItemCompat = getItemCompat()
 
 -- === INDIVIDUAL RESOURCE PACK ADJUST ===
+if classicToolsFusion then
+    addPos{
+        { {"wooden_sword"}, m = {0.025, -0.03, 0.01}, r = {nil, -6.5, nil} },
+        { {"iron_sword", "golden_sword", "diamond_sword"}, m = {0.025, -0.04, -0.02}, r = {nil, -6.5, nil} },
+        { {"stone_sword"}, m = {0.025, -0.015, -0.02}, r = {nil, -6.5, nil} },
+        { {"copper_sword"}, m = {0.025, -0.085, -0.02}, r = {nil, -6.5, nil} },
+        { {"netherite_sword"}, m = {0.025, -0.01, -0.02}, r = {nil, -6.5, nil} },
+        { {"wooden_spear", "stone_spear"}, m = {nil, nil, 0.04} },
+        { {"copper_spear"}, m = {-0.015, -0.13, isUsingItem and 0 or 0.02} },
+        { {"golden_spear", "diamond_spear"}, m = {nil, -0.165, nil} },
+        { {"wooden_axe", "stone_axe"}, m = {0.02, -0.175, -0.055}, r = {nil, -5.5, nil} },
+        { {"copper_axe"}, m = {0.02, -0.175, nil}, r = {nil, -5.5, nil} },
+        { {"iron_axe"}, m = {0.015, -0.2, -0.025}, r = {nil, -5.5, nil} },
+        { {"diamond_axe", "golden_axe"}, m = {0.025, -0.165, -0.055}, r = {nil, -5.5, nil} },
+        { {"netherite_axe"}, m = {0.015, -0.14, -0.025}, r = {nil, -5.5, nil} },
+        { {"wooden_shovel", "stone_shovel"}, m = {-0.015, -0.06, 0.055}, r = {10.5, 5.5, -4.5}, s = {0.8} },
+        { {"shovels"}, m = {-0.015, -0.21, 0.035}, r = {10.5, 5.5, -4.5} },
+        { {"wooden_pickaxe", "stone_pickaxe"}, m = {0.03, -0.1, nil}, r = {nil, -7, nil} },
+        { {"pickaxes"}, m = {0.02, -0.22, nil}, r = {nil, -7, nil} },
+        { {"wooden_hoe", "stone_hoe"}, m = {0.015, -0.135, -0.035}, r = {nil, -5.5, nil} },
+        { {"copper_hoe"}, m = {0.015, -0.145, nil}, r = {nil, -5.5, nil} },
+        { {"iron_hoe", "golden_hoe", "diamond_hoe", "netherite_hoe"}, m = {0.015, -0.265, -0.05}, r = {nil, -5.5, nil} }
+    }
+end
+
 if rvTorches then
     addPos({
         { {"repeater", "comparator"}, m = {-0.045, -0.02, -0.035}, r = {-6, -16, 2.5}, renderAsBlock = false },

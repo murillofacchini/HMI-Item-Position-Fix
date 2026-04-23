@@ -19,6 +19,7 @@
     wNature:            "HMIItemPositionFix.ResourcePacksCompatibility.WeskersonNature",
     better3Dbooks:      "HMIItemPositionFix.ResourcePacksCompatibility.BrayAndCyberBetterFresher3DBooks",
     fyoncle3Dtrims:     "HMIItemPositionFix.ResourcePacksCompatibility.Fyoncle3DTrims",
-    gousPoses:          "HMIItemPositionFix.ResourcePacksCompatibility.GoussHandPoses"
+    gousPoses:          "HMIItemPositionFix.ResourcePacksCompatibility.GoussHandPoses",
+    classicToolsFusion: "HMIItemPositionFix.ResourcePacksCompatibility.ClassicToolsFusion"
   }
 }

@@ -1,8 +1,8 @@
 -- by omnis._.
 
-local l                         = context.mainHand and 1 or -1
-local mat                       = context.matrices
-local itemName                  = I:getName(context.item):gsub("minecraft:", "")
+local l           = context.mainHand and 1 or -1
+local mat         = context.matrices
+local itemName    = I:getName(context.item):gsub("minecraft:", "")
 
 -- === FUNCTIONS AND COMPATIBILITY ===
 local function matched(items, matches)

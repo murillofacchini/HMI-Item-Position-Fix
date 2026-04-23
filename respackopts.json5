@@ -1,10 +1,7 @@
 {
   id: "HMIItemPositionFix",
   version: 14,
-  capabilities: [
-    "FileFilter",
-    "DirFilter"
-  ],
+  capabilities: ["FileFilter", "DirFilter"],
   conf: {
     ResourcePacksCompatibility: {
       WeskersonNature: false,
@@ -26,6 +23,7 @@
       FreshMusicDiscs: false,
       BrayAndCyberBetterFresher3DBooks: false,
       Fyoncle3DTrims: false,
+      ClassicToolsFusion: false,
       GoussHandPoses: false,
       NNEActionSwords: false,
       BeashSwingAnimations: false
