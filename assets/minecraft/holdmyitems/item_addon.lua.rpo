@@ -1,5 +1,5 @@
 {
   expansions: {
-    skinModel: "HMIItemPositionFix.General.SkinModel"
+    skinModel:          "HMIItemPositionFix.General.SkinModel"
   }
 }

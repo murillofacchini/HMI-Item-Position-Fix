@@ -1,12 +1,10 @@
 -- by omnis._.
 
--- === CONTEXTS ===
 local l           = context.mainHand and 1 or -1
 local itemName    = I:getName(context.item):gsub("minecraft:", "")
 local AlexModel   = ${skinModel}
 
--- === FUNCTIONS ===
--- == Match Item ==
+-- == MATCH ITEM ==
 local function matched(items, matches)
     local list = type(items) == "table" and items or {items}
 
@@ -30,7 +28,7 @@ local function matched(items, matches)
     return false
 end
 
--- == Render Item as Block ==
+-- == RENDER AS BLOCK ==
 local function renderBlock(render, items, force)
     if force then
         renderAsBlock:put(I:getName(context.item), render)
@@ -46,60 +44,22 @@ local function renderBlock(render, items, force)
     end
 end
 
--- == Position Processing ==
-local move = {
-    x = function(v) M:moveX(context.matrices, v * l) end,
-    y = function(v) M:moveY(context.matrices, v) end,
-    z = function(v) M:moveZ(context.matrices, v) end
-}
-local rotate = {
-    x = function(v) M:rotateX(context.matrices, v) end,
-    y = function(v) M:rotateY(context.matrices, v * l) end,
-    z = function(v) M:rotateZ(context.matrices, v * l) end
-}
-
-local function process(ops, dataORx, default_y, default_z)
-    if type(dataORx) ~= "table" then
-        if dataORx   then ops.x(dataORx)    end
-        if default_y then ops.y(default_y)  end
-        if default_z then ops.z(default_z)  end
-        return
-    end
-    local order = dataORx[4] or "xyz"
-    for i = 1, 3 do
-        local axis = order:sub(i, i):lower()
-        local val  = dataORx[i]
-        if val and ops[axis] then ops[axis](val) end
-    end
+-- == POSITION PROCESSING ==
+local function move(x, y, z)
+    M:moveX(context.matrices, (x or 0) * l)
+    M:moveY(context.matrices, y or 0)
+    M:moveZ(context.matrices, z or 0)
 end
-
-local function pose(tables, force)
-    for _, t in ipairs(tables) do
-        if (t.condition ~= nil and t.condition[1]) or t.condition == nil then
-            for _, i in ipairs(t[1]) do
-                if matched(i, t.matches) then
-                    if not IsItemCompat or force then
-                        if t.renderAsBlock ~= nil then
-                            renderBlock(t.renderAsBlock, t[1], force)
-                        end
-                        local opsOrder = t.ops or "mrs"
-                        for j = 1, #opsOrder do
-                            local op = opsOrder:sub(j, j):lower()
-                            if op == "m" and t.m then process(move, t.m) end
-                            if op == "r" and t.r then process(rotate, t.r) end
-                            if op == "s" and t.s then
-                                if t.s[2] == nil and t.s[3] == nil then
-                                    M:scale(context.matrices, t.s[1], t.s[1], t.s[1])
-                                else
-                                    M:scale(context.matrices, t.s[1], t.s[2], t.s[3])
-                                end
-                            end
-                        end
-                        if not t.prox then return end
-                    end
-                end
-            end
-        end
+local function rotate(x, y, z)
+    M:rotateX(context.matrices, x or 0)
+    M:rotateY(context.matrices, (y or 0) * l)
+    M:rotateZ(context.matrices, (z or 0) * l)
+end
+local function scale(x, y, z)
+    if x ~= nil and y == nil and z == nil then
+        M:scale(context.matrices, x, x, x)
+    else
+        M:scale(context.matrices, x or 0, y or 0, z or 0)
     end
 end
 
@@ -152,11 +112,77 @@ local itemLists = {
     }
 }
 
+-- == TAGS ==
+local tags = {
+    default = {
+        "doors", "bars", "fences", "walls", "fence_gates", "chains", "trapdoors", "glass_panes", "banners",
+        "beds", "candles", "small_flowers", "saplings", "parrot_food", "lightning_rods", "shulker_boxes",
+        "wooden_shelves", "hanging_signs", "signs", "copper_golem_statues", "lanterns", "buttons", "rails",
+        "chiseled_bookshelf", "pickaxes", "axes", "hoes", "shovels", "bundles", "bookshelf_books", "music_discs",
+        "boats", "chest_boats", "swords", "head_armor", "chest_armor", "leg_armor", "foot_armor", "arrows",
+        "ingots", "raw_materials", "nuggets", "smithing_template"
+    },
+    registry = {
+        pressure_plates   = {"_pressure_plate"},
+        carpets           = {"_carpet"},
+        amethyst_cristals = {"amethyst_bud", "amethyst_cluster"},
+        small_plants      = {"_grass", "_roots", "nether_sprouts"},
+        mushrooms         = {"_mushroom", "_fungus$"},
+        corals            = {"_coral$", "_coral_fan"},
+        bushes            = {"bush"},
+        tulips            = {"tulip"},
+        ground_cover      = {"pink_petals", "wildflowers", "leaf_litter"},
+        froglights        = {"froglight"},
+        campfires         = {"campfire"},
+        torches           = {"^torch$", "soul_torch", "copper_torch", "redstone_torch"},
+        furnaces          = {"^furnace$", "blast_furnace", "smoker"},
+        anvils            = {"anvil"},
+        ender_items       = {"ender_eye", "ender_pearl"},
+        minecarts         = {"minecart"},
+        pistons           = {"piston"},
+        ejectors          = {"dropper", "dispenser", "crafter"},
+        buckets           = {"bucket"},
+        horse_armors      = {"horse_armor"},
+        nautilus_armors   = {"nautilus_armor"},
+        eggs              = {"^egg$", "blue_egg", "brown_egg"},
+        potatoes          = {"potato"},
+        bowl_foods        = {"bowl", "_stew", "_soup"},
+        bottles_drink     = {"potion", "bottle", "dragon_breath"},
+        muttons           = {"mutton"},
+        rabbits           = {"^rabbit$", "cooked_rabbit"},
+        fishes            = {"cod$","cooked_cod", "salmon$", "cooked_salmon", "tropical_fish$"},
+        spider_eyes       = {"spider_eye"},
+        carrots           = {"carrot"},
+        bricks            = {"brick$", "nether_brick", "resin_brick"},
+        ink_sacs          = {"ink_sac"},
+        scutes            = {"_scute"},
+        balls             = {"slime_ball", "clay_ball", "magma_cream"},
+        powders           = {"^redstone$", "gunpowder", "glowstone_dust", "^sugar$"},
+        hanging_plants    = itemLists.hangingPlants,
+        spawn_eggs_adjust = itemLists.spawnEggsAdjust,
+        spawn_eggs        = {"spawn_egg"},
+    }
+}
+local function getTag()
+    for _, tag in ipairs(tags.default) do
+        if I:isIn(context.item, Tags:getVanillaTag(tag)) or I:isIn(context.item, Tags:getFabricTag(tag)) then
+            return tag
+        end
+    end
+    for tag, matches in pairs(tags.registry) do
+        for _, item in ipairs(matches) do
+            if itemName:match(item) then
+                return tag
+            end
+        end
+    end
+end
+
 -- === ITEM TYPE CHECKING ===
 local isException   = matched(itemLists.hangingPlants) or matched(itemLists.except, true) or IsItemCompat
 local is2D          = matched(itemLists.sprites2D, true) or matched("spawn_egg", true)
 local general2D     = not isException and is2D
-local general3D     = not (isException or is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest", "waxed.*chain"}, true)
+local general3D     = not (isException or is2D) or matched({"_bulb", "crafting_table", "waxed.*rod", "waxed.*chest", "waxed.*chain", "waxed.*door"}, true)
 
 -- === NOT RENDER AS BLOCK ===
 renderBlock(
@@ -166,197 +192,224 @@ renderBlock(
 
 -- === GENERAL ADJUST ===
 if general3D then
-    process(move, 0.05, -0.075, -0.1)
-    process(rotate, -4, 18, -1)
+    move(0.05, -0.075, -0.1)
+    rotate(-4, 18, -1)
 elseif general2D then
-    process(move, 0.03, 0.04, -0.075)
-    process(rotate, -6.5, -5.5, -1)
+    move(0.03, 0.04, -0.075)
+    rotate(-6.5, -5.5, -1)
 end
 
 if not AlexModel then
-    process(move, 0.035, nil, nil)
+    move(0.035, nil, nil)
 end
 
--- === INDIVIDUAL ADJUST ===
-pose({
+local poses = {
     -- Building Blocks
-    { {"_trapdoor", "_pressure_plate"}, m = {0.18, -0.08, -0.065}, r = {-7.5, -6, nil}, matches = true },
-    { {"waxed.*door"}, m = {-0.4, -0.495, -0.12}, r = {8.5, 83, -14}, s = {1.15}, matches = true },
-    { {"doors"}, m = {0.01, -0.445, 0.345}, r = {2.5, -113, 3.5}, s = {1.15} },
-    { {"bars"}, m = {nil, nil, -0.01} },
-    { {"fences", "walls"}, m = {0.175, -0.085, -0.075}, r = {-3.5, -5.5, -1} },
-    { {"fence_gates"}, m = {0.17, -0.185, -0.09}, r = {-4.5, -5, -1.5} },
-    { {"chains"}, m = {0.06, nil, -0.01} },
-
+    doors                       = { m = {0.01, -0.445, 0.345},    r = {2.5, -113, 3.5}, s = {1.15} },
+    bars                        = { m = {nil, nil, -0.01} },
+    fences                      = { m = {0.175, -0.085, -0.075},  r = {-3.5, -5.5, -1} },
+    walls                       = { m = {0.175, -0.085, -0.075},  r = {-3.5, -5.5, -1} },
+    fence_gates                 = { m = {0.17, -0.185, -0.09},    r = {-4.5, -5, -1.5} },
+    chains                      = { m = {0.06, nil, -0.01} },
+    trapdoors                   = { m = {0.18, -0.08, -0.065},    r = {-7.5, -6, nil} },
+    pressure_plates             = { m = {0.18, -0.08, -0.065},    r = {-7.5, -6, nil} },
     -- Colored Blocks
-    { {"_carpet"}, m = {0.18, -0.08, -0.065}, r = {-7.5, -6, nil}, matches = true },
-    { {"glass_pane"}, m = {-0.01, 0.01, nil}, s = {0.75}, matches = true },
-    { {"banners"}, m = {0.045, 0.06, 0.02}, r = {-5, -95, nil}, s = {1.25} },
-    { {"beds"}, m = {-0.225, -0.015, -0.005}, r = {7.5, 95, nil} },
-    { {"candles"}, m = {0.37, -0.175, -0.215}, r = {-5.5, -6.5, -1}, s = {2.2} },
-
+    carpets                     = { m = {0.18, -0.08, -0.065},    r = {-7.5, -6, nil} },
+    glass_panes                 = { m = {-0.01, 0.01, nil},       s  = {0.75} },
+    banners                     = { m = {0.045, 0.06, 0.02},      r = {-5, -95, nil},   s = {1.25} },
+    beds                        = { m = {-0.225, -0.015, -0.005}, r = {7.5, 95, nil} },
+    candles                     = { m = {0.37, -0.175, -0.215},   r = {-5.5, -6.5, -1}, s = {2.2} },
     -- Natural Blocks
-    { itemLists.hangingPlants, m = {0.105, -0.59, -0.025} },
-    { {"amethyst_bud", "amethyst_cluster"}, m = {0.04, nil, -0.005}, matches = true, condition = {itemName ~= "small_amethyst_bud"} },
-    { {"_grass", "_roots", "nether_sprouts"}, m = {0.05, nil, nil}, matches = true, condition = {itemName ~= "grass_block"} },
-    { {"fern", "pointed_dripstone"}, m = {0.06, nil, -0.01}, matches = true },
-    { {"_mushroom", "_fungus$"}, m = {0.08, nil, -0.04}, s = {1.3}, matches = true },
-    { {"bush", "lilac", "peony", "pitcher_plant", "_coral$", "_coral_fan", "cobweb"}, m = {0.055, nil, -0.025}, matches = true },
-    { {"torchflower"}, m = {0.01, 0.035, 0.07}, r = {nil, -35, nil} },
-    { {"allium", "tulip"}, m = {0.1, nil, -0.045}, s = {1.4}, matches = true },
-    { {"wither_rose"}, m = {0.08, nil, -0.065}, s = {1.4} },
-    { {"small_flowers"}, m = {0.09, nil, -0.055}, s = {1.4} },
-    { {"saplings"}, m = {0.075, nil, -0.045}, s = {1.25} },
-    { {"small_amethyst_bud"}, m = {nil, -0.03, 0.015} },
-    { {"cactus_flower"}, m = {0.07, nil, -0.03}, s = {1.2} },
-    { {"bamboo"}, m = {0.49, -0.115, -0.26}, r = {-5, -5.5, -0.5}, s = {3, 1.2, 2.5} },
-    { {"sugar_cane"}, m = {-0.06, -0.07, nil} },
-    { {"weeping_vines"}, m = {0.105, -0.24, -0.12}, r = {-3, nil, nil}, s = {1.6} },
-    { {"twisting_vines"}, m = {0.085, nil, nil} },
-    { {"vine", "glow_lichen", "sculk_vein"}, m = {-0.11, -0.245, 0.08}, r = {-5, 84.5, -1.5}, s = {1, 1, 0.3} },
-    { {"sunflower"}, m = {l == 1 and -0.08 or -0.02, nil, l == 1 and 0.33 or -0.07}, r = {nil, l == 1 and -131.5 or 30, nil} },
-    { {"small_dripleaf"}, m = {0.06, nil, -0.015} },
-    { {"big_dripleaf"}, m = {0.065, nil, -0.09} },
-    { {"chorus_plant"}, m = {0.06, -0.145, -0.09}, s = {1.65} },
-    { {"frogspawn"}, m = {0.17, -0.08, -0.08}, r = {-6.5, -5.5, -1} },
-    { {"turtle_egg"}, m = {0.25, -0.165, -0.19}, r = {-5.5, -5.5, -0.5}, s = {1.7} },
-    { {"sniffer_egg"}, m = {0.175, -0.08, -0.05}, r = {-6.5, -5.5, -1} },
-    { {"dried_ghast"}, m = {-0.2, -0.06, 0.27}, r = {-4, 175, nil}, s = {1.25} },
-    { {"parrot_food"}, m = {-0.025, -0.07, -0.01} },
-    { {"beetroot_seeds"}, m = {nil, 0.035, nil} },
-    { {"torchflower_seeds"}, m = {nil, -0.03, nil} },
-    { {"pitcher_pod"}, m = {-0.04, nil, -0.01} },
-    { {"cocoa_beans"}, m = {0.18, -0.275, 0.145}, r = {0.5, -21.5, -1}, s = {1.7} },
-    { {"nether_wart"}, m = {0.105, 0.015, 0.085}, r = {nil, -23.5, nil} },
-    { {"seagrass", "kelp"}, m = {0.08, 0.015, 0.085}, r = {nil, -23.5, nil} },
-    { {"lily_pad"}, m = {-0.02, -0.01, -0.035}, r = {90, nil, nil}, s = {1, 1, 0.385} },
-    { {"sea_pickle"}, m = {0.155, nil, 0.05}, r = {nil, -23.5, nil}, s = {1.5} },
-    { {"pink_petals", "wildflowers", "leaf_litter"}, m = {nil, -0.19, -0.05}, r = {-72.5, 0.5, -1} },
-
+    hanging_plants              = { m = {0.105, -0.59, -0.025} },
+    amethyst_cristals           = { m = {0.04, nil, -0.005} },
+    small_amethyst_bud          = { m = {nil, -0.03, 0.015} },
+    small_plants                = { m = {0.05, nil, nil} },
+    fern                        = { m = {0.06, nil, -0.01} },
+    large_fern                  = { m = {0.06, nil, -0.01} },
+    pointed_dripstone           = { m = {0.06, nil, -0.01} },
+    mushrooms                   = { m = {0.08, nil, -0.04},       s  = {1.3} },
+    corals                      = { m = {0.055, nil, -0.025} },
+    cobweb                      = { m = {0.055, nil, -0.025} },
+    bushes                      = { m = {0.055, nil, -0.025} },
+    lilac                       = { m = {0.055, nil, -0.025} },
+    peony                       = { m = {0.055, nil, -0.025} },
+    pitcher_plant               = { m = {0.055, nil, -0.025} },
+    torchflower                 = { m = {0.01, 0.035, 0.07},      r = {nil, -35, nil} },
+    aliumove                    = { m = {0.1, nil, -0.045},       s  = {1.4} },
+    tulips                      = { m = {0.1, nil, -0.045},       s  = {1.4} },
+    wither_rose                 = { m = {0.08, nil, -0.065},      s  = {1.4} },
+    small_flowers               = { m = {0.09, nil, -0.055},      s  = {1.4} },
+    saplings                    = { m = {0.075, nil, -0.045},     s  = {1.25} },
+    cactus_flower               = { m = {0.07, nil, -0.03},       s  = {1.2} },
+    bamboo                      = { m = {0.49, -0.115, -0.26},    r = {-5, -5.5, -0.5},    s = {3, 1.2, 2.5} },
+    sugar_cane                  = { m = {-0.06, -0.07, nil} },
+    twisting_vines              = { m = {0.085, nil, nil} },
+    vine                        = { m = {-0.11, -0.245, 0.08},    r = {-5, 84.5, -1.5},    s = {1, 1, 0.3} },
+    glow_lichen                 = { m = {-0.11, -0.245, 0.08},    r = {-5, 84.5, -1.5},    s = {1, 1, 0.3} },
+    sculk_vein                  = { m = {-0.11, -0.245, 0.08},    r = {-5, 84.5, -1.5},    s = {1, 1, 0.3} },
+    sunflower                   = { m = {l == 1 and -0.08 or -0.02, nil, l == 1 and 0.33 or -0.07}, r = {nil, l == 1 and -131.5 or 30, nil} },
+    small_dripleaf              = { m = {0.06, nil, -0.015} },
+    big_dripleaf                = { m = {0.065, nil, -0.09} },
+    chorus_plant                = { m = {0.06, -0.145, -0.09},    s  = {1.65} },
+    frogspawn                   = { m = {0.17, -0.08, -0.08},     r = {-6.5, -5.5, -1} },
+    turtle_egg                  = { m = {0.25, -0.165, -0.19},    r = {-5.5, -5.5, -0.5},  s = {1.7} },
+    sniffer_egg                 = { m = {0.175, -0.08, -0.05},    r = {-6.5, -5.5, -1} },
+    dried_ghast                 = { m = {-0.2, -0.06, 0.27},      r = {-4, 175, nil},      s = {1.25} },
+    parrot_food                 = { m = {-0.025, -0.07, -0.01} },
+    beetroot_seeds              = { m = {nil, 0.035, nil} },
+    torchflower_seeds           = { m = {nil, -0.03, nil} },
+    pitcher_pod                 = { m = {-0.04, nil, -0.01} },
+    cocoa_beans                 = { m = {0.18, -0.275, 0.145},    r = {0.5, -21.5, -1},    s = {1.7} },
+    nether_wart                 = { m = {0.105, 0.015, 0.085},    r = {nil, -23.5, nil} },
+    seagrass                    = { m = {0.08, 0.015, 0.085},     r = {nil, -23.5, nil} },
+    kelp                        = { m = {0.08, 0.015, 0.085},     r = {nil, -23.5, nil} },
+    lily_pad                    = { m = {-0.02, -0.01, -0.035},   r = {90, nil, nil},      s = {1, 1, 0.385} },
+    sea_pickle                  = { m = {0.155, nil, 0.05},       r = {nil, -23.5, nil},   s = {1.5} },
+    ground_cover                = { m = {nil, -0.19, -0.05},      r = {-72.5, 0.5, -1} },
     -- Functional Blocks
-    { {"froglight", "shulker_box"}, m = {-0.04, nil, 0.025}, matches = true },
-    { {"campfire"}, m = {0.21, -0.085, -0.095}, r = {-4, -5.5, -1}, s = {1.25}, matches = true },
-    { {"lightning_rod"}, m = {0.18, -0.1, 0.02}, r = {-1, -23, nil}, s = {1.3}, matches = true },
-    { {"torch", "soul_torch", "copper_torch", "redstone_torch"}, m = {0.08, -0.15, -0.075}, r = {-4.5, -5, -1}, s = {1.38} },
-    { {"end_rod"}, m = {0.195, -0.025, 0.03}, r = {nil, -24, nil}, s = {1.5} },
-    { {"grindstone"}, m = {0.215, 0.365, -0.08}, r = {90, nil, 22.5}, s = {1.35} },
-    { {"furnace", "blast_furnace", "smoker", "lectern", "barrel"}, m = {-0.305, nil, 0.27}, r = {-180, nil, 180} },
-    { {"anvil", "brewing_stand"}, m = {-0.11, -0.08, -0.13}, r = {10, 84.5, -16} },
-    { {"end_crystal"}, m = {-0.125, -0.065, 0.23}, r = {nil, -29.5, nil} },
-    { {"conduit"}, m = {0.22, -0.22, -0.1}, r = {-5.5, -6, -1}, s = {1.3} },
-    { {"scaffolding"}, m = {0.13, -0.265, 0.025}, r = {nil, -23, nil} },
-    { {"flower_pot"}, m = {0.19, -0.035, 0.05}, r = {-1.5, -24, nil}, s = {1.4} },
-    { {"wooden_shelves"}, m = {-0.315, -0.005, 0.28}, r = {0.5, 157, nil} },
-    { {"hanging_signs"}, m = {0.06, -0.745, 0.19}, r = {-29, -5.5, -1} },
-    { {"signs"}, m = {-0.02, nil, 0.015} },
-    { {"ender_eye", "ender_pearl"}, m = {-0.045, nil, 0.03} },
-    { {"copper_golem_statues"}, m = {-0.005, 0.515, -0.385}, r = {175.5, -131.5, -3}, s = {1.4} },
-    { {"lanterns"}, m = {0.035, -0.585, 0.095}, r = {-21.5, nil, nil} },
-    { {"glow_item_frame"}, m = {nil, -0.53, 0.225}, r = {-37, nil, nil} },
-    { {"item_frame"}, m = {-0.01, -0.535, 0.175}, r = {-29, nil, nil} },
-    { {"painting"}, m = {-0.025, -0.62, 0.155}, r = {-25, nil, nil} },
-    { {"bell"}, m = {-0.105, -0.61, 0.19}, r = {-18.5, -27.5, -7.5}, s = {1.2} },
-    { {"armor_stand"}, m = {0.015, 0.03, nil} },
-    { {"cauldron"}, m = {0.165, -0.16, -0.07}, r = {-5.5, -4.5, nil} },
-
+    froglights                  = { m = {-0.04, nil, 0.025} },
+    shulker_boxes               = { m = {-0.04, nil, 0.025} },
+    campfires                   = { m = {0.21, -0.085, -0.095},   r = {-4, -5.5, -1},      s = {1.25} },
+    lightning_rods              = { m = {0.18, -0.1, 0.02},       r = {-1, -23, nil},      s = {1.3} },
+    torches                     = { m = {0.08, -0.15, -0.075},    r = {-4.5, -5, -1},      s = {1.38} },
+    end_rod                     = { m = {0.195, -0.025, 0.03},    r = {nil, -24, nil},     s = {1.5} },
+    grindstone                  = { m = {0.215, 0.365, -0.08},    r = {90, nil, 22.5},     s = {1.35} },
+    furnaces                    = { m = {-0.305, nil, 0.27},      r = {-180, nil, 180} },
+    lectern                     = { m = {-0.305, nil, 0.27},      r = {-180, nil, 180} },
+    barrel                      = { m = {-0.305, nil, 0.27},      r = {-180, nil, 180} },
+    anvils                      = { m = {-0.11, -0.08, -0.13},    r = {10, 84.5, -16} },
+    brewing_stand               = { m = {-0.11, -0.08, -0.13},    r = {10, 84.5, -16} },
+    end_crystal                 = { m = {-0.125, -0.065, 0.23},   r = {nil, -29.5, nil} },
+    conduit                     = { m = {0.22, -0.22, -0.1},      r = {-5.5, -6, -1},      s = {1.3} },
+    scaffolding                 = { m = {0.13, -0.265, 0.025},    r = {nil, -23, nil} },
+    flower_pot                  = { m = {0.19, -0.035, 0.05},     r = {-1.5, -24, nil},    s = {1.4} },
+    wooden_shelves              = { m = {-0.315, -0.005, 0.28},   r = {0.5, 157, nil} },
+    hanging_signs               = { m = {0.06, -0.745, 0.19},     r = {-29, -5.5, -1} },
+    signs                       = { m = {-0.02, nil, 0.015} },
+    ender_items                 = { m = {-0.045, nil, 0.03} },
+    copper_golem_statues        = { m = {-0.005, 0.515, -0.385},  r = {175.5, -131.5, -3}, s = {1.4} },
+    lanterns                    = { m = {0.035, -0.585, 0.095},   r = {-21.5, nil, nil} },
+    glow_item_frame             = { m = {nil, -0.53, 0.225},      r = {-37, nil, nil} },
+    item_frame                  = { m = {-0.01, -0.535, 0.175},   r = {-29, nil, nil} },
+    painting                    = { m = {-0.025, -0.62, 0.155},   r = {-25, nil, nil} },
+    bell                        = { m = {-0.105, -0.61, 0.19},    r = {-18.5, -27.5, -7.5}, s = {1.2} },
+    armor_stand                 = { m = {0.015, 0.03, nil} },
+    cauldron                    = { m = {0.165, -0.16, -0.07},    r = {-5.5, -4.5, nil} },
     -- Redstone Blocks
-    { {"minecart"}, m = {-0.055}, matches = true },
-    { {"piston"}, r = {90, nil, nil}, m = {-0.01, -0.085, -0.355}, matches = true, ops = "rms" },
-    { {"repeater", "comparator"}, m = {0.2, -0.075, -0.065}, r = {-5.5, -6, -0.5}, s = {1.25} },
-    { {"lever"}, m = {-0.47, -0.06, -0.1}, r = {nil, 100, nil}, s = {2} },
-    { {"buttons"}, m = {0.235, -0.105, -0.115}, r = {-7, -6, -0.5}, s = {1.4} },
-    { {"hopper"}, m = {0.18, -0.09, -0.085}, r = {-5.5, -5.5, nil} },
-    { {"string"}, m = {-0.05, -0.005, 0.015} },
-    { {"dropper", "dispenser", "crafter", "chiseled_bookshelf"}, m = {-0.305, nil, 0.27}, r = {-180, nil, 180} },
-    { {"rails"}, m = {0.165, -0.085, -0.09}, r = {-5.5, -5, -1.5} },
-
+    minecarts                   = { m = {-0.055} },
+    pistons                     = { m = {-0.33, 0.03, 0.29},      r = {nil, 180, nil} },
+    repeater                    = { m = {0.2, -0.075, -0.065},    r = {-5.5, -6, -0.5},     s = {1.25} },
+    comparator                  = { m = {0.2, -0.075, -0.065},    r = {-5.5, -6, -0.5},     s = {1.25} },
+    lever                       = { m = {-0.47, -0.06, -0.1},     r = {nil, 100, nil},      s = {2} },
+    buttons                     = { m = {0.235, -0.105, -0.115},  r = {-7, -6, -0.5},       s = {1.4} },
+    hopper                      = { m = {0.18, -0.09, -0.085},    r = {-5.5, -5.5, nil} },
+    string                      = { m = {-0.05, -0.005, 0.015} },
+    rails                       = { m = {0.165, -0.085, -0.09},   r = {-5.5, -5, -1.5} },
+    crafter                     = { m = {-0.305, nil, 0.27},      r = {-180, nil, 180} },
+    chiseled_bookshelf          = { m = {-0.305, nil, 0.27},      r = {-180, nil, 180} },
     -- Tools & Utilities
-    { {"bucket"}, m = {0.01, -0.15, -0.15}, r = {nil, -7, nil}, s = {1.5}, matches = true },
-    { {"fishing_rod", "carrot_on_a_stick"}, m = {0.02, 0.04, -0.035}, r = {nil, -5.5, nil} },
-    { {"warped_fungus_on_a_stick"}, m = {0.02, 0.075, -0.07}, r = {nil, -5.5, nil} },
-    { {"pickaxes", "axes", "hoes"}, m = {0.025, -0.115, -0.04}, r = {nil, -8.5, nil} },
-    { {"shovels"}, m = {0.05, -0.173, 0.035}, r = {-4, 5.5, -4.5} },
-    { {"flint_and_steel"}, m = {-0.105, nil, nil} },
-    { {"fire_charge"}, m = {-0.025, -0.035, 0.03} },
-    { {"shears"}, m = {0.03, -0.075, -0.065}, r = {-55, -4, 50} },
-    { {"brush"}, m = {nil, nil, 0.1}, s = {0.7} },
-    { {"bundles"}, m = {-0.05, nil, 0.02} },
-    { {"recovery_compass"}, m = {-0.01, nil, nil} },
-    { {"compass"}, m = {-0.005, -0.04, -0.005} },
-    { {"spyglass"}, m = {-0.12, nil, 0.015}, r = {nil, -24.5, nil} },
-    { {"map", "paper"}, m = {nil, -0.035, nil} },
-    { {"bookshelf_books"}, m = {-0.065, -0.035, nil} },
-    { {"music_disc_11"}, m = {-0.01, -0.07, -0.005} },
-    { {"wind_charge", "music_discs"}, m = {-0.01, -0.07, 0.02} },
-    { {"elytra"}, m = {nil, -0.07, nil} },
-    { {"firework_rocket"}, m = {-0.06, nil, 0.025} },
-    { {"saddle"}, m = {-0.06, -0.04, 0.01} },
-    { {"boats", "chest_boats"}, m = {-0.04, 0.115, 0.025} },
-    { {"goat_horn"}, m = {0.025, -0.04, nil} },
-
+    buckets                     = { m = {0.01, -0.15, -0.15},     r = {nil, -7, nil}, s = {1.5} },
+    fishing_rod                 = { m = {0.02, 0.04, -0.035},     r = {nil, -5.5, nil} },
+    carrot_on_a_stick           = { m = {0.02, 0.04, -0.035},     r = {nil, -5.5, nil} },
+    warped_fungus_on_a_stick    = { m = {0.02, 0.075, -0.07},     r = {nil, -5.5, nil} },
+    pickaxes                    = { m = {0.025, -0.115, -0.04},   r = {nil, -8.5, nil} },
+    axes                        = { m = {0.025, -0.115, -0.04},   r = {nil, -8.5, nil} },
+    hoes                        = { m = {0.025, -0.115, -0.04},   r = {nil, -8.5, nil} },
+    shovels                     = { m = {-0.04, -0.195, -0.01},   r = {13, 2.5, -9.5} },
+    flint_and_steel             = { m = {-0.105, nil, nil} },
+    fire_charge                 = { m = {-0.025, -0.035, 0.03} },
+    shears                      = { m = {0.03, -0.075, -0.065},   r = {-55, -4, 50} },
+    brush                       = { m = {nil, nil, 0.1},          s = {0.7} },
+    bundles                     = { m = {-0.05, nil, 0.02} },
+    recovery_compass            = { m = {-0.01, nil, nil} },
+    compass                     = { m = {-0.005, -0.04, -0.005} },
+    spyglass                    = { m = {-0.12, nil, 0.015},      r = {nil, -24.5, nil} },
+    map                         = { m = {nil, -0.035, nil} },
+    paper                       = { m = {nil, -0.035, nil} },
+    bookshelf_books             = { m = {-0.065, -0.035, nil} },
+    music_disc_11               = { m = {-0.01, -0.07, -0.005} },
+    music_discs                 = { m = {-0.01, -0.07, 0.02} },
+    wind_charge                 = { m = {-0.01, -0.07, 0.02} },
+    elytra                      = { m = {nil, -0.07, nil} },
+    firework_rocket             = { m = {-0.06, nil, 0.025} },
+    saddle                      = { m = {-0.06, -0.04, 0.01} },
+    boats                       = { m = {-0.04, 0.115, 0.025} },
+    chest_boats                 = { m = {-0.04, 0.115, 0.025} },
+    goat_horn                   = { m = {0.025, -0.04, nil} },
     -- Combat
-    { {"horse_armor"}, m = {0.02, -0.04, nil}, matches = true },
-    { {"nautilus_armor"}, m = {-0.04, -0.075, -0.005}, matches = true },
-    { {"swords"}, m = {0.025, nil, -0.025}, r = {nil, -5, nil} },
-    { {"mace"}, m = {0.025, -0.06, -0.025}, r = {nil, -5, nil} },
-    { {"trident"}, m = {-0.03, nil, nil} },
-    { {"shield"}, m = {-0.035, 0.06, 0.005}, r = {-1.5, -22.5, nil}, s = {0.8, 1, 1} },
-    { {"head_armor", "foot_armor"}, m = {nil, -0.11, -0.005} },
-    { {"leg_armor"}, m = {nil, -0.035, -0.005} },
-    { {"wolf_armor"}, m = {-0.005, -0.285, -0.015} },
-    { {"snowball", "egg", "brown_egg", "blue_egg"}, m = {nil, -0.06, nil} },
-    { {"arrows"}, m = {nil, nil, 0.02} },
-    { {"bow"}, m = {-0.03, nil, 0.07}, r = {nil, -25.5, -10.5} },
-    { {"crossbow"}, m = {-0.12, 0.085, 0.065}, r = {nil, -11, nil} },
-
+    horse_armors                = { m = {0.02, -0.04, nil} },
+    nautilus_armors             = { m = {-0.04, -0.075, -0.005} },
+    swords                      = { m = {0.025, nil, -0.025},     r = {nil, -5, nil} },
+    mace                        = { m = {0.025, -0.06, -0.025},   r = {nil, -5, nil} },
+    trident                     = { m = {-0.03, nil, nil} },
+    shield                      = { m = {-0.035, 0.06, 0.005},    r = {-1.5, -22.5, nil}, s = {0.8, 1, 1} },
+    head_armor                  = { m = {nil, -0.11, -0.005} },
+    foot_armor                  = { m = {nil, -0.11, -0.005} },
+    leg_armor                   = { m = {nil, -0.035, -0.005} },
+    wolf_armor                  = { m = {-0.005, -0.285, -0.015} },
+    snowball                    = { m = {nil, -0.06, nil} },
+    eggs                        = { m = {nil, -0.06, nil} },
+    arrows                      = { m = {nil, nil, 0.02} },
+    bow                         = { m = {-0.03, nil, 0.07},       r = {nil, -25.5, -10.5} },
+    crossbow                    = { m = {-0.12, 0.085, 0.065},    r = {nil, -11, nil} },
     -- Foods & Drinks
-    { {"potato"}, m = {nil, -0.04, 0.015}, matches = true },
-    { {"bowl", "_stew", "_soup"}, m = {nil, -0.075, -0.015}, matches = true },
-    { {"potion", "bottle", "dragon_breath"}, m = {-0.025, nil, nil}, matches = true },
-    { {"mutton"}, m = {l == 1 and 0 or -0.07, nil, nil}, matches = true },
-    { {"sweet_berries"}, m = {0.19, 0.08, nil}, r = {nil, nil, 51} },
-    { {"chorus_fruit"}, m = {-0.04, nil, nil} },
-    { {"carrot"}, m = {nil, -0.085, nil} },
-    { {"beetroot"}, m = {nil, -0.105, nil} },
-    { {"rabbit", "cooked_rabbit"}, m = {nil, -0.105, nil} },
-    { {"cod","cooked_cod", "salmon", "cooked_salmon", "tropical_fish"}, m = {nil, -0.065, nil} },
-    { {"pufferfish"}, m = {-0.025, -0.045, -0.01} },
-    { {"bread"}, m = {nil, 0.03, 0.01} },
-    { {"cookie"}, m = {nil, -0.035, nil} },
-    { {"spider_eye", "fermented_spider_eye"}, m = {-0.055, -0.04, nil} },
-    { {"cake"}, m = {0.2, -0.095, -0.085}, r = {-6.5, -5, -1}, s = {1.2} },
-    { {"lingering_potion", "splash_potion"}, m = {-0.025, nil, 0.03} },
-    { {"ominous_bottle"}, m = {0.015, nil, nil} },
-
+    potatoes                    = { m = {nil, -0.04, 0.015} },
+    bowl_foods                  = { m = {nil, -0.075, -0.015} },
+    bottles_drink               = { m = {-0.025, nil, nil} },
+    muttons                     = { m = {l == 1 and 0 or -0.07, nil, nil} },
+    sweet_berries               = { m = {0.19, 0.08, nil},        r = {nil, nil, 51} },
+    chorus_fruit                = { m = {-0.04, nil, nil} },
+    carrots                     = { m = {nil, -0.075, nil} },
+    beetroot                    = { m = {nil, -0.105, nil} },
+    rabbits                     = { m = {nil, -0.105, nil} },
+    fishes                      = { m = {nil, -0.065, nil} },
+    pufferfish                  = { m = {-0.025, -0.045, -0.01} },
+    bread                       = { m = {nil, 0.03, 0.01} },
+    cookie                      = { m = {nil, -0.035, nil} },
+    spider_eyes                 = { m = {-0.055, -0.04, nil} },
+    cake                        = { m = {0.2, -0.095, -0.085},    r = {-6.5, -5, -1}, s = {1.2} },
+    lingering_potion            = { m = {-0.025, nil, 0.03} },
+    splash_potion               = { m = {-0.025, nil, 0.03} },
+    ominous_bottle              = { m = {0.015, nil, nil} },
     -- Ingredients
-    { {"_ingot", "brick$"}, m = {-0.065, -0.075, nil}, matches = true },
-    { {"_key"}, m = {-0.025, 0.005, 0.01}, s = {0.8}, matches = true },
-    { {"raw_iron", "raw_gold", "raw_copper"}, m = {nil, -0.035, -0.01} },
-    { {"emerald", "lapis_lazuli"}, m = {nil, -0.035, nil} },
-    { {"amethyst_shard"}, m = {nil, -0.05, nil} },
-    { {"nuggets"}, m = {0.02, -0.07, -0.01} },
-    { {"iron_nugget"}, m = {-0.015, -0.035, nil} },
-    { {"gold_nugget"}, m = {-0.025, nil, nil} },
-    { {"blaze_rod", "breeze_rod"}, m = {0.02, -0.24, -0.005}, r = {9, -7, nil} },
-    { {"stick"}, m = {-0.01, -0.28, nil}, r = {15.5, nil, nil} },
-    { {"bone"}, m = {nil, -0.39, nil}, r = {15.5, nil, nil} },
-    { {"ink_sac", "glow_ink_sac"}, m = {nil, -0.075, -0.01} },
-    { {"honeycomb"}, m = {0.01, -0.04, nil} },
-    { {"resin_clump"}, m = {-0.01, -0.075, nil} },
-    { {"turtle_scute", "armadillo_scute", "disc_fragment_5"}, m = {nil, -0.105, -0.01} },
-    { {"slime_ball", "clay_ball", "magma_cream"}, m = {nil, -0.04, nil} },
-    { {"prismarine_shard"}, m = {-0.03, nil, nil} },
-    { {"prismarine_crystals"}, m = {-0.03, -0.075, nil} },
-    { {"nether_star"}, m = {-0.02, nil, nil} },
-    { {"heavy_core"}, m = {0.275, -0.12, -0.125}, r = {-5.5, -5, -1.5}, s = {1.75} },
-    { {"popped_chorus_fruit"}, m = {-0.005, -0.035, -0.015} },
-    { {"echo_shard"}, m = {nil, nil, -0.01} },
-    { {"firework_star"}, m = {nil, -0.04, -0.01} },
-    { {"redstone", "gunpowder", "glowstone_dust", "sugar", "rabbit_foot"}, m = {-0.02, -0.02, 0.015} },
-    { {"ghast_tear"}, m = {nil, -0.105, nil} },
-    { {"smithing_template"}, m = {-0.02, nil, 0.02} },
-
+    ingots                      = { m = {-0.065, -0.075, nil} },
+    bricks                      = { m = {-0.065, -0.075, nil} },
+    raw_materials               = { m = {nil, -0.035, -0.01} },
+    emerald                     = { m = {nil, -0.035, nil} },
+    lapis_lazuli                = { m = {nil, -0.035, nil} },
+    amethyst_shard              = { m = {nil, -0.05, nil} },
+    nuggets                     = { m = {0.02, -0.07, -0.01} },
+    blaze_rod                   = { m = {0.02, -0.24, -0.005},    r = {9, -7, nil} },
+    breeze_rod                  = { m = {0.02, -0.24, -0.005},    r = {9, -7, nil} },
+    stick                       = { m = {-0.01, -0.28, nil},      r = {15.5, nil, nil} },
+    bone                        = { m = {nil, -0.39, nil},        r = {15.5, nil, nil} },
+    ink_sacs                    = { m = {nil, -0.075, -0.01} },
+    honeycomb                   = { m = {0.01, -0.04, nil} },
+    resin_clump                 = { m = {-0.01, -0.075, nil} },
+    scutes                      = { m = {nil, -0.105, -0.01} },
+    disc_fragment_5             = { m = {nil, -0.105, -0.01} },
+    balls                       = { m = {nil, -0.04, nil} },
+    prismarine_shard            = { m = {-0.03, nil, nil} },
+    prismarine_crystals         = { m = {-0.03, -0.075, nil} },
+    nether_star                 = { m = {-0.02, nil, nil} },
+    heavy_core                  = { m = {0.275, -0.12, -0.125},   r = {-5.5, -5, -1.5}, s = {1.75} },
+    popped_chorus_fruit         = { m = {-0.005, -0.035, -0.015} },
+    echo_shard                  = { m = {nil, nil, -0.01} },
+    firework_star               = { m = {nil, -0.04, -0.01} },
+    powders                     = { m = {-0.02, -0.02, 0.015} },
+    rabbit_foot                 = { m = {-0.02, -0.02, 0.015} },
+    ghast_tear                  = { m = {nil, -0.105, nil} },
+    smithing_template           = { m = {-0.02, nil, 0.02} },
     -- Spawn Eggs
-    { itemLists.spawnEggsAdjust, m = {-0.005, 0.03, nil}, matches = true },
-    { {"_spawn_egg"}, m = {-0.01, -0.04, nil}, matches = true }
-})
+    spawn_eggs_adjust           = { m = {-0.005, 0.03, nil} },
+    spawn_eggs                  = { m = {-0.01, -0.04, nil} }
+}
+
+if not IsItemCompat then
+    local entry = poses[itemName] or poses[getTag()]
+    if entry then
+        if entry.m then move(entry.m[1], entry.m[2], entry.m[3])   end
+        if entry.r then rotate(entry.r[1], entry.r[2], entry.r[3]) end
+        if entry.s then scale(entry.s[1], entry.s[2], entry.s[3])  end
+    end
+end

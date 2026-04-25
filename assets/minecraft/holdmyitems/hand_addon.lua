@@ -208,7 +208,7 @@ pose({
 
 -- === ACTIONS & STUFF POSES OPTIONS ===
 if ${actionsStuffPoses} then
-    if matched({"mace", "shovels", "pickaxes", "axes", "hoes", "swords", "trident"}) then
+    if matched({"shovels", "pickaxes", "axes", "hoes", "swords", "trident"}) or (matched("mace") and not w3di) then
         M:moveX(mat, -0.1 * l)
         M:moveY(mat, -0.02 * l)
         M:rotateX(mat, -9)

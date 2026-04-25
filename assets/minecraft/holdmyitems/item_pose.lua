@@ -165,6 +165,21 @@ local function matched(items, matches)
     return false
 end
 
+local function renderBlock(render, items, force)
+    if force then
+        renderAsBlock:put(I:getName(context.item), render)
+        return
+    end
+    if IsItemCompat then return end
+
+    for _, i in ipairs(items) do
+        if matched(i) then
+            renderAsBlock:put(I:getName(context.item), render)
+            return
+        end
+    end
+end
+
 local move = {
     x = function(v) M:moveX(context.matrices, v * l) end,
     y = function(v) M:moveY(context.matrices, v) end,
@@ -197,6 +212,9 @@ local function pose(tables, force)
             for _, i in ipairs(t[1]) do
                 if matched(i, t.matches) then
                     if not IsItemCompat or force then
+                        if t.renderAsBlock ~= nil then
+                            renderBlock(t.renderAsBlock, t[1], force)
+                        end
                         local opsOrder = t.ops or "mrs"
                         for j = 1, #opsOrder do
                             local op = opsOrder:sub(j, j):lower()
@@ -308,11 +326,6 @@ else
 end
 
 swing_rot = swing_rot * swing_rot * swing_rot
-local swing = M:clamp(M:sin(context.swingProgress * 4.78), 0, 1)
-local swing_hit = M:sin(M:clamp(context.swingProgress, 0.16561, 0.49422) * 4.78 * 2 + 4.7)
-local swingOverall = M:sin(context.swingProgress * 3.14)
-local swingRise = M:clamp(M:sin(context.swingProgress * 6.28), 0, 1)
-local swingRiseS = M:sin(context.swingProgress * 6.28)
 
 if context.swingProgress < 0.65594 then
     swing_hit_second = M:sin(M:clamp(context.swingProgress, 0.16561, 0.32991) * 4.78 * 2 + 4.7)
