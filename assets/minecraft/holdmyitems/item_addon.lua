@@ -136,7 +136,7 @@ if refinedTorches then
     positioning({
         torches       = { m = {0.035, -0.05, -0.04}, r = {-5, -4.5, nil} },
         lanterns      = { m = {-0.04, -0.44, 0.3}, r = {-38, 9, nil} },
-        candles       = { m = {-0.025, 0.01, -0.01}, r = {nil, -9.5, nil}, renderAsBlock = false },
+        candles       = { m = {-0.025, 0.01, -0.01}, r = {nil, -7, nil}, renderAsBlock = false },
         repeater      = { m = {-0.02, -0.02, -0.06}, r = {-10, -49, -4}, renderAsBlock = false },
         comparator    = { m = {-0.02, -0.02, -0.06}, r = {-10, -49, -4}, renderAsBlock = false },
     })
@@ -362,10 +362,20 @@ if a3ds then
             sugar_cane          = { m = {0.015, nil, -0.105}, r = {nil, -5.5, nil}, s = {0.9} },
             glow_lichen         = { m = {nil, -0.21, nil} },
             lily_pad            = { m = {nil, -0.215, 0.02}, r = {-109, nil, nil}, s = {1, 0.4, 1} },
-            ground_cover        = { m = {-0.035, -0.22, -0.085}, r = {-73.5, nil, nil} }
+            ground_cover        = { m = {-0.035, -0.22, -0.085}, r = {-73.5, nil, nil} },
+            corals              = { m = {0.01, -0.035, -0.075}, r = {-3.5, -5.5, -1}, s = {0.85} },
+        })
+    end
+    if not freshSeeds then
+        positioning({
+            seeds               = { m = {0.015, -0.205, -0.065}, r = {-22, 30, 2.5} },
+            cocoa_beans         = { m = {0.05, -0.11, -0.095}, r = {-15, nil, -0.5} }
         })
     end
     positioning({
+        -- Collored Blocks
+        banners            = { m = {0.03, 0.05, -0.035}, r = {-5.5, -5.5, -2.5} },
+        candles            = { m = {0.015, nil, -0.075}, r = {-11, -4.5, 6.5}, renderAsBlock = false },
         -- Natural Blocks
         frogspawn           = { m = {-0.06, 0.04, -0.025}, r = {-4, -5.5, -2}, renderAsBlock = false },
         -- Functional Blocks
@@ -654,6 +664,8 @@ local packsDepositions = {
         torch = { s = {0.95}, m = {-0.035, -0.05, nil, "zyx"} }
     },
     a3ds = {
+        -- Collored Blocks
+        candles                   = { s = {1/1.1}, r = {-5, nil, 8}, ops = "srm" },
         -- Tools & Utilities
         shears                    = { m = {nil, -0.025, -0.065}, r = {-14.5, 2.5, -35.5} },
         writable_book             = { m = {nil, -0.1, nil}, r = {-25, nil, nil} },
@@ -809,6 +821,8 @@ if a3ds then
     local a3dsConditions = {
         { freshFlowers,                  PackCompat.freshFlowersPlants },
         { refinedTotem,                  PackCompat.refinedTotem },
+        { refinedTorches,                PackCompat.refinedTorches },
+        { rvTorches,                     PackCompat.rvTorches },
         -- without W3DI
         { glowing3Dtotem and not w3di,   PackCompat.glowing3Dtotem },
         { gousPoses and not w3di,        PackCompat.gousPoses },

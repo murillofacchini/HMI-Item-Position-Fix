@@ -290,7 +290,6 @@ local positions = {
     wolf_armor                  = { m = {-0.005, -0.285, -0.015} },
     snowball                    = { m = {nil, -0.06, nil} },
     eggs                        = { m = {nil, -0.06, nil} },
-    arrows                      = { m = {nil, -0.09, -0.02} },
     bow                         = { m = {-0.03, nil, 0.07},       r = {nil, -25.5, -10.5} },
     crossbow                    = { m = {-0.12, 0.085, 0.065},    r = {nil, -11, nil} },
     -- Foods & Drinks
@@ -1114,4 +1113,10 @@ end
 if isShovel then
 	M:moveX(mat, -0.09 * l)
 	M:rotateY(mat, 80 * l)
+end
+
+if tag == "arrows" then
+    move(0.06, -0.155, 0.21)
+    rotate(-1.5, -98, 45)
+    scale(1.25)
 end

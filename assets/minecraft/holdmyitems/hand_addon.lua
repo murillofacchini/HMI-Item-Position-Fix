@@ -219,6 +219,7 @@ local depositions = {
         vine                    = { m = {0.05, -0.25, nil, "zyx"} },
         glow_lichen             = { m = {0.05, -0.25, nil, "zyx"} },
         hanging_plants          = { m = {0.05, -0.25, nil, "zyx"} },
+        candles                 = { m = {nil, nil, -0.1}, r = {nil, nil, -10} },
     },
     w3di = {
         -- Functional Blocks
@@ -320,7 +321,9 @@ end
 
 if a3ds then
     local a3dsConditions = {
-        { freshFlowers, PackCompat.freshFlowersPlants }
+        { freshFlowers, PackCompat.freshFlowersPlants },
+        { refinedTorches, PackCompat.refinedTorches },
+        { rvTorches, PackCompat.rvTorches }
     }
     for _, entry in ipairs(a3dsConditions) do
         if entry[1] and isInList(entry[2]) then
@@ -335,6 +338,7 @@ if ${alternative} then
     local positionItem = true
     if isInList(PackCompat.w3di) and w3di then positionItem = false end
     if isInList(PackCompat.w3Dfoods) and w3Dfoods then positionItem = false end
+    if isInList({"candles"}) and a3ds and not (rvTorches or refinedTorches) then positionItem = false end
 
     if positionItem then
         if tag == "spears" then

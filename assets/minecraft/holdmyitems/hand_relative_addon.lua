@@ -45,7 +45,7 @@ ItemLists = {
         "repeater", "button", "^hopper$", "pickaxe", "axe", "shovel", "hoe", "sword", "_on_a_stick",
         "boat", "raft", "trident", "mace", "cake", "blaze_rod", "breeze_rod", "heavy_core", "item_frame", "painting",
         "^lantern$", "soul_lantern", "copper_lantern", "_head", "_skull", "pressure_plate", "trapdoor", "carpet",
-        "bamboo", "^vine$", "frogspawn", "turtle_egg", "dried_ghast", "_spear", "^cauldron$"
+        "bamboo", "^vine$", "frogspawn", "turtle_egg", "dried_ghast", "_spear", "^cauldron$", "arrows"
     }
 }
 
@@ -149,10 +149,13 @@ PackCompat = {
         "corals", "weeping_vines", "twisting_vines", "saplings"
     },
     a3ds = {
+        -- Collored Blocks
+        "banners", "candles",
         -- Natural Blocks
         "pale_hanging_moss", "saplings", "mushrooms", "small_plants", "fern", "small_flowers", "cactus_flower",
         "bushes", "ground_cover", "bamboo", "sugar_cane", "hanging_roots", "frogspawn", "twisting_vines", "vine", "peony",
         "sunflower", "lilac", "pitcher_plant", "glow_lichen", "lily_pad", "azalea", "flowering_azalea", "weeping_vines",
+        "corals", "seeds", "cocoa_beans",
         -- Functional Blocks
         "bell", "armor_stand", "item_frame", "glow_item_frame", "painting", "ender_items",
         -- Redstone Blocks
@@ -167,7 +170,7 @@ PackCompat = {
         "netherite_scrap", "stick", "flint", "bone", "leather", "nautilus_shell", "heart_of_the_sea", "blaze_rod",  "dyes",
         "ink_sacs", "balls", "prismarine_crystals", "bricks", "paper", "book", "firework_star", "powders", "nether_star",
         "breeze_rod", "blaze_powder", "sugar", "rabbit_foot", "ghast_tear", "banner_patterns", "smithing_templates", "ingots",
-        "keys", "enchanted_book", "echo_shard", "amethyst_shard", "nuggets"
+        "keys", "enchanted_book", "echo_shard", "amethyst_shard", "nuggets", "prismarine_shard"
     },
     wNature = {
         "oak_sapling", "azalea", "flowering_azalea", "mushrooms", "fern", "dead_bush", "oxeye_daisy", "cornflower",
