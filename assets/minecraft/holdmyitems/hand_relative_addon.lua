@@ -155,7 +155,7 @@ PackCompat = {
         "pale_hanging_moss", "saplings", "mushrooms", "small_plants", "fern", "small_flowers", "cactus_flower",
         "bushes", "ground_cover", "bamboo", "sugar_cane", "hanging_roots", "frogspawn", "twisting_vines", "vine", "peony",
         "sunflower", "lilac", "pitcher_plant", "glow_lichen", "lily_pad", "azalea", "flowering_azalea", "weeping_vines",
-        "corals", "seeds", "cocoa_beans",
+        "corals", "seeds", "cocoa_beans", "pointed_dripstone",
         -- Functional Blocks
         "bell", "armor_stand", "item_frame", "glow_item_frame", "painting", "ender_items",
         -- Redstone Blocks
@@ -232,3 +232,4 @@ ActivePacks = {}
     beashAnimations    = ${beashAnimations}     and (table.insert(ActivePacks, "beashAnimations") or true)
     nneSwords          = ${nneSwords}           and (table.insert(ActivePacks, "nneSwords") or true)
     vfx                = ${vfx}                 and (table.insert(ActivePacks, "visualEffects") or true)
+    freshPlayer        = ${freshPlayer}

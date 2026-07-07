@@ -1120,3 +1120,12 @@ if tag == "arrows" then
     rotate(-1.5, -98, 45)
     scale(1.25)
 end
+
+-- === FRESH PLAYER COMPAT ===
+if freshPlayer then
+    local mX = -0.025 * l
+    if itemName == "end_rod" then mX = -0.01 * l end
+
+    M:moveX(mat, mX)
+    M:rotateY(mat, -1 * l)
+end

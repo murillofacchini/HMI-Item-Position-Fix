@@ -19,7 +19,7 @@
         default: 74
       }
     },
-    ResourcePacksCompatibility: {
+    ItemsResourcePacksCompatibility: {
       WeskersonNature: false,
       Weskerson3DFoods: false,
       Weskerson3DItems: false,
@@ -41,10 +41,13 @@
       BrayAndCyberBetterFresher3DBooks: false,
       Fyoncle3DTrims: false,
       ClassicToolsFusion: false,
+      VisualEffects: false
+    },
+    AnimationsPacksCompatibility: {
       GoussHandPoses: false,
       NNEActionSwords: false,
       BeashSwingAnimations: false,
-      VisualEffects: false
+      FreshAnimationsPlayerExtension: false
     }
   }
 }
